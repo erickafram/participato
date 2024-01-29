@@ -1,0 +1,90 @@
+[15-Sep-2023 16:43:12 America/Fortaleza] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home2/partic70/public_html/sistema/header.php:1) in /home2/partic70/public_html/sistema/enquete/votar.php on line 85
+[15-Sep-2023 16:44:45 America/Fortaleza] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home2/partic70/public_html/sistema/header.php:1) in /home2/partic70/public_html/sistema/enquete/votar.php on line 85
+[15-Sep-2023 16:45:02 America/Fortaleza] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home2/partic70/public_html/sistema/header.php:1) in /home2/partic70/public_html/sistema/enquete/votar.php on line 85
+[15-Sep-2023 16:48:46 America/Fortaleza] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home2/partic70/public_html/sistema/header.php:1) in /home2/partic70/public_html/sistema/enquete/votar.php on line 85
+[15-Sep-2023 16:53:22 America/Fortaleza] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home2/partic70/public_html/sistema/header.php:1) in /home2/partic70/public_html/sistema/enquete/votar.php on line 85
+[15-Sep-2023 16:53:31 America/Fortaleza] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home2/partic70/public_html/sistema/header.php:1) in /home2/partic70/public_html/sistema/enquete/votar.php on line 85
+[15-Sep-2023 16:55:09 America/Fortaleza] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home2/partic70/public_html/sistema/header.php:1) in /home2/partic70/public_html/sistema/enquete/votar.php on line 85
+[15-Sep-2023 17:05:13 America/Fortaleza] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot delete or update a parent row: a foreign key constraint fails (`partic70_sistema`.`opcoes_enquete`, CONSTRAINT `opcoes_enquete_ibfk_1` FOREIGN KEY (`id_enquete`) REFERENCES `enquetes` (`id`)) in /home2/partic70/public_html/sistema/enquete/delete_poll.php:14
+Stack trace:
+#0 /home2/partic70/public_html/sistema/enquete/delete_poll.php(14): mysqli_stmt->execute()
+#1 {main}
+  thrown in /home2/partic70/public_html/sistema/enquete/delete_poll.php on line 14
+[21-Sep-2023 09:10:41 America/Fortaleza] PHP Warning:  Undefined array key "descricao" in /home2/partic70/public_html/sistema/enquete/votar.php on line 67
+[21-Sep-2023 09:10:41 America/Fortaleza] PHP Warning:  Undefined array key "descricao" in /home2/partic70/public_html/sistema/enquete/votar.php on line 67
+[21-Sep-2023 09:10:54 America/Fortaleza] PHP Warning:  Undefined array key "descricao" in /home2/partic70/public_html/sistema/enquete/edit_poll.php on line 74
+[21-Sep-2023 09:52:34 America/Fortaleza] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot delete or update a parent row: a foreign key constraint fails (`partic70_sistema`.`votos_enquete`, CONSTRAINT `votos_enquete_ibfk_1` FOREIGN KEY (`id_opcao`) REFERENCES `opcoes_enquete` (`id`)) in /home2/partic70/public_html/sistema/enquete/delete_poll.php:14
+Stack trace:
+#0 /home2/partic70/public_html/sistema/enquete/delete_poll.php(14): mysqli_stmt->execute()
+#1 {main}
+  thrown in /home2/partic70/public_html/sistema/enquete/delete_poll.php on line 14
+[21-Sep-2023 09:52:43 America/Fortaleza] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot delete or update a parent row: a foreign key constraint fails (`partic70_sistema`.`votos_enquete`, CONSTRAINT `votos_enquete_ibfk_1` FOREIGN KEY (`id_opcao`) REFERENCES `opcoes_enquete` (`id`)) in /home2/partic70/public_html/sistema/enquete/delete_poll.php:14
+Stack trace:
+#0 /home2/partic70/public_html/sistema/enquete/delete_poll.php(14): mysqli_stmt->execute()
+#1 {main}
+  thrown in /home2/partic70/public_html/sistema/enquete/delete_poll.php on line 14
+[21-Sep-2023 09:52:44 America/Fortaleza] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot delete or update a parent row: a foreign key constraint fails (`partic70_sistema`.`votos_enquete`, CONSTRAINT `votos_enquete_ibfk_1` FOREIGN KEY (`id_opcao`) REFERENCES `opcoes_enquete` (`id`)) in /home2/partic70/public_html/sistema/enquete/delete_poll.php:14
+Stack trace:
+#0 /home2/partic70/public_html/sistema/enquete/delete_poll.php(14): mysqli_stmt->execute()
+#1 {main}
+  thrown in /home2/partic70/public_html/sistema/enquete/delete_poll.php on line 14
+[21-Sep-2023 09:52:57 America/Fortaleza] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot delete or update a parent row: a foreign key constraint fails (`partic70_sistema`.`votos_enquete`, CONSTRAINT `votos_enquete_ibfk_1` FOREIGN KEY (`id_opcao`) REFERENCES `opcoes_enquete` (`id`)) in /home2/partic70/public_html/sistema/enquete/delete_poll.php:14
+Stack trace:
+#0 /home2/partic70/public_html/sistema/enquete/delete_poll.php(14): mysqli_stmt->execute()
+#1 {main}
+  thrown in /home2/partic70/public_html/sistema/enquete/delete_poll.php on line 14
+[21-Sep-2023 09:53:02 America/Fortaleza] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot delete or update a parent row: a foreign key constraint fails (`partic70_sistema`.`votos_enquete`, CONSTRAINT `votos_enquete_ibfk_1` FOREIGN KEY (`id_opcao`) REFERENCES `opcoes_enquete` (`id`)) in /home2/partic70/public_html/sistema/enquete/delete_poll.php:14
+Stack trace:
+#0 /home2/partic70/public_html/sistema/enquete/delete_poll.php(14): mysqli_stmt->execute()
+#1 {main}
+  thrown in /home2/partic70/public_html/sistema/enquete/delete_poll.php on line 14
+[22-Sep-2023 10:36:38 America/Fortaleza] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'imagem_path' in 'field list' in /home2/partic70/public_html/sistema/enquete/votar.php:38
+Stack trace:
+#0 /home2/partic70/public_html/sistema/enquete/votar.php(38): mysqli->prepare('SELECT id, perg...')
+#1 {main}
+  thrown in /home2/partic70/public_html/sistema/enquete/votar.php on line 38
+[22-Sep-2023 10:51:21 America/Fortaleza] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot delete or update a parent row: a foreign key constraint fails (`partic70_sistema`.`votos_enquete`, CONSTRAINT `votos_enquete_ibfk_1` FOREIGN KEY (`id_opcao`) REFERENCES `opcoes_enquete` (`id`)) in /home2/partic70/public_html/sistema/enquete/delete_poll.php:14
+Stack trace:
+#0 /home2/partic70/public_html/sistema/enquete/delete_poll.php(14): mysqli_stmt->execute()
+#1 {main}
+  thrown in /home2/partic70/public_html/sistema/enquete/delete_poll.php on line 14
+[22-Sep-2023 12:38:22 America/Fortaleza] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot delete or update a parent row: a foreign key constraint fails (`partic70_sistema`.`votos_enquete`, CONSTRAINT `votos_enquete_ibfk_1` FOREIGN KEY (`id_opcao`) REFERENCES `opcoes_enquete` (`id`)) in /home2/partic70/public_html/sistema/enquete/delete_poll.php:14
+Stack trace:
+#0 /home2/partic70/public_html/sistema/enquete/delete_poll.php(14): mysqli_stmt->execute()
+#1 {main}
+  thrown in /home2/partic70/public_html/sistema/enquete/delete_poll.php on line 14
+[23-Sep-2023 09:13:52 America/Fortaleza] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot delete or update a parent row: a foreign key constraint fails (`partic70_sistema`.`votos_enquete`, CONSTRAINT `votos_enquete_ibfk_1` FOREIGN KEY (`id_opcao`) REFERENCES `opcoes_enquete` (`id`)) in /home2/partic70/public_html/sistema/enquete/delete_poll.php:14
+Stack trace:
+#0 /home2/partic70/public_html/sistema/enquete/delete_poll.php(14): mysqli_stmt->execute()
+#1 {main}
+  thrown in /home2/partic70/public_html/sistema/enquete/delete_poll.php on line 14
+[23-Sep-2023 12:08:19 America/Fortaleza] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot delete or update a parent row: a foreign key constraint fails (`partic70_sistema`.`votos_enquete`, CONSTRAINT `votos_enquete_ibfk_1` FOREIGN KEY (`id_opcao`) REFERENCES `opcoes_enquete` (`id`)) in /home2/partic70/public_html/sistema/enquete/delete_poll.php:14
+Stack trace:
+#0 /home2/partic70/public_html/sistema/enquete/delete_poll.php(14): mysqli_stmt->execute()
+#1 {main}
+  thrown in /home2/partic70/public_html/sistema/enquete/delete_poll.php on line 14
+[24-Sep-2023 14:54:33 America/Fortaleza] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'e.data_adicao' in 'order clause' in /home2/partic70/public_html/sistema/enquete/index.php:26
+Stack trace:
+#0 /home2/partic70/public_html/sistema/enquete/index.php(26): mysqli_query(Object(mysqli), 'SELECT e.id, e....')
+#1 {main}
+  thrown in /home2/partic70/public_html/sistema/enquete/index.php on line 26
+[24-Sep-2023 14:54:35 America/Fortaleza] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'e.data_adicao' in 'order clause' in /home2/partic70/public_html/sistema/enquete/index.php:26
+Stack trace:
+#0 /home2/partic70/public_html/sistema/enquete/index.php(26): mysqli_query(Object(mysqli), 'SELECT e.id, e....')
+#1 {main}
+  thrown in /home2/partic70/public_html/sistema/enquete/index.php on line 26
+[24-Sep-2023 14:54:36 America/Fortaleza] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'e.data_adicao' in 'order clause' in /home2/partic70/public_html/sistema/enquete/index.php:26
+Stack trace:
+#0 /home2/partic70/public_html/sistema/enquete/index.php(26): mysqli_query(Object(mysqli), 'SELECT e.id, e....')
+#1 {main}
+  thrown in /home2/partic70/public_html/sistema/enquete/index.php on line 26
+[24-Sep-2023 14:54:37 America/Fortaleza] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'e.data_adicao' in 'order clause' in /home2/partic70/public_html/sistema/enquete/index.php:26
+Stack trace:
+#0 /home2/partic70/public_html/sistema/enquete/index.php(26): mysqli_query(Object(mysqli), 'SELECT e.id, e....')
+#1 {main}
+  thrown in /home2/partic70/public_html/sistema/enquete/index.php on line 26
+[24-Sep-2023 14:54:38 America/Fortaleza] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'e.data_adicao' in 'order clause' in /home2/partic70/public_html/sistema/enquete/index.php:26
+Stack trace:
+#0 /home2/partic70/public_html/sistema/enquete/index.php(26): mysqli_query(Object(mysqli), 'SELECT e.id, e....')
+#1 {main}
+  thrown in /home2/partic70/public_html/sistema/enquete/index.php on line 26
