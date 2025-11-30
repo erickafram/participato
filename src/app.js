@@ -26,6 +26,9 @@ const app = express();
 // CONFIGURAÇÕES
 // ==========================================
 
+// Trust proxy (para nginx/CloudPanel)
+app.set('trust proxy', 1);
+
 // View engine (EJS)
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
