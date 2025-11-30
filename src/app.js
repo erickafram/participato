@@ -123,7 +123,7 @@ app.use((err, req, res, next) => {
 // INICIALIZAÇÃO
 // ==========================================
 
-const PORT = process.env.PORT || 3000;
+const PORT = 3000; // Forçar porta 3000 para CloudPanel
 
 // Sincronizar banco de dados e iniciar servidor
 async function startServer() {
