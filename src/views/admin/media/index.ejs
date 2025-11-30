@@ -1,0 +1,236 @@
+<%- include('../layouts/main', { body: `
+<div class="page-header">
+  <h1><i class="bi bi-images me-2"></i>Biblioteca de Mídia</h1>
+  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
+    <i class="bi bi-cloud-upload me-1"></i>Upload
+  </button>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    ${medias && medias.length > 0 
+      ? '<div class="row g-3">' +
+          medias.map(media => 
+            '<div class="col-6 col-md-4 col-lg-3 col-xl-2">' +
+              '<div class="card h-100 media-item" style="cursor: pointer;" onclick="showMediaDetails(' + media.id + ')">' +
+                '<div class="ratio ratio-1x1">' +
+                  '<img src="' + media.url + '" alt="' + (media.alt_text || '') + '" class="card-img-top" style="object-fit: cover;">' +
+                '</div>' +
+                '<div class="card-body p-2">' +
+                  '<small class="text-truncate d-block">' + media.filename + '</small>' +
+                '</div>' +
+              '</div>' +
+            '</div>'
+          ).join('') +
+        '</div>'
+      : '<div class="text-center py-5 text-muted"><i class="bi bi-images fs-1 d-block mb-3"></i><p>Nenhuma mídia encontrada</p><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="bi bi-cloud-upload me-1"></i>Fazer Upload</button></div>'
+    }
+  </div>
+  
+  ${pagination.totalPages > 1 ? '<div class="card-footer">' +
+    '<nav>' +
+      '<ul class="pagination pagination-sm mb-0 justify-content-center">' +
+        (pagination.hasPrev ? '<li class="page-item"><a class="page-link" href="?page=' + (pagination.page - 1) + '">Anterior</a></li>' : '') +
+        '<li class="page-item disabled"><span class="page-link">Página ' + pagination.page + ' de ' + pagination.totalPages + '</span></li>' +
+        (pagination.hasNext ? '<li class="page-item"><a class="page-link" href="?page=' + (pagination.page + 1) + '">Próxima</a></li>' : '') +
+      '</ul>' +
+    '</nav>' +
+  '</div>' : ''}
+</div>
+
+<!-- Upload Modal -->
+<div class="modal fade" id="uploadModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-cloud-upload me-2"></i>Upload de Mídia</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="uploadForm" enctype="multipart/form-data">
+          <div class="mb-3">
+            <label class="form-label">Selecione os arquivos</label>
+            <input type="file" name="files" id="fileInput" class="form-control" accept="image/*" multiple>
+            <small class="text-muted">Formatos aceitos: JPG, PNG, GIF, WebP (máx. 10MB cada)</small>
+          </div>
+          <div id="uploadProgress" style="display: none;">
+            <div class="progress">
+              <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%"></div>
+            </div>
+            <small class="text-muted mt-1 d-block">Enviando...</small>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" onclick="uploadFiles()">
+          <i class="bi bi-upload me-1"></i>Enviar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Media Details Modal -->
+<div class="modal fade" id="mediaModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Detalhes da Mídia</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <img id="mediaPreview" src="" alt="" class="img-fluid rounded">
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">URL</label>
+              <div class="input-group">
+                <input type="text" id="mediaUrl" class="form-control" readonly>
+                <button class="btn btn-outline-secondary" onclick="copyUrl()"><i class="bi bi-clipboard"></i></button>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Texto Alternativo</label>
+              <input type="text" id="mediaAlt" class="form-control" placeholder="Descrição da imagem">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Legenda</label>
+              <textarea id="mediaCaption" class="form-control" rows="2"></textarea>
+            </div>
+            <div class="mb-3">
+              <small class="text-muted">
+                <strong>Arquivo:</strong> <span id="mediaFilename"></span><br>
+                <strong>Tamanho:</strong> <span id="mediaSize"></span><br>
+                <strong>Dimensões:</strong> <span id="mediaDimensions"></span>
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger me-auto" onclick="deleteMedia()">
+          <i class="bi bi-trash me-1"></i>Excluir
+        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+        <button type="button" class="btn btn-primary" onclick="saveMedia()">
+          <i class="bi bi-check-lg me-1"></i>Salvar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentMediaId = null;
+
+function uploadFiles() {
+  const input = document.getElementById('fileInput');
+  const files = input.files;
+  
+  if (files.length === 0) {
+    alert('Selecione pelo menos um arquivo.');
+    return;
+  }
+  
+  const formData = new FormData();
+  for (let i = 0; i < files.length; i++) {
+    formData.append('files', files[i]);
+  }
+  
+  const progress = document.getElementById('uploadProgress');
+  const progressBar = progress.querySelector('.progress-bar');
+  progress.style.display = 'block';
+  
+  fetch('/admin/media/upload-multiple', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      location.reload();
+    } else {
+      alert(data.message || 'Erro ao fazer upload.');
+      progress.style.display = 'none';
+    }
+  })
+  .catch(error => {
+    alert('Erro ao fazer upload.');
+    progress.style.display = 'none';
+  });
+}
+
+function showMediaDetails(id) {
+  currentMediaId = id;
+  
+  fetch('/admin/media/' + id)
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const media = data.media;
+        document.getElementById('mediaPreview').src = media.url;
+        document.getElementById('mediaUrl').value = media.url;
+        document.getElementById('mediaAlt').value = media.alt_text || '';
+        document.getElementById('mediaCaption').value = media.caption || '';
+        document.getElementById('mediaFilename').textContent = media.filename;
+        document.getElementById('mediaSize').textContent = media.formattedSize;
+        document.getElementById('mediaDimensions').textContent = (media.width || '?') + ' x ' + (media.height || '?') + ' px';
+        
+        new bootstrap.Modal(document.getElementById('mediaModal')).show();
+      }
+    });
+}
+
+function saveMedia() {
+  const formData = new FormData();
+  formData.append('alt_text', document.getElementById('mediaAlt').value);
+  formData.append('caption', document.getElementById('mediaCaption').value);
+  
+  fetch('/admin/media/' + currentMediaId, {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      bootstrap.Modal.getInstance(document.getElementById('mediaModal')).hide();
+      alert('Mídia atualizada!');
+    } else {
+      alert(data.message || 'Erro ao salvar.');
+    }
+  });
+}
+
+function deleteMedia() {
+  if (!confirm('Tem certeza que deseja excluir esta mídia?')) return;
+  
+  fetch('/admin/media/' + currentMediaId + '/delete', { method: 'POST' })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+      } else {
+        alert(data.message || 'Erro ao excluir.');
+      }
+    });
+}
+
+function copyUrl() {
+  const input = document.getElementById('mediaUrl');
+  input.select();
+  document.execCommand('copy');
+  alert('URL copiada!');
+}
+</script>
+
+<style>
+.media-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: all 0.2s;
+}
+</style>
+`}) %>

@@ -1,0 +1,73 @@
+<%- include('../layouts/main', { body: `
+<div class="page-header">
+  <h1><i class="bi bi-folder me-2"></i>Categorias</h1>
+  <a href="/admin/categories/create" class="btn btn-primary">
+    <i class="bi bi-plus-lg me-1"></i>Nova Categoria
+  </a>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th style="width: 50px;">Cor</th>
+            <th>Nome</th>
+            <th>Slug</th>
+            <th>Posts</th>
+            <th>Status</th>
+            <th>Ordem</th>
+            <th style="width: 120px;">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${categories && categories.length > 0 
+            ? categories.map(cat => '<tr>' +
+                '<td><div class="rounded" style="width: 30px; height: 30px; background: ' + (cat.color || '#3ba4ff') + ';"></div></td>' +
+                '<td>' +
+                  '<strong>' + cat.name + '</strong>' +
+                  (cat.icon ? ' <i class="' + cat.icon + '"></i>' : '') +
+                '</td>' +
+                '<td><code>' + cat.slug + '</code></td>' +
+                '<td><span class="badge bg-secondary">' + cat.postCount + '</span></td>' +
+                '<td>' +
+                  (cat.active 
+                    ? '<span class="badge bg-success">Ativa</span>'
+                    : '<span class="badge bg-secondary">Inativa</span>'
+                  ) +
+                '</td>' +
+                '<td>' + cat.order + '</td>' +
+                '<td>' +
+                  '<div class="btn-group btn-group-sm">' +
+                    '<a href="/admin/categories/' + cat.id + '/edit" class="btn btn-outline-primary" title="Editar"><i class="bi bi-pencil"></i></a>' +
+                    '<a href="/categoria/' + cat.slug + '" target="_blank" class="btn btn-outline-secondary" title="Ver"><i class="bi bi-eye"></i></a>' +
+                    '<button type="button" class="btn btn-outline-danger" onclick="deleteCategory(' + cat.id + ', ' + cat.postCount + ')" title="Excluir"><i class="bi bi-trash"></i></button>' +
+                  '</div>' +
+                '</td>' +
+              '</tr>').join('')
+            : '<tr><td colspan="7" class="text-center text-muted py-5">Nenhuma categoria encontrada</td></tr>'
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Form -->
+<form id="deleteForm" method="POST" style="display: none;"></form>
+
+<script>
+function deleteCategory(id, postCount) {
+  if (postCount > 0) {
+    alert('Não é possível excluir esta categoria pois existem ' + postCount + ' posts vinculados.');
+    return;
+  }
+  if (confirm('Tem certeza que deseja excluir esta categoria?')) {
+    const form = document.getElementById('deleteForm');
+    form.action = '/admin/categories/' + id + '/delete';
+    form.submit();
+  }
+}
+</script>
+`}) %>

@@ -1,0 +1,118 @@
+<%- include('../layouts/main', { body: `
+<div class="page-header">
+  <h1><i class="bi bi-file-earmark-text me-2"></i>Posts</h1>
+  <a href="/admin/posts/create" class="btn btn-primary">
+    <i class="bi bi-plus-lg me-1"></i>Novo Post
+  </a>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+  <div class="card-body">
+    <form action="/admin/posts" method="GET" class="row g-3">
+      <div class="col-md-4">
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-search"></i></span>
+          <input type="text" name="search" class="form-control" placeholder="Buscar posts..." value="${filters.search || ''}">
+        </div>
+      </div>
+      <div class="col-md-3">
+        <select name="category" class="form-select">
+          <option value="">Todas as categorias</option>
+          ${categories.map(cat => 
+            '<option value="' + cat.id + '"' + (filters.category == cat.id ? ' selected' : '') + '>' + cat.name + '</option>'
+          ).join('')}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select name="status" class="form-select">
+          <option value="">Todos os status</option>
+          <option value="published"${filters.status === 'published' ? ' selected' : ''}>Publicado</option>
+          <option value="draft"${filters.status === 'draft' ? ' selected' : ''}>Rascunho</option>
+          <option value="scheduled"${filters.status === 'scheduled' ? ' selected' : ''}>Agendado</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-outline-primary w-100">
+          <i class="bi bi-funnel me-1"></i>Filtrar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Posts Table -->
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th style="width: 50px;"></th>
+            <th>Título</th>
+            <th>Categoria</th>
+            <th>Autor</th>
+            <th>Status</th>
+            <th>Views</th>
+            <th>Data</th>
+            <th style="width: 120px;">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${posts && posts.length > 0 
+            ? posts.map(post => '<tr>' +
+                '<td>' + 
+                  (post.featured_image 
+                    ? '<img src="' + post.featured_image + '" alt="" class="rounded" style="width: 40px; height: 40px; object-fit: cover;">'
+                    : '<div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;"><i class="bi bi-image text-muted"></i></div>'
+                  ) + 
+                '</td>' +
+                '<td>' +
+                  '<a href="/admin/posts/' + post.id + '/edit" class="text-decoration-none fw-medium">' + post.title.substring(0, 50) + (post.title.length > 50 ? '...' : '') + '</a>' +
+                  (post.featured ? ' <i class="bi bi-star-fill text-warning" title="Destaque"></i>' : '') +
+                '</td>' +
+                '<td>' + (post.category ? '<span class="badge" style="background:' + post.category.color + '">' + post.category.name + '</span>' : '<span class="text-muted">-</span>') + '</td>' +
+                '<td>' + (post.author ? post.author.name : '-') + '</td>' +
+                '<td><span class="badge-status badge-' + post.status + '">' + (post.status === 'published' ? 'Publicado' : post.status === 'draft' ? 'Rascunho' : 'Agendado') + '</span></td>' +
+                '<td>' + post.views.toLocaleString('pt-BR') + '</td>' +
+                '<td>' + new Date(post.created_at).toLocaleDateString('pt-BR') + '</td>' +
+                '<td>' +
+                  '<div class="btn-group btn-group-sm">' +
+                    '<a href="/admin/posts/' + post.id + '/edit" class="btn btn-outline-primary" title="Editar"><i class="bi bi-pencil"></i></a>' +
+                    '<a href="/noticia/' + post.slug + '" target="_blank" class="btn btn-outline-secondary" title="Ver"><i class="bi bi-eye"></i></a>' +
+                    '<button type="button" class="btn btn-outline-danger" onclick="deletePost(' + post.id + ')" title="Excluir"><i class="bi bi-trash"></i></button>' +
+                  '</div>' +
+                '</td>' +
+              '</tr>').join('')
+            : '<tr><td colspan="8" class="text-center text-muted py-5">Nenhum post encontrado</td></tr>'
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  ${pagination.totalPages > 1 ? '<div class="card-footer">' +
+    '<nav>' +
+      '<ul class="pagination pagination-sm mb-0 justify-content-center">' +
+        (pagination.hasPrev ? '<li class="page-item"><a class="page-link" href="?page=' + (pagination.page - 1) + '&search=' + (filters.search || '') + '&category=' + (filters.category || '') + '&status=' + (filters.status || '') + '">Anterior</a></li>' : '') +
+        '<li class="page-item disabled"><span class="page-link">Página ' + pagination.page + ' de ' + pagination.totalPages + '</span></li>' +
+        (pagination.hasNext ? '<li class="page-item"><a class="page-link" href="?page=' + (pagination.page + 1) + '&search=' + (filters.search || '') + '&category=' + (filters.category || '') + '&status=' + (filters.status || '') + '">Próxima</a></li>' : '') +
+      '</ul>' +
+    '</nav>' +
+  '</div>' : ''}
+</div>
+
+<!-- Delete Form (hidden) -->
+<form id="deleteForm" method="POST" style="display: none;">
+</form>
+
+<script>
+function deletePost(id) {
+  if (confirm('Tem certeza que deseja excluir este post?')) {
+    const form = document.getElementById('deleteForm');
+    form.action = '/admin/posts/' + id + '/delete';
+    form.submit();
+  }
+}
+</script>
+`}) %>

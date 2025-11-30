@@ -1,0 +1,39 @@
+<%- include('layouts/main', { body: `
+<!-- Breadcrumb -->
+<section class="breadcrumb-section">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/"><i class="bi bi-house-door"></i> Início</a></li>
+        <li class="breadcrumb-item active">Categorias</li>
+      </ol>
+    </nav>
+  </div>
+</section>
+
+<div class="container py-4">
+  <h1 class="section-title mb-4">Categorias</h1>
+  
+  <div class="row g-4">
+    ${categories && categories.length > 0 
+      ? categories.map(cat => `
+        <div class="col-md-6 col-lg-4">
+          <a href="/categoria/${cat.slug}" class="text-decoration-none">
+            <div class="card h-100 text-center p-4">
+              <div class="rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px; background: ${cat.color}22;">
+                <i class="${cat.icon || 'bi bi-folder'} fs-1" style="color: ${cat.color};"></i>
+              </div>
+              <h4 class="card-title">${cat.name}</h4>
+              ${cat.description ? '<p class="text-muted">' + cat.description.substring(0, 100) + '...</p>' : ''}
+              <div class="mt-auto">
+                <span class="badge bg-primary">${cat.postCount || 0} posts</span>
+              </div>
+            </div>
+          </a>
+        </div>
+      `).join('')
+      : '<div class="col-12"><p class="text-muted text-center py-5">Nenhuma categoria encontrada.</p></div>'
+    }
+  </div>
+</div>
+`}) %>

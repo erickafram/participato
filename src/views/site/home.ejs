@@ -1,0 +1,168 @@
+<%- include('layouts/main', { body: `
+<!-- Featured Section -->
+${featuredPosts && featuredPosts.length > 0 ? `
+<section class="featured-section">
+  <div class="container">
+    <div class="row g-4">
+      <!-- Post Principal -->
+      <div class="col-lg-8">
+        <div class="featured-main">
+          <img src="${featuredPosts[0].featured_image || '/images/placeholder.jpg'}" alt="${featuredPosts[0].title}">
+          <div class="featured-content">
+            ${featuredPosts[0].category ? '<span class="card-category" style="background: ' + featuredPosts[0].category.color + '; position: static; margin-bottom: 15px; display: inline-block;">' + featuredPosts[0].category.name + '</span>' : ''}
+            <h2 class="display-5 fw-bold mb-3"><a href="/noticia/${featuredPosts[0].slug}" class="text-white">${featuredPosts[0].title}</a></h2>
+            <div class="text-white-50 mb-0">
+              <i class="bi bi-calendar3 me-2"></i>${new Date(featuredPosts[0].published_at || featuredPosts[0].created_at).toLocaleDateString('pt-BR')}
+              <span class="mx-2">•</span>
+              <i class="bi bi-eye me-2"></i>${featuredPosts[0].views} visualizações
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Posts Secundários -->
+      <div class="col-lg-4 d-none d-lg-block">
+        <div class="d-flex flex-column h-100 justify-content-between">
+          ${featuredPosts.slice(1, 3).map(post => `
+            <div class="featured-sub">
+              <img src="${post.featured_image || '/images/placeholder.jpg'}" alt="${post.title}">
+              <div class="featured-content p-3">
+                ${post.category ? '<span class="badge mb-2" style="background: ' + post.category.color + '">' + post.category.name + '</span>' : ''}
+                <h5 class="fw-bold mb-0"><a href="/noticia/${post.slug}" class="text-white">${post.title}</a></h5>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+` : ''}
+
+<div class="container py-5">
+  <div class="row g-5">
+    <!-- Conteúdo Principal -->
+    <div class="col-lg-8">
+      <!-- Últimas Notícias -->
+      <section class="mb-5">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <h2 class="section-title mb-0">Últimas Notícias</h2>
+          <a href="/noticias" class="btn btn-outline-primary rounded-pill px-4">Ver Tudo</a>
+        </div>
+        
+        <div class="row g-4">
+          ${latestPosts && latestPosts.length > 0 
+            ? latestPosts.map(post => `
+              <div class="col-md-6">
+                <article class="card h-100">
+                  <div class="position-relative">
+                    ${post.category ? '<span class="card-category" style="background: ' + post.category.color + '">' + post.category.name + '</span>' : ''}
+                    <a href="/noticia/${post.slug}">
+                      <img src="${post.featured_image || '/images/placeholder.jpg'}" class="card-img-top" alt="${post.title}">
+                    </a>
+                  </div>
+                  <div class="card-body">
+                    <h5 class="card-title"><a href="/noticia/${post.slug}" class="text-dark">${post.title}</a></h5>
+                    <p class="card-text">${post.excerpt ? post.excerpt.substring(0, 100) + '...' : ''}</p>
+                    <div class="card-meta">
+                      <span><i class="bi bi-calendar3 me-1"></i>${new Date(post.published_at || post.created_at).toLocaleDateString('pt-BR')}</span>
+                      <span><i class="bi bi-person me-1"></i>${post.author ? post.author.name : 'Redação'}</span>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            `).join('')
+            : '<div class="col-12"><div class="alert alert-info">Nenhuma notícia encontrada.</div></div>'
+          }
+        </div>
+      </section>
+      
+      <!-- Posts por Categoria -->
+      ${categoriesWithPosts && categoriesWithPosts.filter(c => c.posts && c.posts.length > 0).slice(0, 2).map(cat => `
+        <section class="mb-5">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="section-title mb-0">${cat.name}</h2>
+            <a href="/categoria/${cat.slug}" class="btn btn-sm btn-light text-primary fw-bold">Ver mais <i class="bi bi-arrow-right"></i></a>
+          </div>
+          <div class="row g-4">
+            ${cat.posts.slice(0, 4).map(post => `
+              <div class="col-md-6">
+                <div class="d-flex gap-3 align-items-start">
+                  <a href="/noticia/${post.slug}" class="flex-shrink-0">
+                    <img src="${post.featured_image || '/images/placeholder.jpg'}" class="rounded-3" style="width: 100px; height: 75px; object-fit: cover;" alt="${post.title}">
+                  </a>
+                  <div>
+                    <h6 class="fw-bold mb-1"><a href="/noticia/${post.slug}" class="text-dark text-decoration-none">${post.title}</a></h6>
+                    <small class="text-muted"><i class="bi bi-clock me-1"></i>${new Date(post.published_at || post.created_at).toLocaleDateString('pt-BR')}</small>
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </section>
+      `).join('')}
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+      <div class="position-sticky" style="top: 100px;">
+        <!-- Search Mobile -->
+        <div class="sidebar-widget d-lg-none">
+          <form action="/busca" method="GET">
+            <div class="input-group">
+              <input type="text" name="q" class="form-control" placeholder="Buscar...">
+              <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i></button>
+            </div>
+          </form>
+        </div>
+        
+        <!-- Categorias -->
+        <div class="sidebar-widget">
+          <h4 class="widget-title">Categorias</h4>
+          <div class="d-flex flex-column gap-2">
+            ${categories.map(cat => `
+              <a href="/categoria/${cat.slug}" class="d-flex align-items-center justify-content-between text-dark text-decoration-none p-2 rounded hover-bg-light transition">
+                <span class="d-flex align-items-center gap-2">
+                  <i class="${cat.icon || 'bi bi-folder'} text-primary"></i>
+                  ${cat.name}
+                </span>
+                <span class="badge bg-light text-dark border">${cat.postCount || 0}</span>
+              </a>
+            `).join('')}
+          </div>
+        </div>
+        
+        <!-- Mais Lidas -->
+        <div class="sidebar-widget">
+          <h4 class="widget-title">Mais Lidas</h4>
+          <div class="d-flex flex-column gap-3">
+            ${popularPosts && popularPosts.length > 0 
+              ? popularPosts.map((post, index) => `
+                <div class="d-flex align-items-center gap-3">
+                  <span class="fw-bold text-muted fs-4 opacity-25">0${index + 1}</span>
+                  <div>
+                    <h6 class="mb-1 fw-bold"><a href="/noticia/${post.slug}" class="text-dark text-decoration-none">${post.title}</a></h6>
+                    <small class="text-primary fw-bold"><i class="bi bi-eye me-1"></i>${post.views} views</small>
+                  </div>
+                </div>
+              `).join('')
+              : '<p class="text-muted">Nenhum post encontrado.</p>'
+            }
+          </div>
+        </div>
+        
+        <!-- Newsletter -->
+        <div class="card bg-primary text-white border-0 p-4 text-center">
+          <i class="bi bi-envelope-paper fs-1 mb-3"></i>
+          <h4 class="fw-bold">Newsletter</h4>
+          <p class="opacity-75 small mb-4">Receba as melhores notícias e atualizações exclusivas diretamente no seu email.</p>
+          <form>
+            <input type="email" class="form-control mb-2 border-0" placeholder="Seu melhor email">
+            <button class="btn btn-dark w-100 fw-bold">Inscrever-se</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`}) %>

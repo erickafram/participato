@@ -1,0 +1,61 @@
+<%- include('../layouts/main', { body: `
+<div class="page-header">
+  <h1><i class="bi bi-file-earmark me-2"></i>Páginas</h1>
+  <a href="/admin/pages/create" class="btn btn-primary">
+    <i class="bi bi-plus-lg me-1"></i>Nova Página
+  </a>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Slug</th>
+            <th>Autor</th>
+            <th>Status</th>
+            <th>Menu</th>
+            <th>Ordem</th>
+            <th style="width: 120px;">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${pages && pages.length > 0 
+            ? pages.map(page => '<tr>' +
+                '<td><strong>' + page.title + '</strong></td>' +
+                '<td><code>/pagina/' + page.slug + '</code></td>' +
+                '<td>' + (page.author ? page.author.name : '-') + '</td>' +
+                '<td><span class="badge-status badge-' + page.status + '">' + (page.status === 'published' ? 'Publicada' : 'Rascunho') + '</span></td>' +
+                '<td>' + (page.show_in_menu ? '<i class="bi bi-check-circle text-success"></i>' : '<i class="bi bi-x-circle text-muted"></i>') + '</td>' +
+                '<td>' + page.order + '</td>' +
+                '<td>' +
+                  '<div class="btn-group btn-group-sm">' +
+                    '<a href="/admin/pages/' + page.id + '/edit" class="btn btn-outline-primary" title="Editar"><i class="bi bi-pencil"></i></a>' +
+                    '<a href="/pagina/' + page.slug + '" target="_blank" class="btn btn-outline-secondary" title="Ver"><i class="bi bi-eye"></i></a>' +
+                    '<button type="button" class="btn btn-outline-danger" onclick="deletePage(' + page.id + ')" title="Excluir"><i class="bi bi-trash"></i></button>' +
+                  '</div>' +
+                '</td>' +
+              '</tr>').join('')
+            : '<tr><td colspan="7" class="text-center text-muted py-5">Nenhuma página encontrada</td></tr>'
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Form -->
+<form id="deleteForm" method="POST" style="display: none;"></form>
+
+<script>
+function deletePage(id) {
+  if (confirm('Tem certeza que deseja excluir esta página?')) {
+    const form = document.getElementById('deleteForm');
+    form.action = '/admin/pages/' + id + '/delete';
+    form.submit();
+  }
+}
+</script>
+`}) %>

@@ -1,0 +1,126 @@
+<%- include('../layouts/main', { body: `
+<!-- Breadcrumb -->
+<section class="breadcrumb-section">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/"><i class="bi bi-house-door"></i> Início</a></li>
+        <li class="breadcrumb-item active">${page.title}</li>
+      </ol>
+    </nav>
+  </div>
+</section>
+
+<div class="container py-4">
+  <div class="row">
+    <div class="col-lg-8">
+      <article class="card">
+        <div class="card-body p-4 p-md-5">
+          <h1 class="card-title mb-4">${page.title}</h1>
+          
+          <div class="page-content mb-5">
+            ${page.content || ''}
+          </div>
+          
+          <!-- Contact Form -->
+          <div class="card bg-light border-0">
+            <div class="card-body p-4">
+              <h4 class="mb-4"><i class="bi bi-envelope me-2"></i>Envie uma mensagem</h4>
+              <form>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Nome <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" required placeholder="Seu nome">
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Email <span class="text-danger">*</span></label>
+                    <input type="email" class="form-control" required placeholder="seu@email.com">
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Assunto <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" required placeholder="Assunto da mensagem">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Mensagem <span class="text-danger">*</span></label>
+                  <textarea class="form-control" rows="5" required placeholder="Sua mensagem..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg">
+                  <i class="bi bi-send me-2"></i>Enviar Mensagem
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+      <!-- Contact Info -->
+      <div class="sidebar-widget">
+        <h4 class="widget-title">Informações de Contato</h4>
+        <ul class="list-unstyled">
+          ${settings.contact_email ? `
+            <li class="mb-3">
+              <div class="d-flex align-items-start">
+                <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-3">
+                  <i class="bi bi-envelope text-primary"></i>
+                </div>
+                <div>
+                  <strong>Email</strong><br>
+                  <a href="mailto:${settings.contact_email}">${settings.contact_email}</a>
+                </div>
+              </div>
+            </li>
+          ` : ''}
+          ${settings.contact_phone ? `
+            <li class="mb-3">
+              <div class="d-flex align-items-start">
+                <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-3">
+                  <i class="bi bi-telephone text-primary"></i>
+                </div>
+                <div>
+                  <strong>Telefone</strong><br>
+                  <a href="tel:${settings.contact_phone.replace(/\D/g, '')}">${settings.contact_phone}</a>
+                </div>
+              </div>
+            </li>
+          ` : ''}
+          ${settings.contact_address ? `
+            <li class="mb-3">
+              <div class="d-flex align-items-start">
+                <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-3">
+                  <i class="bi bi-geo-alt text-primary"></i>
+                </div>
+                <div>
+                  <strong>Endereço</strong><br>
+                  ${settings.contact_address}
+                </div>
+              </div>
+            </li>
+          ` : ''}
+        </ul>
+      </div>
+      
+      <!-- Social -->
+      <div class="sidebar-widget">
+        <h4 class="widget-title">Redes Sociais</h4>
+        <div class="d-flex gap-2 flex-wrap">
+          ${settings.social_facebook ? '<a href="' + settings.social_facebook + '" target="_blank" class="btn btn-outline-primary"><i class="bi bi-facebook"></i></a>' : ''}
+          ${settings.social_instagram ? '<a href="' + settings.social_instagram + '" target="_blank" class="btn btn-outline-danger"><i class="bi bi-instagram"></i></a>' : ''}
+          ${settings.social_twitter ? '<a href="' + settings.social_twitter + '" target="_blank" class="btn btn-outline-info"><i class="bi bi-twitter-x"></i></a>' : ''}
+          ${settings.social_youtube ? '<a href="' + settings.social_youtube + '" target="_blank" class="btn btn-outline-danger"><i class="bi bi-youtube"></i></a>' : ''}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.page-content {
+  font-size: 17px;
+  line-height: 1.8;
+}
+</style>
+`}) %>

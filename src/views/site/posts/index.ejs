@@ -1,0 +1,110 @@
+<%- include('../layouts/main', { body: `
+<!-- Breadcrumb -->
+<section class="breadcrumb-section">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/"><i class="bi bi-house-door"></i> Início</a></li>
+        <li class="breadcrumb-item active">Notícias</li>
+      </ol>
+    </nav>
+  </div>
+</section>
+
+<div class="container py-4">
+  <div class="row">
+    <!-- Main Content -->
+    <div class="col-lg-8">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="section-title mb-0">Notícias</h1>
+        <span class="text-muted">${pagination.total} resultado(s)</span>
+      </div>
+      
+      <!-- Filters -->
+      <div class="card mb-4">
+        <div class="card-body">
+          <form action="/noticias" method="GET" class="row g-3">
+            <div class="col-md-6">
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" name="search" class="form-control" placeholder="Buscar..." value="${filters.search || ''}">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <select name="category" class="form-select">
+                <option value="">Todas as categorias</option>
+                ${categories.map(cat => 
+                  '<option value="' + cat.slug + '"' + (filters.category === cat.slug ? ' selected' : '') + '>' + cat.name + '</option>'
+                ).join('')}
+              </select>
+            </div>
+            <div class="col-md-2">
+              <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+      <!-- Posts Grid -->
+      <div class="row g-4">
+        ${posts && posts.length > 0 
+          ? posts.map(post => `
+            <div class="col-md-6">
+              <article class="card h-100">
+                <a href="/noticia/${post.slug}">
+                  <img src="${post.featured_image || '/images/placeholder.jpg'}" class="card-img-top" alt="${post.title}">
+                </a>
+                <div class="card-body">
+                  ${post.category ? '<span class="card-category" style="background: ' + post.category.color + '">' + post.category.name + '</span>' : ''}
+                  <h5 class="card-title"><a href="/noticia/${post.slug}">${post.title}</a></h5>
+                  <p class="card-text text-muted">${post.excerpt ? post.excerpt.substring(0, 120) + '...' : ''}</p>
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                  <div class="card-meta d-flex justify-content-between">
+                    <span><i class="bi bi-person me-1"></i>${post.author ? post.author.name : 'Admin'}</span>
+                    <span><i class="bi bi-calendar3 me-1"></i>${new Date(post.published_at || post.created_at).toLocaleDateString('pt-BR')}</span>
+                  </div>
+                </div>
+              </article>
+            </div>
+          `).join('')
+          : '<div class="col-12"><div class="text-center py-5"><i class="bi bi-inbox fs-1 text-muted d-block mb-3"></i><p class="text-muted">Nenhuma notícia encontrada.</p></div></div>'
+        }
+      </div>
+      
+      <!-- Pagination -->
+      ${pagination.totalPages > 1 ? `
+        <nav class="mt-5">
+          <ul class="pagination justify-content-center">
+            ${pagination.hasPrev ? '<li class="page-item"><a class="page-link" href="?page=' + (pagination.page - 1) + '&search=' + (filters.search || '') + '&category=' + (filters.category || '') + '"><i class="bi bi-chevron-left"></i></a></li>' : ''}
+            ${Array.from({length: Math.min(5, pagination.totalPages)}, (_, i) => {
+              let pageNum = pagination.page - 2 + i;
+              if (pageNum < 1) pageNum = i + 1;
+              if (pageNum > pagination.totalPages) return '';
+              return '<li class="page-item' + (pageNum === pagination.page ? ' active' : '') + '"><a class="page-link" href="?page=' + pageNum + '&search=' + (filters.search || '') + '&category=' + (filters.category || '') + '">' + pageNum + '</a></li>';
+            }).join('')}
+            ${pagination.hasNext ? '<li class="page-item"><a class="page-link" href="?page=' + (pagination.page + 1) + '&search=' + (filters.search || '') + '&category=' + (filters.category || '') + '"><i class="bi bi-chevron-right"></i></a></li>' : ''}
+          </ul>
+        </nav>
+      ` : ''}
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+      <!-- Categories -->
+      <div class="sidebar-widget">
+        <h4 class="widget-title">Categorias</h4>
+        <ul class="category-list">
+          ${categories.map(cat => `
+            <li>
+              <a href="/categoria/${cat.slug}">
+                <span><i class="${cat.icon || 'bi bi-folder'} me-2" style="color: ${cat.color}"></i>${cat.name}</span>
+              </a>
+            </li>
+          `).join('')}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+`}) %>

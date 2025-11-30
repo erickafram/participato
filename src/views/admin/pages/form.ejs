@@ -1,0 +1,127 @@
+<%- include('../layouts/main', { body: `
+<div class="page-header">
+  <h1><i class="bi bi-file-earmark me-2"></i>${isEdit ? 'Editar Página' : 'Nova Página'}</h1>
+  <a href="/admin/pages" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i>Voltar
+  </a>
+</div>
+
+<form action="${isEdit ? '/admin/pages/' + page.id : '/admin/pages'}" method="POST" enctype="multipart/form-data">
+  <div class="row">
+    <!-- Main Content -->
+    <div class="col-lg-8">
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="mb-3">
+            <label class="form-label">Título <span class="text-danger">*</span></label>
+            <input type="text" name="title" class="form-control form-control-lg" value="${page ? page.title : ''}" required placeholder="Título da página">
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Conteúdo</label>
+            <textarea name="content" id="editor" class="form-control" rows="15">${page ? page.content || '' : ''}</textarea>
+          </div>
+        </div>
+      </div>
+      
+      <!-- SEO -->
+      <div class="card">
+        <div class="card-header">
+          <i class="bi bi-search me-2"></i>SEO
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label class="form-label">Slug (URL)</label>
+            <div class="input-group">
+              <span class="input-group-text">/pagina/</span>
+              <input type="text" name="slug" class="form-control" value="${page ? page.slug : ''}" placeholder="url-amigavel">
+            </div>
+            <small class="text-muted">Deixe em branco para gerar automaticamente</small>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Meta Título</label>
+            <input type="text" name="meta_title" class="form-control" value="${page ? page.meta_title || '' : ''}" maxlength="70" placeholder="Título para SEO (máx. 70 caracteres)">
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Meta Descrição</label>
+            <textarea name="meta_description" class="form-control" rows="2" maxlength="160" placeholder="Descrição para SEO (máx. 160 caracteres)">${page ? page.meta_description || '' : ''}</textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+      <!-- Publish -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="bi bi-send me-2"></i>Publicar
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label class="form-label">Status</label>
+            <select name="status" class="form-select">
+              <option value="draft"${page && page.status === 'draft' ? ' selected' : ''}>Rascunho</option>
+              <option value="published"${page && page.status === 'published' ? ' selected' : ''}>Publicada</option>
+            </select>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Template</label>
+            <select name="template" class="form-select">
+              <option value="default"${page && page.template === 'default' ? ' selected' : ''}>Padrão</option>
+              <option value="contact"${page && page.template === 'contact' ? ' selected' : ''}>Contato</option>
+              <option value="full-width"${page && page.template === 'full-width' ? ' selected' : ''}>Largura Total</option>
+            </select>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Ordem no Menu</label>
+            <input type="number" name="order" class="form-control" value="${page ? page.order : 0}" min="0">
+          </div>
+          
+          <div class="form-check mb-3">
+            <input type="checkbox" name="show_in_menu" class="form-check-input" id="show_in_menu"${page && page.show_in_menu ? ' checked' : ''}>
+            <label class="form-check-label" for="show_in_menu">
+              <i class="bi bi-list me-1"></i>Exibir no Menu
+            </label>
+          </div>
+          
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-check-lg me-1"></i>${isEdit ? 'Atualizar' : 'Publicar'}
+            </button>
+            ${isEdit ? '<a href="/pagina/' + page.slug + '" target="_blank" class="btn btn-outline-secondary"><i class="bi bi-eye me-1"></i>Visualizar</a>' : ''}
+          </div>
+        </div>
+      </div>
+      
+      <!-- Featured Image -->
+      <div class="card">
+        <div class="card-header">
+          <i class="bi bi-image me-2"></i>Imagem Destacada
+        </div>
+        <div class="card-body">
+          ${page && page.featured_image 
+            ? '<div class="mb-3"><img src="' + page.featured_image + '" alt="" class="img-fluid rounded"></div>'
+            : ''
+          }
+          <input type="file" name="featured_image" class="form-control" accept="image/*">
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<!-- CKEditor -->
+<script src="https://cdn.ckeditor.com/ckeditor5/40.1.0/classic/ckeditor.js"></script>
+<script>
+ClassicEditor
+  .create(document.querySelector('#editor'), {
+    toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'blockQuote', 'insertTable', 'undo', 'redo']
+  })
+  .catch(error => console.error(error));
+</script>
+`}) %>

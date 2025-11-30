@@ -1,0 +1,96 @@
+<%- include('layouts/main', { body: `
+<!-- Breadcrumb -->
+<section class="breadcrumb-section">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/"><i class="bi bi-house-door"></i> Início</a></li>
+        <li class="breadcrumb-item active">Busca</li>
+      </ol>
+    </nav>
+  </div>
+</section>
+
+<div class="container py-4">
+  <div class="row">
+    <div class="col-lg-8">
+      <!-- Search Form -->
+      <div class="card mb-4">
+        <div class="card-body">
+          <form action="/busca" method="GET">
+            <div class="input-group input-group-lg">
+              <input type="text" name="q" class="form-control" placeholder="O que você procura?" value="${query}" autofocus>
+              <button class="btn btn-primary" type="submit">
+                <i class="bi bi-search me-1"></i>Buscar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+      ${query ? `
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="section-title mb-0">Resultados para "${query}"</h2>
+          <span class="text-muted">${pagination.total} resultado(s)</span>
+        </div>
+        
+        ${posts && posts.length > 0 
+          ? `<div class="row g-4">
+              ${posts.map(post => `
+                <div class="col-md-6">
+                  <article class="card h-100">
+                    <a href="/noticia/${post.slug}">
+                      <img src="${post.featured_image || '/images/placeholder.jpg'}" class="card-img-top" alt="${post.title}">
+                    </a>
+                    <div class="card-body">
+                      ${post.category ? '<span class="card-category" style="background: ' + post.category.color + '">' + post.category.name + '</span>' : ''}
+                      <h5 class="card-title"><a href="/noticia/${post.slug}">${post.title}</a></h5>
+                      <p class="card-text text-muted">${post.excerpt ? post.excerpt.substring(0, 100) + '...' : ''}</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pt-0">
+                      <div class="card-meta">
+                        <i class="bi bi-calendar3 me-1"></i>${new Date(post.published_at || post.created_at).toLocaleDateString('pt-BR')}
+                      </div>
+                    </div>
+                  </article>
+                </div>
+              `).join('')}
+            </div>
+            
+            ${pagination.totalPages > 1 ? `
+              <nav class="mt-5">
+                <ul class="pagination justify-content-center">
+                  ${pagination.hasPrev ? '<li class="page-item"><a class="page-link" href="?q=' + encodeURIComponent(query) + '&page=' + (pagination.page - 1) + '"><i class="bi bi-chevron-left"></i></a></li>' : ''}
+                  <li class="page-item disabled"><span class="page-link">Página ${pagination.page} de ${pagination.totalPages}</span></li>
+                  ${pagination.hasNext ? '<li class="page-item"><a class="page-link" href="?q=' + encodeURIComponent(query) + '&page=' + (pagination.page + 1) + '"><i class="bi bi-chevron-right"></i></a></li>' : ''}
+                </ul>
+              </nav>
+            ` : ''}`
+          : '<div class="text-center py-5"><i class="bi bi-search fs-1 text-muted d-block mb-3"></i><p class="text-muted">Nenhum resultado encontrado para "<strong>' + query + '</strong>".</p><p class="text-muted">Tente buscar por outros termos.</p></div>'
+        }
+      ` : `
+        <div class="text-center py-5">
+          <i class="bi bi-search fs-1 text-muted d-block mb-3"></i>
+          <p class="text-muted">Digite algo para buscar.</p>
+        </div>
+      `}
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+      <div class="sidebar-widget">
+        <h4 class="widget-title">Categorias</h4>
+        <ul class="category-list">
+          ${categories.map(cat => `
+            <li>
+              <a href="/categoria/${cat.slug}">
+                <span><i class="${cat.icon || 'bi bi-folder'} me-2" style="color: ${cat.color}"></i>${cat.name}</span>
+              </a>
+            </li>
+          `).join('')}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+`}) %>

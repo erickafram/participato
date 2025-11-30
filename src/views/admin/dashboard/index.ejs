@@ -1,0 +1,166 @@
+<%- include('../layouts/main', { body: `
+<div class="d-flex align-items-center justify-content-between mb-4">
+  <div>
+    <h4 class="fw-bold mb-1">Dashboard</h4>
+    <p class="text-muted small mb-0">Visão geral do seu portal</p>
+  </div>
+  <a href="/admin/posts/create" class="btn btn-primary btn-sm d-flex align-items-center gap-2">
+    <i class="bi bi-plus-lg"></i>
+    Novo Post
+  </a>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-4">
+  <div class="col-sm-6 col-xl-3">
+    <div class="card h-100 border-0 shadow-sm">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <div class="bg-primary bg-opacity-10 text-primary rounded p-2">
+            <i class="bi bi-file-earmark-text fs-4"></i>
+          </div>
+          <span class="badge bg-light text-muted border">Total</span>
+        </div>
+        <h3 class="fw-bold mb-1">${stats.totalPosts || 0}</h3>
+        <p class="text-muted small mb-0">Posts criados</p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-sm-6 col-xl-3">
+    <div class="card h-100 border-0 shadow-sm">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <div class="bg-success bg-opacity-10 text-success rounded p-2">
+            <i class="bi bi-check-circle fs-4"></i>
+          </div>
+          <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-10">Ativos</span>
+        </div>
+        <h3 class="fw-bold mb-1">${stats.publishedPosts || 0}</h3>
+        <p class="text-muted small mb-0">Posts publicados</p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-sm-6 col-xl-3">
+    <div class="card h-100 border-0 shadow-sm">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <div class="bg-warning bg-opacity-10 text-warning rounded p-2">
+            <i class="bi bi-eye fs-4"></i>
+          </div>
+          <span class="badge bg-light text-muted border">Total</span>
+        </div>
+        <h3 class="fw-bold mb-1">${stats.totalViews ? stats.totalViews.toLocaleString('pt-BR') : 0}</h3>
+        <p class="text-muted small mb-0">Visualizações</p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-sm-6 col-xl-3">
+    <div class="card h-100 border-0 shadow-sm">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <div class="bg-info bg-opacity-10 text-info rounded p-2">
+            <i class="bi bi-people fs-4"></i>
+          </div>
+          <span class="badge bg-light text-muted border">Total</span>
+        </div>
+        <h3 class="fw-bold mb-1">${stats.totalUsers || 0}</h3>
+        <p class="text-muted small mb-0">Usuários registrados</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Recent Posts -->
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between">
+        <h6 class="mb-0 fw-bold">Posts Recentes</h6>
+        <a href="/admin/posts" class="btn btn-light btn-sm text-primary fw-bold" style="font-size: 12px;">Ver Todos</a>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="bg-light">
+            <tr>
+              <th class="border-0 text-uppercase text-muted small fw-bold ps-4">Título</th>
+              <th class="border-0 text-uppercase text-muted small fw-bold">Categoria</th>
+              <th class="border-0 text-uppercase text-muted small fw-bold">Status</th>
+              <th class="border-0 text-uppercase text-muted small fw-bold pe-4 text-end">Data</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${recentPosts && recentPosts.length > 0 
+              ? recentPosts.map(post => `
+                <tr>
+                  <td class="ps-4">
+                    <a href="/admin/posts/${post.id}/edit" class="text-dark fw-bold text-decoration-none text-truncate d-block" style="max-width: 250px;">
+                      ${post.title}
+                    </a>
+                  </td>
+                  <td>
+                    ${post.category 
+                      ? `<span class="badge bg-light text-dark border" style="font-weight: 500;">
+                          <i class="bi bi-circle-fill me-1" style="font-size: 6px; color: ${post.category.color}"></i>
+                          ${post.category.name}
+                         </span>`
+                      : '<span class="text-muted small">-</span>'
+                    }
+                  </td>
+                  <td>
+                    <span class="badge ${
+                      post.status === 'published' ? 'bg-success bg-opacity-10 text-success' : 
+                      post.status === 'draft' ? 'bg-warning bg-opacity-10 text-warning' : 
+                      'bg-info bg-opacity-10 text-info'
+                    } border border-opacity-10 px-2 py-1 rounded-pill" style="font-weight: 500;">
+                      ${post.status === 'published' ? 'Publicado' : post.status === 'draft' ? 'Rascunho' : 'Agendado'}
+                    </span>
+                  </td>
+                  <td class="text-end pe-4 text-muted small">
+                    ${new Date(post.created_at).toLocaleDateString('pt-BR')}
+                  </td>
+                </tr>
+              `).join('')
+              : '<tr><td colspan="4" class="text-center text-muted py-5">Nenhum post encontrado</td></tr>'
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Popular Posts -->
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-header bg-white border-bottom py-3">
+        <h6 class="mb-0 fw-bold">Mais Visualizados</h6>
+      </div>
+      <div class="card-body p-0">
+        <div class="list-group list-group-flush">
+          ${popularPosts && popularPosts.length > 0
+            ? popularPosts.map((post, index) => `
+                <div class="list-group-item border-0 px-4 py-3 d-flex align-items-center gap-3">
+                  <div class="flex-shrink-0 fw-bold text-muted opacity-25 fs-4" style="width: 20px;">
+                    ${index + 1}
+                  </div>
+                  <div class="flex-grow-1 min-w-0">
+                    <a href="/admin/posts/${post.id}/edit" class="text-dark fw-bold text-decoration-none text-truncate d-block mb-1">
+                      ${post.title}
+                    </a>
+                    <div class="d-flex align-items-center gap-2 text-muted small">
+                      <i class="bi bi-eye"></i>
+                      ${post.views.toLocaleString('pt-BR')} views
+                    </div>
+                  </div>
+                </div>
+              `).join('')
+            : '<div class="text-center text-muted py-4">Nenhum dado disponível</div>'
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`}) %>

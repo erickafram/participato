@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <rect fill="#e2e8f0" width="800" height="600"/>
+  <text fill="#94a3b8" font-family="Arial, sans-serif" font-size="32" font-weight="bold" text-anchor="middle" x="400" y="290">Imagem</text>
+  <text fill="#94a3b8" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" x="400" y="330">800 x 600</text>
+  <path fill="#94a3b8" d="M340 220h120v80H340z" opacity="0.5"/>
+  <circle fill="#94a3b8" cx="370" cy="250" r="15" opacity="0.7"/>
+  <path fill="#94a3b8" d="M340 300l40-40 30 30 50-50v60H340z" opacity="0.6"/>
+</svg>

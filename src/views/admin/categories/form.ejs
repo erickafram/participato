@@ -1,0 +1,82 @@
+<%- include('../layouts/main', { body: `
+<div class="page-header">
+  <h1><i class="bi bi-folder me-2"></i>${isEdit ? 'Editar Categoria' : 'Nova Categoria'}</h1>
+  <a href="/admin/categories" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i>Voltar
+  </a>
+</div>
+
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-body">
+        <form action="${isEdit ? '/admin/categories/' + category.id : '/admin/categories'}" method="POST">
+          <div class="mb-3">
+            <label class="form-label">Nome <span class="text-danger">*</span></label>
+            <input type="text" name="name" class="form-control" value="${category ? category.name : ''}" required placeholder="Nome da categoria">
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Slug</label>
+            <div class="input-group">
+              <span class="input-group-text">/categoria/</span>
+              <input type="text" name="slug" class="form-control" value="${category ? category.slug : ''}" placeholder="url-amigavel">
+            </div>
+            <small class="text-muted">Deixe em branco para gerar automaticamente</small>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Descrição</label>
+            <textarea name="description" class="form-control" rows="3" placeholder="Descrição da categoria">${category ? category.description || '' : ''}</textarea>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Cor</label>
+              <input type="color" name="color" class="form-control form-control-color w-100" value="${category ? category.color || '#3ba4ff' : '#3ba4ff'}">
+            </div>
+            
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Ícone (Bootstrap Icons)</label>
+              <input type="text" name="icon" class="form-control" value="${category ? category.icon || '' : ''}" placeholder="bi-folder">
+              <small class="text-muted"><a href="https://icons.getbootstrap.com/" target="_blank">Ver ícones</a></small>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Ordem</label>
+              <input type="number" name="order" class="form-control" value="${category ? category.order : 0}" min="0">
+            </div>
+          </div>
+          
+          <div class="form-check mb-4">
+            <input type="checkbox" name="active" class="form-check-input" id="active"${!category || category.active ? ' checked' : ''}>
+            <label class="form-check-label" for="active">Categoria ativa</label>
+          </div>
+          
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-check-lg me-1"></i>${isEdit ? 'Atualizar' : 'Criar Categoria'}
+            </button>
+            <a href="/admin/categories" class="btn btn-outline-secondary">Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-header">
+        <i class="bi bi-info-circle me-2"></i>Dicas
+      </div>
+      <div class="card-body">
+        <p class="mb-2"><strong>Nome:</strong> Será exibido no menu e nas listagens.</p>
+        <p class="mb-2"><strong>Slug:</strong> URL amigável da categoria.</p>
+        <p class="mb-2"><strong>Cor:</strong> Usada para destacar a categoria.</p>
+        <p class="mb-2"><strong>Ícone:</strong> Use classes do Bootstrap Icons (ex: bi-folder).</p>
+        <p class="mb-0"><strong>Ordem:</strong> Define a posição no menu (menor = primeiro).</p>
+      </div>
+    </div>
+  </div>
+</div>
+`}) %>
