@@ -84,7 +84,10 @@ app.use((req, res, next) => {
     title: 'Página não encontrada',
     settings: res.locals.settings || {},
     categories: res.locals.categories || [],
-    menuPages: res.locals.menuPages || []
+    menuPages: res.locals.menuPages || [],
+    siteUrl: process.env.SITE_URL || `http://${req.headers.host}`,
+    currentUrl: req.originalUrl,
+    currentYear: new Date().getFullYear()
   });
 });
 
@@ -106,7 +109,10 @@ app.use((err, req, res, next) => {
     error: process.env.NODE_ENV === 'development' ? err : null,
     settings: res.locals.settings || {},
     categories: res.locals.categories || [],
-    menuPages: res.locals.menuPages || []
+    menuPages: res.locals.menuPages || [],
+    siteUrl: process.env.SITE_URL || `http://${req.headers.host}`,
+    currentUrl: req.originalUrl,
+    currentYear: new Date().getFullYear()
   });
 });
 
