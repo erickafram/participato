@@ -10,27 +10,55 @@
   <style>
     :root { --primary: #3ba4ff; }
     * { font-family: 'Inter', sans-serif; }
-    body { background: #f1f5f9; }
-    .navbar { background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    .navbar-brand { font-weight: 700; color: var(--primary) !important; }
-    .card { border: none; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-    .card-header { background: #fff; border-bottom: 1px solid #e2e8f0; font-weight: 600; padding: 1rem 1.25rem; }
-    .form-label { font-weight: 500; color: #374151; margin-bottom: 6px; }
-    .form-control, .form-select { border-radius: 8px; border: 1px solid #d1d5db; padding: 10px 14px; }
-    .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59,164,255,0.15); }
-    .btn-primary { background: var(--primary); border: none; border-radius: 8px; padding: 10px 20px; font-weight: 500; }
+    body { background: #f1f5f9; font-size: 13px; }
+    .navbar { background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 0.5rem 0; }
+    .navbar-brand { font-weight: 700; color: var(--primary) !important; font-size: 1rem; }
+    .card { border: none; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .card-header { background: #fff; border-bottom: 1px solid #e2e8f0; font-weight: 600; padding: 0.75rem 1rem; font-size: 0.85rem; }
+    .form-label { font-weight: 500; color: #374151; margin-bottom: 4px; font-size: 0.8rem; }
+    .form-control, .form-select { border-radius: 6px; border: 1px solid #d1d5db; padding: 8px 12px; font-size: 0.85rem; }
+    .form-control-lg { padding: 10px 14px; font-size: 1rem; }
+    .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(59,164,255,0.15); }
+    .btn { font-size: 0.85rem; padding: 6px 14px; }
+    .btn-primary { background: var(--primary); border: none; border-radius: 6px; font-weight: 500; }
     .btn-primary:hover { background: #2b8ce6; }
-    .btn-outline-secondary { border-radius: 8px; }
-    .ck-editor__editable { min-height: 300px !important; }
-    .img-preview { max-height: 150px; object-fit: cover; border-radius: 8px; }
+    .btn-lg { padding: 10px 18px; font-size: 0.9rem; }
+    .btn-outline-secondary { border-radius: 6px; }
+    .btn-sm { font-size: 0.75rem; padding: 4px 10px; }
+    .ck-editor__editable { min-height: 350px !important; font-size: 0.9rem; }
+    .img-preview { max-height: 120px; object-fit: cover; border-radius: 6px; }
+    .text-muted { font-size: 0.75rem; }
+    .form-check-label { font-size: 0.85rem; }
+    .input-group-text { font-size: 0.8rem; padding: 8px 10px; }
+    small { font-size: 0.7rem; }
+    .mb-3 { margin-bottom: 0.75rem !important; }
+    .mb-4 { margin-bottom: 1rem !important; }
+    .g-4 { gap: 1rem !important; }
+    .card-body { padding: 1rem; }
+    
+    /* Forçar layout lado a lado */
+    .row.g-4 { flex-wrap: nowrap; }
+    @media (max-width: 991px) {
+      .row.g-4 { flex-wrap: wrap; }
+    }
+    
+    /* Estilos para o modal de galeria */
+    .media-gallery { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; max-height: 400px; overflow-y: auto; }
+    .media-item { cursor: pointer; border: 2px solid transparent; border-radius: 8px; overflow: hidden; transition: all 0.2s; }
+    .media-item:hover { border-color: var(--primary); transform: scale(1.02); }
+    .media-item.selected { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59,164,255,0.3); }
+    .media-item img { width: 100%; height: 100px; object-fit: cover; }
+    .upload-zone { border: 2px dashed #d1d5db; border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s; }
+    .upload-zone:hover { border-color: var(--primary); background: rgba(59,164,255,0.05); }
+    .upload-zone.dragover { border-color: var(--primary); background: rgba(59,164,255,0.1); }
   </style>
 </head>
 <body>
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg mb-4">
-    <div class="container-fluid px-4">
+  <nav class="navbar navbar-expand-lg mb-3">
+    <div class="container-fluid px-3">
       <a class="navbar-brand" href="/admin"><i class="bi bi-lightning-charge"></i> Portal Admin</a>
-      <div class="d-flex align-items-center gap-3">
+      <div class="d-flex align-items-center gap-2">
         <a href="/admin/posts" class="btn btn-outline-secondary btn-sm">
           <i class="bi bi-arrow-left me-1"></i>Voltar
         </a>
@@ -41,15 +69,15 @@
     </div>
   </nav>
 
-  <div class="container-fluid px-4 pb-5">
+  <div class="container-fluid px-3 pb-4">
     <form id="postForm" action="<%= isEdit ? '/admin/posts/' + post.id : '/admin/posts' %>" method="POST" enctype="multipart/form-data">
       <div class="row g-4">
         <!-- Conteúdo Principal -->
-        <div class="col-lg-8">
+        <div class="col-md-8">
           <!-- Título -->
-          <div class="card mb-4">
-            <div class="card-body">
-              <div class="mb-3">
+          <div class="card mb-3">
+            <div class="card-body py-3">
+              <div class="mb-2">
                 <label class="form-label">Título <span class="text-danger">*</span></label>
                 <input type="text" name="title" class="form-control form-control-lg" 
                        value="<%= post ? post.title : '' %>" required 
@@ -65,9 +93,12 @@
           </div>
 
           <!-- Editor de Conteúdo -->
-          <div class="card mb-4">
-            <div class="card-header">
-              <i class="bi bi-pencil-square me-2"></i>Conteúdo
+          <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <span><i class="bi bi-pencil-square me-2"></i>Conteúdo</span>
+              <button type="button" class="btn btn-outline-primary btn-sm" onclick="openMediaModal()">
+                <i class="bi bi-image me-1"></i>Inserir Imagem
+              </button>
             </div>
             <div class="card-body">
               <textarea name="content" id="editor"><%= post ? post.content : '' %></textarea>
@@ -83,7 +114,7 @@
             </div>
             <div class="collapse" id="seoSection">
               <div class="card-body">
-                <div class="mb-3">
+                <div class="mb-2">
                   <label class="form-label">Slug (URL)</label>
                   <div class="input-group">
                     <span class="input-group-text">/noticia/</span>
@@ -92,7 +123,7 @@
                   </div>
                   <small class="text-muted">Deixe em branco para gerar automaticamente</small>
                 </div>
-                <div class="mb-3">
+                <div class="mb-2">
                   <label class="form-label">Meta Título</label>
                   <input type="text" name="meta_title" class="form-control" 
                          value="<%= post ? (post.meta_title || '') : '' %>" 
@@ -109,14 +140,14 @@
         </div>
 
         <!-- Sidebar -->
-        <div class="col-lg-4">
+        <div class="col-md-4">
           <!-- Publicar -->
-          <div class="card mb-4">
+          <div class="card mb-3">
             <div class="card-header">
               <i class="bi bi-send me-2"></i>Publicar
             </div>
             <div class="card-body">
-              <div class="mb-3">
+              <div class="mb-2">
                 <label class="form-label">Status</label>
                 <select name="status" class="form-select">
                   <option value="draft" <%= post && post.status === 'draft' ? 'selected' : '' %>>📝 Rascunho</option>
@@ -125,7 +156,7 @@
                 </select>
               </div>
               
-              <div class="mb-3">
+              <div class="mb-2">
                 <label class="form-label">Agendar para</label>
                 <input type="datetime-local" name="scheduled_at" class="form-control" 
                        value="<%= post && post.scheduled_at ? new Date(post.scheduled_at).toISOString().slice(0,16) : '' %>">
@@ -152,11 +183,11 @@
           </div>
 
           <!-- Categoria -->
-          <div class="card mb-4">
+          <div class="card mb-3">
             <div class="card-header">
               <i class="bi bi-folder me-2"></i>Categoria
             </div>
-            <div class="card-body">
+            <div class="card-body py-2">
               <select name="category_id" class="form-select">
                 <option value="">Sem categoria</option>
                 <% categories.forEach(cat => { %>
@@ -167,11 +198,11 @@
           </div>
 
           <!-- Tags -->
-          <div class="card mb-4">
+          <div class="card mb-3">
             <div class="card-header">
               <i class="bi bi-tags me-2"></i>Tags
             </div>
-            <div class="card-body">
+            <div class="card-body py-2">
               <input type="text" name="tags" class="form-control" 
                      value="<%= post && post.tags ? (Array.isArray(post.tags) ? post.tags.join(', ') : post.tags) : '' %>" 
                      placeholder="tag1, tag2, tag3">
@@ -184,9 +215,9 @@
             <div class="card-header">
               <i class="bi bi-image me-2"></i>Imagem Destacada
             </div>
-            <div class="card-body">
+            <div class="card-body py-2">
               <% if (post && post.featured_image) { %>
-                <div class="mb-3">
+                <div class="mb-2">
                   <img src="<%= post.featured_image %>" alt="" class="img-fluid img-preview w-100">
                 </div>
               <% } %>
@@ -200,21 +231,251 @@
     </form>
   </div>
 
+  <!-- Modal de Mídia para inserir imagem no conteúdo -->
+  <div class="modal fade" id="mediaModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" style="font-size: 1rem;"><i class="bi bi-images me-2"></i>Inserir Imagem no Conteúdo</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Tabs -->
+          <ul class="nav nav-tabs mb-3" role="tablist">
+            <li class="nav-item">
+              <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#uploadTab" style="font-size: 0.85rem;">
+                <i class="bi bi-cloud-upload me-1"></i>Upload
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#galleryTab" style="font-size: 0.85rem;">
+                <i class="bi bi-grid me-1"></i>Galeria
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#urlTab" style="font-size: 0.85rem;">
+                <i class="bi bi-link-45deg me-1"></i>URL Externa
+              </button>
+            </li>
+          </ul>
+          
+          <div class="tab-content">
+            <!-- Upload Tab -->
+            <div class="tab-pane fade show active" id="uploadTab">
+              <div class="upload-zone" id="uploadZone" onclick="document.getElementById('mediaUploadInput').click()">
+                <i class="bi bi-cloud-arrow-up" style="font-size: 2rem; color: #6b7280;"></i>
+                <p class="mb-1 mt-2" style="font-size: 0.9rem;">Clique ou arraste uma imagem aqui</p>
+                <small class="text-muted">JPG, PNG, GIF, WebP (máx. 10MB)</small>
+              </div>
+              <input type="file" id="mediaUploadInput" accept="image/*" style="display: none;">
+              <div id="uploadPreview" class="mt-3 text-center"></div>
+            </div>
+            
+            <!-- Gallery Tab -->
+            <div class="tab-pane fade" id="galleryTab">
+              <div id="mediaGallery" class="media-gallery">
+                <div class="text-center py-4 w-100">
+                  <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                  <p class="mt-2 mb-0" style="font-size: 0.85rem;">Carregando imagens...</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- URL Tab -->
+            <div class="tab-pane fade" id="urlTab">
+              <div class="mb-3">
+                <label class="form-label">URL da Imagem</label>
+                <input type="url" id="externalImageUrl" class="form-control" placeholder="https://exemplo.com/imagem.jpg">
+              </div>
+              <div id="urlPreview" class="text-center"></div>
+            </div>
+          </div>
+          
+          <!-- Opções da imagem -->
+          <div id="imageOptions" class="mt-3 p-3 bg-light rounded" style="display: none;">
+            <div class="row g-2">
+              <div class="col-md-6">
+                <label class="form-label">Texto alternativo (alt)</label>
+                <input type="text" id="imageAlt" class="form-control" placeholder="Descrição da imagem">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Alinhamento</label>
+                <select id="imageAlign" class="form-select">
+                  <option value="">Padrão</option>
+                  <option value="left">Esquerda</option>
+                  <option value="center">Centro</option>
+                  <option value="right">Direita</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" id="insertImageBtn" disabled onclick="insertImageToEditor()">
+            <i class="bi bi-plus-lg me-1"></i>Inserir Imagem
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.ckeditor.com/ckeditor5/40.1.0/classic/ckeditor.js"></script>
   <script>
     let editorInstance;
+    let selectedImageUrl = '';
+    let mediaModal;
     
-    // Inicializar CKEditor
+    // Inicializar CKEditor com suporte a imagens
     ClassicEditor
       .create(document.querySelector('#editor'), {
-        toolbar: ['heading', '|', 'bold', 'italic', 'link', '|', 'bulletedList', 'numberedList', '|', 'blockQuote', 'undo', 'redo'],
+        toolbar: ['heading', '|', 'bold', 'italic', 'link', '|', 'bulletedList', 'numberedList', '|', 'blockQuote', 'insertTable', '|', 'undo', 'redo'],
         placeholder: 'Escreva o conteúdo do seu post aqui...'
       })
       .then(editor => {
         editorInstance = editor;
       })
       .catch(error => console.error(error));
+
+    // Inicializar modal
+    document.addEventListener('DOMContentLoaded', function() {
+      mediaModal = new bootstrap.Modal(document.getElementById('mediaModal'));
+    });
+
+    // Abrir modal de mídia
+    function openMediaModal() {
+      selectedImageUrl = '';
+      document.getElementById('insertImageBtn').disabled = true;
+      document.getElementById('imageOptions').style.display = 'none';
+      document.getElementById('uploadPreview').innerHTML = '';
+      document.getElementById('urlPreview').innerHTML = '';
+      document.getElementById('externalImageUrl').value = '';
+      document.getElementById('imageAlt').value = '';
+      document.getElementById('imageAlign').value = '';
+      
+      // Carregar galeria
+      loadMediaGallery();
+      
+      mediaModal.show();
+    }
+
+    // Carregar galeria de mídia
+    async function loadMediaGallery() {
+      const gallery = document.getElementById('mediaGallery');
+      try {
+        const response = await fetch('/admin/media/browse');
+        const data = await response.json();
+        
+        if (data.medias && data.medias.length > 0) {
+          gallery.innerHTML = data.medias.map(item => `
+            <div class="media-item" onclick="selectGalleryImage('${item.url}', this)">
+              <img src="${item.url}" alt="${item.alt_text || ''}">
+            </div>
+          `).join('');
+        } else {
+          gallery.innerHTML = '<div class="text-center py-4 w-100"><p class="text-muted mb-0" style="font-size: 0.85rem;">Nenhuma imagem na galeria</p></div>';
+        }
+      } catch (error) {
+        gallery.innerHTML = '<div class="text-center py-4 w-100"><p class="text-muted mb-0" style="font-size: 0.85rem;">Erro ao carregar galeria</p></div>';
+      }
+    }
+
+    // Selecionar imagem da galeria
+    function selectGalleryImage(url, element) {
+      document.querySelectorAll('.media-item').forEach(el => el.classList.remove('selected'));
+      element.classList.add('selected');
+      selectedImageUrl = url;
+      document.getElementById('insertImageBtn').disabled = false;
+      document.getElementById('imageOptions').style.display = 'block';
+    }
+
+    // Upload de imagem
+    document.getElementById('mediaUploadInput').addEventListener('change', async function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const preview = document.getElementById('uploadPreview');
+      preview.innerHTML = '<div class="spinner-border spinner-border-sm text-primary"></div> Enviando...';
+      
+      try {
+        const response = await fetch('/admin/media/upload', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await response.json();
+        
+        if (data.success && data.media) {
+          selectedImageUrl = data.media.url;
+          preview.innerHTML = `<img src="${data.media.url}" style="max-height: 150px; border-radius: 8px;">`;
+          document.getElementById('insertImageBtn').disabled = false;
+          document.getElementById('imageOptions').style.display = 'block';
+        } else {
+          preview.innerHTML = '<p class="text-danger">Erro no upload: ' + (data.message || 'Erro desconhecido') + '</p>';
+        }
+      } catch (error) {
+        preview.innerHTML = '<p class="text-danger">Erro no upload</p>';
+      }
+    });
+
+    // Drag and drop
+    const uploadZone = document.getElementById('uploadZone');
+    uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+    uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+    uploadZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadZone.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const input = document.getElementById('mediaUploadInput');
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        input.files = dt.files;
+        input.dispatchEvent(new Event('change'));
+      }
+    });
+
+    // URL externa
+    document.getElementById('externalImageUrl').addEventListener('input', function() {
+      const url = this.value.trim();
+      const preview = document.getElementById('urlPreview');
+      
+      if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+        preview.innerHTML = `<img src="${url}" style="max-height: 150px; border-radius: 8px;" onerror="this.parentElement.innerHTML='<p class=\\'text-danger\\'>Imagem não encontrada</p>'">`;
+        selectedImageUrl = url;
+        document.getElementById('insertImageBtn').disabled = false;
+        document.getElementById('imageOptions').style.display = 'block';
+      } else {
+        preview.innerHTML = '';
+        selectedImageUrl = '';
+        document.getElementById('insertImageBtn').disabled = true;
+        document.getElementById('imageOptions').style.display = 'none';
+      }
+    });
+
+    // Inserir imagem no editor
+    function insertImageToEditor() {
+      if (!selectedImageUrl || !editorInstance) return;
+      
+      const alt = document.getElementById('imageAlt').value || '';
+      const align = document.getElementById('imageAlign').value;
+      
+      let style = '';
+      if (align === 'center') style = 'display: block; margin: 0 auto;';
+      else if (align === 'left') style = 'float: left; margin-right: 15px;';
+      else if (align === 'right') style = 'float: right; margin-left: 15px;';
+      
+      const imgHtml = `<img src="${selectedImageUrl}" alt="${alt}" style="${style} max-width: 100%; height: auto; margin-bottom: 15px;">`;
+      
+      const viewFragment = editorInstance.data.processor.toView(imgHtml);
+      const modelFragment = editorInstance.data.toModel(viewFragment);
+      editorInstance.model.insertContent(modelFragment);
+      
+      mediaModal.hide();
+    }
 
     // Validar formulário antes de enviar
     document.getElementById('postForm').addEventListener('submit', function(e) {
@@ -233,12 +494,11 @@
         return false;
       }
       
-      // Atualizar o textarea hidden com o conteúdo do editor
       document.getElementById('contentBackup').value = content;
       return true;
     });
 
-    // Preview de imagem
+    // Preview de imagem destacada
     document.getElementById('imageInput').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (file) {
