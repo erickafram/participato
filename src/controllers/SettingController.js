@@ -31,7 +31,9 @@ class SettingController {
           social: 'Redes Sociais',
           posts: 'Posts',
           footer: 'Rodapé'
-        }
+        },
+        nodeVersion: process.version,
+        nodeEnv: process.env.NODE_ENV || 'development'
       });
     } catch (error) {
       console.error('Erro ao carregar configurações:', error);
