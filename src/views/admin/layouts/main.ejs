@@ -7,19 +7,23 @@
   <title><%= title %> - Admin</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary: #3b82f6;
-      --sidebar-bg: #0f172a;
-      --sidebar-text: #94a3b8;
-      --sidebar-hover: #1e293b;
-      --sidebar-active: #3b82f6;
-      --content-bg: #f8fafc;
+      --primary-dark: #1d4ed8;
+      --sidebar-width: 220px;
     }
     
-    * { font-family: 'Plus Jakarta Sans', sans-serif; }
-    body { background-color: var(--content-bg); }
+    * { 
+      font-family: 'Inter', sans-serif; 
+      box-sizing: border-box;
+    }
+    
+    body { 
+      background: #f1f5f9; 
+      margin: 0;
+    }
     
     /* Sidebar */
     .sidebar {
@@ -27,219 +31,445 @@
       top: 0;
       left: 0;
       height: 100vh;
-      width: 260px;
-      background-color: var(--sidebar-bg);
+      width: var(--sidebar-width);
+      background: linear-gradient(180deg, #1e40af 0%, #1d4ed8 100%);
       z-index: 1000;
-      transition: transform 0.3s ease;
-    }
-    
-    .sidebar-brand {
-      padding: 24px;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-    
-    .sidebar-menu { padding: 16px; }
-    .menu-header {
-      font-size: 11px;
-      text-transform: uppercase;
-      color: #64748b;
-      font-weight: 700;
-      margin: 24px 12px 8px;
-      letter-spacing: 0.05em;
-    }
-    
-    .nav-link {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      color: var(--sidebar-text);
-      padding: 12px;
-      border-radius: 8px;
-      font-weight: 500;
-      transition: all 0.2s;
-    }
-    
-    .nav-link:hover {
-      background-color: var(--sidebar-hover);
-      color: #fff;
-    }
-    
-    .nav-link.active {
-      background-color: var(--sidebar-active);
-      color: #fff;
-    }
-    
-    .nav-link i { font-size: 18px; }
-    
-    /* Main Content */
-    .main-content {
-      margin-left: 260px;
-      min-height: 100vh;
+      transition: transform 0.3s;
       display: flex;
       flex-direction: column;
     }
     
-    /* Header */
+    .sidebar-brand {
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .sidebar-brand i {
+      font-size: 24px;
+      color: #fff;
+    }
+    
+    .sidebar-brand span {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+    }
+    
+    .sidebar-menu {
+      flex: 1;
+      padding: 8px 12px;
+      overflow-y: auto;
+    }
+    
+    .menu-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      padding: 16px 12px 8px;
+    }
+    
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 2px;
+      transition: all 0.2s;
+    }
+    
+    .nav-item:hover {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+    }
+    
+    .nav-item.active {
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+    }
+    
+    .nav-item i {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+    }
+    
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    
+    .user-info:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .user-details {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .user-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .user-role {
+      font-size: 10px;
+      color: rgba(255,255,255,0.5);
+    }
+    
+    /* Main Content */
+    .main-wrapper {
+      margin-left: var(--sidebar-width);
+      min-height: 100vh;
+    }
+    
+    /* Topbar */
     .topbar {
-      height: 70px;
+      height: 56px;
       background: #fff;
       border-bottom: 1px solid #e2e8f0;
-      padding: 0 32px;
+      padding: 0 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       position: sticky;
       top: 0;
-      z-index: 999;
+      z-index: 100;
     }
     
-    .search-form input {
-      border: 1px solid #e2e8f0;
-      padding: 8px 16px 8px 40px;
-      border-radius: 50px;
-      width: 280px;
-      background: #f8fafc;
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
     }
     
-    .search-form i {
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #94a3b8;
-    }
-    
-    /* Content Area */
-    .page-content { padding: 32px; flex: 1; }
-    
-    /* Components */
-    .card {
+    .menu-toggle {
+      display: none;
+      background: none;
       border: none;
-      border-radius: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      padding: 8px;
+      color: #64748b;
+      cursor: pointer;
+    }
+    
+    .search-box {
+      position: relative;
+    }
+    
+    .search-box input {
+      width: 240px;
+      padding: 8px 12px 8px 36px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 13px;
+      background: #f8fafc;
+      transition: all 0.2s;
+    }
+    
+    .search-box input:focus {
+      outline: none;
+      border-color: var(--primary);
       background: #fff;
     }
     
+    .search-box i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      font-size: 14px;
+    }
+    
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .btn-site {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: #f1f5f9;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #475569;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    
+    .btn-site:hover {
+      background: #e2e8f0;
+      color: #334155;
+    }
+    
+    .btn-logout {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      color: #64748b;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    
+    .btn-logout:hover {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+    
+    /* Page Content */
+    .page-content {
+      padding: 24px;
+    }
+    
+    /* Alerts */
+    .alert-toast {
+      position: fixed;
+      top: 72px;
+      right: 24px;
+      z-index: 1050;
+      min-width: 300px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: slideIn 0.3s ease;
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    .alert-toast.success {
+      background: #dcfce7;
+      color: #166534;
+    }
+    
+    .alert-toast.error {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    
+    .alert-toast .btn-close {
+      margin-left: auto;
+      font-size: 10px;
+    }
+    
+    /* Cards */
+    .card {
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      background: #fff;
+    }
+    
+    /* Buttons */
     .btn-primary {
-      background-color: var(--primary);
+      background: var(--primary);
       border-color: var(--primary);
+    }
+    
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      border-color: var(--primary-dark);
     }
     
     /* Responsive */
     @media (max-width: 991px) {
-      .sidebar { transform: translateX(-100%); }
-      .sidebar.show { transform: translateX(0); }
-      .main-content { margin-left: 0; }
-      .sidebar-overlay {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      
+      .sidebar.show {
+        transform: translateX(0);
+      }
+      
+      .main-wrapper {
+        margin-left: 0;
+      }
+      
+      .menu-toggle {
+        display: block;
+      }
+      
+      .search-box {
+        display: none;
+      }
+      
+      .overlay {
         display: none;
         position: fixed;
         inset: 0;
         background: rgba(0,0,0,0.5);
         z-index: 999;
       }
-      .sidebar-overlay.show { display: block; }
+      
+      .overlay.show {
+        display: block;
+      }
+    }
+    
+    @media (max-width: 640px) {
+      .page-content {
+        padding: 16px;
+      }
+      
+      .btn-site span {
+        display: none;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- Mobile Overlay -->
-  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="overlay" id="overlay"></div>
 
   <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
-    <div class="sidebar-brand d-flex align-items-center gap-2">
-      <i class="bi bi-lightning-charge-fill text-primary fs-4"></i>
-      <h5 class="text-white mb-0 fw-bold">Portal<span class="text-primary">Admin</span></h5>
+    <div class="sidebar-brand">
+      <i class="bi bi-lightning-charge-fill"></i>
+      <span>PortalAdmin</span>
     </div>
     
-    <nav class="sidebar-menu overflow-auto" style="height: calc(100vh - 80px);">
-      <a href="/admin" class="nav-link <%= currentPath === '/admin' ? 'active' : '' %>">
-        <i class="bi bi-grid-fill"></i>
+    <nav class="sidebar-menu">
+      <a href="/admin" class="nav-item <%= currentPath === '/admin' ? 'active' : '' %>">
+        <i class="bi bi-grid"></i>
         <span>Dashboard</span>
       </a>
       
-      <div class="menu-header">Conteúdo</div>
-      <a href="/admin/posts" class="nav-link <%= currentPath.startsWith('/admin/posts') ? 'active' : '' %>">
-        <i class="bi bi-file-earmark-text-fill"></i>
+      <div class="menu-label">Conteúdo</div>
+      
+      <a href="/admin/posts" class="nav-item <%= currentPath.startsWith('/admin/posts') ? 'active' : '' %>">
+        <i class="bi bi-file-text"></i>
         <span>Posts</span>
       </a>
-      <a href="/admin/categories" class="nav-link <%= currentPath.startsWith('/admin/categories') ? 'active' : '' %>">
-        <i class="bi bi-folder-fill"></i>
+      
+      <a href="/admin/categories" class="nav-item <%= currentPath.startsWith('/admin/categories') ? 'active' : '' %>">
+        <i class="bi bi-folder"></i>
         <span>Categorias</span>
       </a>
-      <a href="/admin/pages" class="nav-link <%= currentPath.startsWith('/admin/pages') ? 'active' : '' %>">
-        <i class="bi bi-file-earmark-fill"></i>
+      
+      <a href="/admin/pages" class="nav-item <%= currentPath.startsWith('/admin/pages') ? 'active' : '' %>">
+        <i class="bi bi-file-earmark"></i>
         <span>Páginas</span>
       </a>
-      <a href="/admin/media" class="nav-link <%= currentPath.startsWith('/admin/media') ? 'active' : '' %>">
-        <i class="bi bi-images"></i>
+      
+      <a href="/admin/media" class="nav-item <%= currentPath.startsWith('/admin/media') ? 'active' : '' %>">
+        <i class="bi bi-image"></i>
         <span>Mídia</span>
       </a>
       
       <% if (user && user.role === 'admin') { %>
-        <div class="menu-header">Sistema</div>
-        <a href="/admin/users" class="nav-link <%= currentPath.startsWith('/admin/users') ? 'active' : '' %>">
-          <i class="bi bi-people-fill"></i>
+        <div class="menu-label">Sistema</div>
+        
+        <a href="/admin/users" class="nav-item <%= currentPath.startsWith('/admin/users') ? 'active' : '' %>">
+          <i class="bi bi-people"></i>
           <span>Usuários</span>
         </a>
-        <a href="/admin/settings" class="nav-link <%= currentPath.startsWith('/admin/settings') ? 'active' : '' %>">
-          <i class="bi bi-gear-fill"></i>
+        
+        <a href="/admin/settings" class="nav-item <%= currentPath.startsWith('/admin/settings') ? 'active' : '' %>">
+          <i class="bi bi-gear"></i>
           <span>Configurações</span>
         </a>
       <% } %>
     </nav>
+    
+    <div class="sidebar-footer">
+      <a href="/admin/profile" class="user-info">
+        <div class="user-avatar">
+          <%= user ? user.name.charAt(0).toUpperCase() : 'U' %>
+        </div>
+        <div class="user-details">
+          <div class="user-name"><%= user ? user.name : 'Usuário' %></div>
+          <div class="user-role"><%= user && user.role === 'admin' ? 'Admin' : 'Editor' %></div>
+        </div>
+      </a>
+    </div>
   </aside>
 
-  <div class="main-content">
+  <!-- Main -->
+  <div class="main-wrapper">
     <header class="topbar">
-      <div class="d-flex align-items-center gap-3">
-        <button class="btn border-0 d-lg-none p-0" id="sidebarToggle">
-          <i class="bi bi-list fs-4"></i>
+      <div class="topbar-left">
+        <button class="menu-toggle" id="menuToggle">
+          <i class="bi bi-list fs-5"></i>
         </button>
-        <div class="search-form position-relative d-none d-md-block">
+        <div class="search-box">
           <i class="bi bi-search"></i>
-          <input type="text" placeholder="Buscar no painel...">
+          <input type="text" placeholder="Buscar...">
         </div>
       </div>
       
-      <div class="d-flex align-items-center gap-4">
-        <a href="/" target="_blank" class="btn btn-light btn-sm rounded-pill px-3 text-muted fw-bold d-none d-sm-block">
-          <i class="bi bi-box-arrow-up-right me-2"></i>Ver Site
+      <div class="topbar-right">
+        <a href="/" target="_blank" class="btn-site">
+          <i class="bi bi-box-arrow-up-right"></i>
+          <span>Ver Site</span>
         </a>
-        
-        <div class="dropdown">
-          <a href="#" class="d-flex align-items-center gap-2 text-decoration-none dropdown-toggle text-dark" data-bs-toggle="dropdown">
-            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px;">
-              <%= user ? user.name.charAt(0).toUpperCase() : 'U' %>
-            </div>
-            <div class="d-none d-sm-block text-start">
-              <div class="fw-bold small"><%= user ? user.name : 'Usuário' %></div>
-              <div class="text-muted" style="font-size: 10px;"><%= user && user.role === 'admin' ? 'Administrador' : 'Editor' %></div>
-            </div>
-          </a>
-          <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2">
-            <li><a class="dropdown-item" href="/admin/profile"><i class="bi bi-person me-2"></i>Perfil</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item text-danger" href="/admin/logout"><i class="bi bi-box-arrow-right me-2"></i>Sair</a></li>
-          </ul>
-        </div>
+        <a href="/admin/logout" class="btn-logout" title="Sair">
+          <i class="bi bi-box-arrow-right"></i>
+        </a>
       </div>
     </header>
 
     <div class="page-content">
       <% if (success && success.length > 0) { %>
-        <div class="alert alert-success border-0 shadow-sm d-flex align-items-center mb-4">
-          <i class="bi bi-check-circle-fill me-2 fs-5"></i>
-          <div><%- success %></div>
-          <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+        <div class="alert-toast success">
+          <i class="bi bi-check-circle-fill"></i>
+          <%- success %>
+          <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
         </div>
       <% } %>
       
       <% if (error && error.length > 0) { %>
-        <div class="alert alert-danger border-0 shadow-sm d-flex align-items-center mb-4">
-          <i class="bi bi-exclamation-circle-fill me-2 fs-5"></i>
-          <div><%- error %></div>
-          <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+        <div class="alert-toast error">
+          <i class="bi bi-exclamation-circle-fill"></i>
+          <%- error %>
+          <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
         </div>
       <% } %>
 
@@ -249,23 +479,24 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    const toggle = document.getElementById('sidebarToggle');
+    const toggle = document.getElementById('menuToggle');
     const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebarOverlay');
+    const overlay = document.getElementById('overlay');
     
-    if (toggle) {
-      toggle.addEventListener('click', () => {
-        sidebar.classList.add('show');
-        overlay.classList.add('show');
-      });
-    }
+    toggle?.addEventListener('click', () => {
+      sidebar.classList.add('show');
+      overlay.classList.add('show');
+    });
     
-    if (overlay) {
-      overlay.addEventListener('click', () => {
-        sidebar.classList.remove('show');
-        overlay.classList.remove('show');
-      });
-    }
+    overlay?.addEventListener('click', () => {
+      sidebar.classList.remove('show');
+      overlay.classList.remove('show');
+    });
+    
+    // Auto-hide alerts
+    setTimeout(() => {
+      document.querySelectorAll('.alert-toast').forEach(el => el.remove());
+    }, 5000);
   </script>
 </body>
 </html>

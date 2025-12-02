@@ -169,14 +169,21 @@ const uploadMultiple = (fieldName, maxCount = 10) => {
 
 // Função para deletar imagem
 const deleteImage = (filename) => {
-  const imagePath = path.join(uploadDir, 'images', filename);
-  const thumbnailPath = path.join(uploadDir, 'thumbnails', filename);
-  
-  if (fs.existsSync(imagePath)) {
-    fs.unlinkSync(imagePath);
-  }
-  if (fs.existsSync(thumbnailPath)) {
-    fs.unlinkSync(thumbnailPath);
+  try {
+    if (!filename) return;
+    
+    const imagePath = path.join(uploadDir, 'images', filename);
+    const thumbnailPath = path.join(uploadDir, 'thumbnails', filename);
+    
+    if (fs.existsSync(imagePath)) {
+      fs.unlinkSync(imagePath);
+    }
+    if (fs.existsSync(thumbnailPath)) {
+      fs.unlinkSync(thumbnailPath);
+    }
+  } catch (error) {
+    console.error('Erro ao deletar arquivo:', error);
+    // Não lança erro para não interromper o fluxo
   }
 };
 

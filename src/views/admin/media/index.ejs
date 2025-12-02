@@ -1,221 +1,509 @@
 <%- include('../layouts/main', { body: `
 <div class="page-header">
-  <h1><i class="bi bi-images me-2"></i>Biblioteca de Mídia</h1>
-  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
-    <i class="bi bi-cloud-upload me-1"></i>Upload
+  <div>
+    <h1>Mídia</h1>
+    <p>Biblioteca de imagens e arquivos</p>
+  </div>
+  <button type="button" class="btn-action" onclick="document.getElementById('fileInput').click()">
+    <i class="bi bi-cloud-upload"></i>
+    Upload
   </button>
+  <input type="file" id="fileInput" accept="image/*" multiple style="display: none;" onchange="uploadFiles(this.files)">
 </div>
 
-<div class="card">
-  <div class="card-body">
-    ${medias && medias.length > 0 
-      ? '<div class="row g-3">' +
-          medias.map(media => 
-            '<div class="col-6 col-md-4 col-lg-3 col-xl-2">' +
-              '<div class="card h-100 media-item" style="cursor: pointer;" onclick="showMediaDetails(' + media.id + ')">' +
-                '<div class="ratio ratio-1x1">' +
-                  '<img src="' + media.url + '" alt="' + (media.alt_text || '') + '" class="card-img-top" style="object-fit: cover;">' +
-                '</div>' +
-                '<div class="card-body p-2">' +
-                  '<small class="text-truncate d-block">' + media.filename + '</small>' +
-                '</div>' +
-              '</div>' +
-            '</div>'
-          ).join('') +
-        '</div>'
-      : '<div class="text-center py-5 text-muted"><i class="bi bi-images fs-1 d-block mb-3"></i><p>Nenhuma mídia encontrada</p><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="bi bi-cloud-upload me-1"></i>Fazer Upload</button></div>'
-    }
+<div class="media-card">
+  ${medias && medias.length > 0 
+    ? '<div class="media-grid">' +
+        medias.map(media => 
+          '<div class="media-item" onclick="showDetails(' + media.id + ')">' +
+            '<div class="media-thumb">' +
+              '<img src="' + media.url + '" alt="' + (media.alt_text || '') + '">' +
+            '</div>' +
+            '<div class="media-info">' +
+              '<span class="media-name">' + media.filename + '</span>' +
+            '</div>' +
+          '</div>'
+        ).join('') +
+      '</div>' +
+      (pagination.totalPages > 1 
+        ? '<div class="media-pagination">' +
+            (pagination.hasPrev ? '<a href="?page=' + (pagination.page - 1) + '" class="page-btn"><i class="bi bi-chevron-left"></i></a>' : '') +
+            '<span class="page-info">' + pagination.page + ' / ' + pagination.totalPages + '</span>' +
+            (pagination.hasNext ? '<a href="?page=' + (pagination.page + 1) + '" class="page-btn"><i class="bi bi-chevron-right"></i></a>' : '') +
+          '</div>'
+        : ''
+      )
+    : '<div class="empty-state">' +
+        '<i class="bi bi-images"></i>' +
+        '<h3>Nenhuma mídia</h3>' +
+        '<p>Faça upload de imagens para usar nos posts</p>' +
+        '<button type="button" class="btn-action" id="emptyUploadBtn">' +
+          '<i class="bi bi-cloud-upload"></i> Fazer Upload' +
+        '</button>' +
+      '</div>'
+  }
+</div>
+
+<!-- Upload Progress -->
+<div id="uploadProgress" class="upload-progress" style="display: none;">
+  <div class="progress-content">
+    <div class="spinner"></div>
+    <span>Enviando...</span>
   </div>
-  
-  ${pagination.totalPages > 1 ? '<div class="card-footer">' +
-    '<nav>' +
-      '<ul class="pagination pagination-sm mb-0 justify-content-center">' +
-        (pagination.hasPrev ? '<li class="page-item"><a class="page-link" href="?page=' + (pagination.page - 1) + '">Anterior</a></li>' : '') +
-        '<li class="page-item disabled"><span class="page-link">Página ' + pagination.page + ' de ' + pagination.totalPages + '</span></li>' +
-        (pagination.hasNext ? '<li class="page-item"><a class="page-link" href="?page=' + (pagination.page + 1) + '">Próxima</a></li>' : '') +
-      '</ul>' +
-    '</nav>' +
-  '</div>' : ''}
 </div>
 
-<!-- Upload Modal -->
-<div class="modal fade" id="uploadModal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title"><i class="bi bi-cloud-upload me-2"></i>Upload de Mídia</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <form id="uploadForm" enctype="multipart/form-data">
-          <div class="mb-3">
-            <label class="form-label">Selecione os arquivos</label>
-            <input type="file" name="files" id="fileInput" class="form-control" accept="image/*" multiple>
-            <small class="text-muted">Formatos aceitos: JPG, PNG, GIF, WebP (máx. 10MB cada)</small>
-          </div>
-          <div id="uploadProgress" style="display: none;">
-            <div class="progress">
-              <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%"></div>
-            </div>
-            <small class="text-muted mt-1 d-block">Enviando...</small>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-primary" onclick="uploadFiles()">
-          <i class="bi bi-upload me-1"></i>Enviar
-        </button>
-      </div>
+<!-- Media Modal -->
+<div id="mediaModal" class="modal-overlay" style="display: none;" onclick="if(event.target === this) closeModal()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Detalhes da Mídia</h3>
+      <button type="button" class="modal-close" onclick="closeModal()"><i class="bi bi-x-lg"></i></button>
     </div>
-  </div>
-</div>
-
-<!-- Media Details Modal -->
-<div class="modal fade" id="mediaModal" tabindex="-1">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Detalhes da Mídia</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <div class="row">
-          <div class="col-md-6">
-            <img id="mediaPreview" src="" alt="" class="img-fluid rounded">
+    <div class="modal-body">
+      <div class="modal-grid">
+        <div class="modal-preview">
+          <img id="previewImg" src="" alt="">
+        </div>
+        <div class="modal-form">
+          <div class="form-group">
+            <label>URL</label>
+            <div class="input-copy">
+              <input type="text" id="mediaUrl" readonly>
+              <button type="button" onclick="copyUrl()"><i class="bi bi-clipboard"></i></button>
+            </div>
           </div>
-          <div class="col-md-6">
-            <div class="mb-3">
-              <label class="form-label">URL</label>
-              <div class="input-group">
-                <input type="text" id="mediaUrl" class="form-control" readonly>
-                <button class="btn btn-outline-secondary" onclick="copyUrl()"><i class="bi bi-clipboard"></i></button>
-              </div>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Texto Alternativo</label>
-              <input type="text" id="mediaAlt" class="form-control" placeholder="Descrição da imagem">
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Legenda</label>
-              <textarea id="mediaCaption" class="form-control" rows="2"></textarea>
-            </div>
-            <div class="mb-3">
-              <small class="text-muted">
-                <strong>Arquivo:</strong> <span id="mediaFilename"></span><br>
-                <strong>Tamanho:</strong> <span id="mediaSize"></span><br>
-                <strong>Dimensões:</strong> <span id="mediaDimensions"></span>
-              </small>
-            </div>
+          <div class="form-group">
+            <label>Texto Alternativo</label>
+            <input type="text" id="mediaAlt" placeholder="Descrição da imagem">
+          </div>
+          <div class="form-group">
+            <label>Legenda</label>
+            <textarea id="mediaCaption" rows="2" placeholder="Legenda opcional"></textarea>
+          </div>
+          <div class="media-meta">
+            <span><strong>Arquivo:</strong> <span id="metaFilename"></span></span>
+            <span><strong>Tamanho:</strong> <span id="metaSize"></span></span>
+            <span><strong>Dimensões:</strong> <span id="metaDimensions"></span></span>
           </div>
         </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger me-auto" onclick="deleteMedia()">
-          <i class="bi bi-trash me-1"></i>Excluir
-        </button>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-        <button type="button" class="btn btn-primary" onclick="saveMedia()">
-          <i class="bi bi-check-lg me-1"></i>Salvar
-        </button>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn-delete" onclick="deleteMedia()">
+        <i class="bi bi-trash"></i> Excluir
+      </button>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" onclick="closeModal()">Cancelar</button>
+        <button type="button" class="btn-primary" onclick="saveMedia()">Salvar</button>
       </div>
     </div>
   </div>
 </div>
 
-<script>
-let currentMediaId = null;
+<style>
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.page-header > div {
+  flex: 1;
+}
+.page-header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 4px;
+}
+.page-header p {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+.btn-action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-action:hover {
+  background: #2563eb;
+}
 
-function uploadFiles() {
-  const input = document.getElementById('fileInput');
-  const files = input.files;
-  
-  if (files.length === 0) {
-    alert('Selecione pelo menos um arquivo.');
-    return;
+.media-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+}
+.media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 16px;
+}
+.media-item {
+  cursor: pointer;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+}
+.media-item:hover {
+  border-color: #3b82f6;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.media-thumb {
+  aspect-ratio: 1;
+  background: #f1f5f9;
+}
+.media-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.media-info {
+  padding: 8px;
+  background: #f8fafc;
+}
+.media-name {
+  font-size: 11px;
+  color: #64748b;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.media-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #f1f5f9;
+}
+.page-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: #f1f5f9;
+  color: #475569;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.page-btn:hover {
+  background: #3b82f6;
+  color: #fff;
+}
+.page-info {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+}
+.empty-state i {
+  font-size: 48px;
+  color: #cbd5e1;
+  margin-bottom: 16px;
+}
+.empty-state h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #475569;
+  margin: 0 0 8px;
+}
+.empty-state p {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0 0 20px;
+}
+
+/* Upload Progress */
+.upload-progress {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #0f172a;
+  color: #fff;
+  padding: 16px 24px;
+  border-radius: 10px;
+  z-index: 1000;
+}
+.progress-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+}
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+.modal-box {
+  background: #fff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f5f9;
+}
+.modal-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+.modal-close {
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 4px;
+}
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+}
+.modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.modal-preview {
+  background: #f1f5f9;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.modal-preview img {
+  width: 100%;
+  height: auto;
+}
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 6px;
+}
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 13px;
+}
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+.input-copy {
+  display: flex;
+  gap: 8px;
+}
+.input-copy input {
+  flex: 1;
+  background: #f8fafc;
+}
+.input-copy button {
+  padding: 10px 12px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #64748b;
+}
+.input-copy button:hover {
+  background: #e2e8f0;
+}
+.media-meta {
+  font-size: 12px;
+  color: #64748b;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-top: 1px solid #f1f5f9;
+}
+.modal-actions {
+  display: flex;
+  gap: 8px;
+}
+.btn-delete {
+  background: none;
+  border: none;
+  color: #dc2626;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-delete:hover {
+  text-decoration: underline;
+}
+.btn-secondary {
+  padding: 10px 16px;
+  background: #f1f5f9;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.btn-primary {
+  padding: 10px 16px;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.btn-primary:hover {
+  background: #2563eb;
+}
+
+@media (max-width: 640px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
   }
-  
-  const formData = new FormData();
-  for (let i = 0; i < files.length; i++) {
-    formData.append('files', files[i]);
+  .btn-action {
+    width: 100%;
+    justify-content: center;
   }
+  .modal-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+
+<script>
+let currentId = null;
+
+async function uploadFiles(files) {
+  if (!files.length) return;
   
   const progress = document.getElementById('uploadProgress');
-  const progressBar = progress.querySelector('.progress-bar');
   progress.style.display = 'block';
   
-  fetch('/admin/media/upload-multiple', {
-    method: 'POST',
-    body: formData
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      location.reload();
-    } else {
-      alert(data.message || 'Erro ao fazer upload.');
-      progress.style.display = 'none';
-    }
-  })
-  .catch(error => {
-    alert('Erro ao fazer upload.');
-    progress.style.display = 'none';
-  });
-}
-
-function showMediaDetails(id) {
-  currentMediaId = id;
+  const formData = new FormData();
+  for (let file of files) {
+    formData.append('files', file);
+  }
   
-  fetch('/admin/media/' + id)
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        const media = data.media;
-        document.getElementById('mediaPreview').src = media.url;
-        document.getElementById('mediaUrl').value = media.url;
-        document.getElementById('mediaAlt').value = media.alt_text || '';
-        document.getElementById('mediaCaption').value = media.caption || '';
-        document.getElementById('mediaFilename').textContent = media.filename;
-        document.getElementById('mediaSize').textContent = media.formattedSize;
-        document.getElementById('mediaDimensions').textContent = (media.width || '?') + ' x ' + (media.height || '?') + ' px';
-        
-        new bootstrap.Modal(document.getElementById('mediaModal')).show();
-      }
-    });
+  try {
+    const res = await fetch('/admin/media/upload-multiple', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (data.success) location.reload();
+    else alert(data.message || 'Erro no upload');
+  } catch (e) {
+    alert('Erro no upload');
+  }
+  progress.style.display = 'none';
 }
 
-function saveMedia() {
+async function showDetails(id) {
+  currentId = id;
+  try {
+    const res = await fetch('/admin/media/' + id);
+    const data = await res.json();
+    if (data.success) {
+      const m = data.media;
+      document.getElementById('previewImg').src = m.url;
+      document.getElementById('mediaUrl').value = m.url;
+      document.getElementById('mediaAlt').value = m.alt_text || '';
+      document.getElementById('mediaCaption').value = m.caption || '';
+      document.getElementById('metaFilename').textContent = m.filename;
+      document.getElementById('metaSize').textContent = m.formattedSize;
+      document.getElementById('metaDimensions').textContent = (m.width || '?') + ' x ' + (m.height || '?') + 'px';
+      document.getElementById('mediaModal').style.display = 'flex';
+    }
+  } catch (e) {}
+}
+
+function closeModal() {
+  document.getElementById('mediaModal').style.display = 'none';
+}
+
+async function saveMedia() {
   const formData = new FormData();
   formData.append('alt_text', document.getElementById('mediaAlt').value);
   formData.append('caption', document.getElementById('mediaCaption').value);
   
-  fetch('/admin/media/' + currentMediaId, {
-    method: 'POST',
-    body: formData
-  })
-  .then(response => response.json())
-  .then(data => {
+  try {
+    const res = await fetch('/admin/media/' + currentId, { method: 'POST', body: formData });
+    const data = await res.json();
     if (data.success) {
-      bootstrap.Modal.getInstance(document.getElementById('mediaModal')).hide();
-      alert('Mídia atualizada!');
-    } else {
-      alert(data.message || 'Erro ao salvar.');
+      closeModal();
+      alert('Salvo!');
     }
-  });
+  } catch (e) {}
 }
 
-function deleteMedia() {
-  if (!confirm('Tem certeza que deseja excluir esta mídia?')) return;
-  
-  fetch('/admin/media/' + currentMediaId + '/delete', { method: 'POST' })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        location.reload();
-      } else {
-        alert(data.message || 'Erro ao excluir.');
-      }
-    });
+async function deleteMedia() {
+  if (!confirm('Excluir esta mídia?')) return;
+  try {
+    const res = await fetch('/admin/media/' + currentId + '/delete', { method: 'POST' });
+    const data = await res.json();
+    if (data.success) location.reload();
+  } catch (e) {}
 }
 
 function copyUrl() {
@@ -224,13 +512,13 @@ function copyUrl() {
   document.execCommand('copy');
   alert('URL copiada!');
 }
-</script>
 
-<style>
-.media-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  transition: all 0.2s;
+// Empty state button
+const emptyBtn = document.getElementById('emptyUploadBtn');
+if (emptyBtn) {
+  emptyBtn.addEventListener('click', function() {
+    document.getElementById('fileInput').click();
+  });
 }
-</style>
+</script>
 `}) %>

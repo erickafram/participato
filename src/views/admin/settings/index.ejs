@@ -1,136 +1,306 @@
 <%- include('../layouts/main', { body: `
 <div class="page-header">
-  <h1><i class="bi bi-gear me-2"></i>Configurações</h1>
+  <div>
+    <h1>Configurações</h1>
+    <p>Personalize seu portal</p>
+  </div>
 </div>
 
 <form action="/admin/settings" method="POST">
-  <div class="row">
-    <div class="col-lg-8">
-      <!-- General Settings -->
-      <div class="card mb-4">
+  <div class="settings-layout">
+    <div class="settings-main">
+      <!-- Geral -->
+      <div class="settings-card">
         <div class="card-header">
-          <i class="bi bi-sliders me-2"></i>Configurações Gerais
+          <i class="bi bi-sliders"></i>
+          <span>Geral</span>
         </div>
         <div class="card-body">
-          ${groupedSettings.general ? groupedSettings.general.map(setting => 
-            '<div class="mb-3">' +
-              '<label class="form-label">' + (setting.label || setting.key) + '</label>' +
-              (setting.type === 'textarea' 
-                ? '<textarea name="' + setting.key + '" class="form-control" rows="2">' + (setting.value || '') + '</textarea>'
-                : '<input type="' + (setting.type === 'number' ? 'number' : 'text') + '" name="' + setting.key + '" class="form-control" value="' + (setting.value || '') + '">'
+          ${groupedSettings.general ? groupedSettings.general.map(s => 
+            '<div class="form-group">' +
+              '<label>' + (s.label || s.key) + '</label>' +
+              (s.type === 'textarea' 
+                ? '<textarea name="' + s.key + '" rows="2">' + (s.value || '') + '</textarea>'
+                : '<input type="' + (s.type === 'number' ? 'number' : 'text') + '" name="' + s.key + '" value="' + (s.value || '') + '">'
               ) +
-              (setting.description ? '<small class="text-muted">' + setting.description + '</small>' : '') +
+              (s.description ? '<small>' + s.description + '</small>' : '') +
             '</div>'
-          ).join('') : '<p class="text-muted">Nenhuma configuração encontrada.</p>'}
+          ).join('') : '<p class="empty">Nenhuma configuração</p>'}
         </div>
       </div>
       
-      <!-- Contact Settings -->
-      <div class="card mb-4">
+      <!-- Contato -->
+      <div class="settings-card">
         <div class="card-header">
-          <i class="bi bi-envelope me-2"></i>Contato
+          <i class="bi bi-envelope"></i>
+          <span>Contato</span>
         </div>
         <div class="card-body">
-          ${groupedSettings.contact ? groupedSettings.contact.map(setting => 
-            '<div class="mb-3">' +
-              '<label class="form-label">' + (setting.label || setting.key) + '</label>' +
-              (setting.type === 'textarea' 
-                ? '<textarea name="' + setting.key + '" class="form-control" rows="2">' + (setting.value || '') + '</textarea>'
-                : '<input type="text" name="' + setting.key + '" class="form-control" value="' + (setting.value || '') + '">'
+          ${groupedSettings.contact ? groupedSettings.contact.map(s => 
+            '<div class="form-group">' +
+              '<label>' + (s.label || s.key) + '</label>' +
+              (s.type === 'textarea' 
+                ? '<textarea name="' + s.key + '" rows="2">' + (s.value || '') + '</textarea>'
+                : '<input type="text" name="' + s.key + '" value="' + (s.value || '') + '">'
               ) +
             '</div>'
           ).join('') : ''}
         </div>
       </div>
       
-      <!-- Social Settings -->
-      <div class="card mb-4">
+      <!-- Redes Sociais -->
+      <div class="settings-card">
         <div class="card-header">
-          <i class="bi bi-share me-2"></i>Redes Sociais
+          <i class="bi bi-share"></i>
+          <span>Redes Sociais</span>
         </div>
         <div class="card-body">
-          ${groupedSettings.social ? groupedSettings.social.map(setting => 
-            '<div class="mb-3">' +
-              '<label class="form-label">' + (setting.label || setting.key) + '</label>' +
-              '<input type="url" name="' + setting.key + '" class="form-control" value="' + (setting.value || '') + '" placeholder="https://">' +
+          ${groupedSettings.social ? groupedSettings.social.map(s => 
+            '<div class="form-group">' +
+              '<label>' + (s.label || s.key) + '</label>' +
+              '<input type="url" name="' + s.key + '" value="' + (s.value || '') + '" placeholder="https://">' +
             '</div>'
           ).join('') : ''}
         </div>
       </div>
       
-      <!-- Posts Settings -->
-      <div class="card mb-4">
+      <!-- Posts -->
+      <div class="settings-card">
         <div class="card-header">
-          <i class="bi bi-file-text me-2"></i>Posts
+          <i class="bi bi-file-text"></i>
+          <span>Posts</span>
         </div>
         <div class="card-body">
-          ${groupedSettings.posts ? groupedSettings.posts.map(setting => 
-            '<div class="mb-3">' +
-              '<label class="form-label">' + (setting.label || setting.key) + '</label>' +
-              '<input type="number" name="' + setting.key + '" class="form-control" value="' + (setting.value || '') + '" min="1">' +
-              (setting.description ? '<small class="text-muted">' + setting.description + '</small>' : '') +
+          ${groupedSettings.posts ? groupedSettings.posts.map(s => 
+            '<div class="form-group">' +
+              '<label>' + (s.label || s.key) + '</label>' +
+              '<input type="number" name="' + s.key + '" value="' + (s.value || '') + '" min="1">' +
+              (s.description ? '<small>' + s.description + '</small>' : '') +
             '</div>'
           ).join('') : ''}
         </div>
       </div>
       
-      <!-- Footer Settings -->
-      <div class="card mb-4">
+      <!-- Rodapé -->
+      <div class="settings-card">
         <div class="card-header">
-          <i class="bi bi-layout-text-window-reverse me-2"></i>Rodapé
+          <i class="bi bi-layout-text-window"></i>
+          <span>Rodapé</span>
         </div>
         <div class="card-body">
-          ${groupedSettings.footer ? groupedSettings.footer.map(setting => 
-            '<div class="mb-3">' +
-              '<label class="form-label">' + (setting.label || setting.key) + '</label>' +
-              '<textarea name="' + setting.key + '" class="form-control" rows="2">' + (setting.value || '') + '</textarea>' +
+          ${groupedSettings.footer ? groupedSettings.footer.map(s => 
+            '<div class="form-group">' +
+              '<label>' + (s.label || s.key) + '</label>' +
+              '<textarea name="' + s.key + '" rows="2">' + (s.value || '') + '</textarea>' +
             '</div>'
           ).join('') : ''}
         </div>
       </div>
       
-      <div class="d-flex gap-2 mb-4">
-        <button type="submit" class="btn btn-primary btn-lg">
-          <i class="bi bi-check-lg me-1"></i>Salvar Configurações
-        </button>
-      </div>
+      <button type="submit" class="btn-save">
+        <i class="bi bi-check-lg"></i>
+        Salvar Configurações
+      </button>
     </div>
     
-    <div class="col-lg-4">
-      <div class="card">
+    <div class="settings-sidebar">
+      <div class="settings-card">
         <div class="card-header">
-          <i class="bi bi-info-circle me-2"></i>Informações
+          <i class="bi bi-info-circle"></i>
+          <span>Sistema</span>
         </div>
         <div class="card-body">
-          <p class="mb-2"><strong>Versão:</strong> 1.0.0</p>
-          <p class="mb-2"><strong>Node.js:</strong> ${process.version}</p>
-          <p class="mb-2"><strong>Ambiente:</strong> ${process.env.NODE_ENV || 'development'}</p>
-          <p class="mb-2"><strong>Desenvolvido por:</strong> Erick Vinicius</p>
-          <hr>
-          <p class="small text-muted mb-0">
-            As configurações são aplicadas imediatamente após salvar. 
-            Algumas alterações podem exigir que você atualize a página para ver os efeitos.
-          </p>
+          <div class="info-list">
+            <div class="info-item">
+              <span class="info-label">Versão</span>
+              <span class="info-value">1.0.0</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Node.js</span>
+              <span class="info-value">${process.version}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Ambiente</span>
+              <span class="info-value">${process.env.NODE_ENV || 'development'}</span>
+            </div>
+          </div>
         </div>
       </div>
       
-      <div class="card mt-3">
+      <div class="settings-card">
         <div class="card-header">
-          <i class="bi bi-link-45deg me-2"></i>Links Úteis
+          <i class="bi bi-link-45deg"></i>
+          <span>Links</span>
         </div>
         <div class="card-body">
-          <a href="/" target="_blank" class="btn btn-outline-primary btn-sm w-100 mb-2">
-            <i class="bi bi-eye me-1"></i>Ver Site
-          </a>
-          <a href="/sitemap.xml" target="_blank" class="btn btn-outline-secondary btn-sm w-100 mb-2">
-            <i class="bi bi-diagram-3 me-1"></i>Sitemap
-          </a>
-          <a href="/robots.txt" target="_blank" class="btn btn-outline-secondary btn-sm w-100">
-            <i class="bi bi-robot me-1"></i>Robots.txt
-          </a>
+          <div class="quick-links">
+            <a href="/" target="_blank"><i class="bi bi-eye"></i> Ver Site</a>
+            <a href="/sitemap.xml" target="_blank"><i class="bi bi-diagram-3"></i> Sitemap</a>
+            <a href="/robots.txt" target="_blank"><i class="bi bi-robot"></i> Robots.txt</a>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </form>
+
+<style>
+.page-header {
+  margin-bottom: 24px;
+}
+.page-header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 4px;
+}
+.page-header p {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+
+.settings-layout {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 24px;
+  align-items: start;
+}
+
+.settings-card {
+  background: #fff;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+}
+.card-header i {
+  color: #3b82f6;
+}
+.card-body {
+  padding: 20px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+.form-group:last-child {
+  margin-bottom: 0;
+}
+.form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 6px;
+}
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 13px;
+  transition: border-color 0.2s;
+}
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+.form-group small {
+  display: block;
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 4px;
+}
+
+.btn-save {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-save:hover {
+  background: #2563eb;
+}
+
+.info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+.info-label {
+  color: #64748b;
+}
+.info-value {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.quick-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.quick-links a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #475569;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.quick-links a:hover {
+  background: #f1f5f9;
+  color: #3b82f6;
+}
+.quick-links a i {
+  font-size: 16px;
+}
+
+.empty {
+  font-size: 13px;
+  color: #94a3b8;
+  text-align: center;
+  padding: 20px;
+}
+
+@media (max-width: 900px) {
+  .settings-layout {
+    grid-template-columns: 1fr;
+  }
+  .settings-sidebar {
+    order: -1;
+  }
+}
+</style>
 `}) %>

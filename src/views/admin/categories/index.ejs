@@ -1,72 +1,238 @@
 <%- include('../layouts/main', { body: `
 <div class="page-header">
-  <h1><i class="bi bi-folder me-2"></i>Categorias</h1>
-  <a href="/admin/categories/create" class="btn btn-primary">
-    <i class="bi bi-plus-lg me-1"></i>Nova Categoria
+  <div>
+    <h1>Categorias</h1>
+    <p>Organize seus posts por categorias</p>
+  </div>
+  <a href="/admin/categories/create" class="btn-action">
+    <i class="bi bi-plus"></i>
+    Nova Categoria
   </a>
 </div>
 
-<div class="card">
-  <div class="card-body p-0">
-    <div class="table-responsive">
-      <table class="table table-hover mb-0">
-        <thead>
-          <tr>
-            <th style="width: 50px;">Cor</th>
-            <th>Nome</th>
-            <th>Slug</th>
-            <th>Posts</th>
-            <th>Status</th>
-            <th>Ordem</th>
-            <th style="width: 120px;">Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${categories && categories.length > 0 
-            ? categories.map(cat => '<tr>' +
-                '<td><div class="rounded" style="width: 30px; height: 30px; background: ' + (cat.color || '#3ba4ff') + ';"></div></td>' +
-                '<td>' +
-                  '<strong>' + cat.name + '</strong>' +
-                  (cat.icon ? ' <i class="' + cat.icon + '"></i>' : '') +
-                '</td>' +
-                '<td><code>' + cat.slug + '</code></td>' +
-                '<td><span class="badge bg-secondary">' + cat.postCount + '</span></td>' +
-                '<td>' +
-                  (cat.active 
-                    ? '<span class="badge bg-success">Ativa</span>'
-                    : '<span class="badge bg-secondary">Inativa</span>'
-                  ) +
-                '</td>' +
-                '<td>' + cat.order + '</td>' +
-                '<td>' +
-                  '<div class="btn-group btn-group-sm">' +
-                    '<a href="/admin/categories/' + cat.id + '/edit" class="btn btn-outline-primary" title="Editar"><i class="bi bi-pencil"></i></a>' +
-                    '<a href="/categoria/' + cat.slug + '" target="_blank" class="btn btn-outline-secondary" title="Ver"><i class="bi bi-eye"></i></a>' +
-                    '<button type="button" class="btn btn-outline-danger" onclick="deleteCategory(' + cat.id + ', ' + cat.postCount + ')" title="Excluir"><i class="bi bi-trash"></i></button>' +
-                  '</div>' +
-                '</td>' +
-              '</tr>').join('')
-            : '<tr><td colspan="7" class="text-center text-muted py-5">Nenhuma categoria encontrada</td></tr>'
-          }
-        </tbody>
-      </table>
-    </div>
-  </div>
+<div class="data-card">
+  ${categories && categories.length > 0 
+    ? '<div class="data-list">' +
+        categories.map(cat => 
+          '<div class="data-item">' +
+            '<div class="item-color" style="background: ' + (cat.color || '#3b82f6') + '"></div>' +
+            '<div class="item-info">' +
+              '<h3>' + cat.name + '</h3>' +
+              '<span class="item-meta">' +
+                '<code>/' + cat.slug + '</code>' +
+                ' • ' + cat.postCount + ' posts' +
+                ' • Ordem: ' + cat.order +
+              '</span>' +
+            '</div>' +
+            '<div class="item-status">' +
+              (cat.active 
+                ? '<span class="badge success">Ativa</span>'
+                : '<span class="badge muted">Inativa</span>'
+              ) +
+            '</div>' +
+            '<div class="item-actions">' +
+              '<a href="/admin/categories/' + cat.id + '/edit" class="btn-icon" title="Editar"><i class="bi bi-pencil"></i></a>' +
+              '<a href="/categoria/' + cat.slug + '" target="_blank" class="btn-icon" title="Ver"><i class="bi bi-eye"></i></a>' +
+              '<button type="button" class="btn-icon danger" onclick="deleteItem(' + cat.id + ', ' + cat.postCount + ')" title="Excluir"><i class="bi bi-trash"></i></button>' +
+            '</div>' +
+          '</div>'
+        ).join('') +
+      '</div>'
+    : '<div class="empty-state">' +
+        '<i class="bi bi-folder"></i>' +
+        '<h3>Nenhuma categoria</h3>' +
+        '<p>Crie categorias para organizar seus posts</p>' +
+        '<a href="/admin/categories/create" class="btn-action"><i class="bi bi-plus"></i> Nova Categoria</a>' +
+      '</div>'
+  }
 </div>
 
-<!-- Delete Form -->
 <form id="deleteForm" method="POST" style="display: none;"></form>
 
+<style>
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.page-header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 4px;
+}
+.page-header p {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+.btn-action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: #3b82f6;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.btn-action:hover {
+  background: #2563eb;
+  color: #fff;
+}
+.btn-action i {
+  font-size: 16px;
+}
+
+.data-card {
+  background: #fff;
+  border-radius: 12px;
+}
+.data-list {
+  display: flex;
+  flex-direction: column;
+}
+.data-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background 0.2s;
+}
+.data-item:last-child {
+  border-bottom: none;
+}
+.data-item:hover {
+  background: #f8fafc;
+}
+.item-color {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.item-info {
+  flex: 1;
+  min-width: 0;
+}
+.item-info h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 4px;
+}
+.item-meta {
+  font-size: 12px;
+  color: #64748b;
+}
+.item-meta code {
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+.item-status {
+  flex-shrink: 0;
+}
+.badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge.success {
+  background: #dcfce7;
+  color: #16a34a;
+}
+.badge.muted {
+  background: #f1f5f9;
+  color: #64748b;
+}
+.item-actions {
+  display: flex;
+  gap: 4px;
+}
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+.btn-icon:hover {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+.btn-icon.danger:hover {
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #64748b;
+}
+.empty-state i {
+  font-size: 48px;
+  color: #cbd5e1;
+  margin-bottom: 16px;
+}
+.empty-state h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #475569;
+  margin: 0 0 8px;
+}
+.empty-state p {
+  font-size: 13px;
+  margin: 0 0 20px;
+}
+
+@media (max-width: 640px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .btn-action {
+    width: 100%;
+    justify-content: center;
+  }
+  .data-item {
+    flex-wrap: wrap;
+  }
+  .item-status {
+    order: 3;
+    width: 100%;
+    margin-top: 8px;
+  }
+}
+</style>
+
 <script>
-function deleteCategory(id, postCount) {
+function deleteItem(id, postCount) {
   if (postCount > 0) {
-    alert('Não é possível excluir esta categoria pois existem ' + postCount + ' posts vinculados.');
+    alert('Não é possível excluir: existem ' + postCount + ' posts vinculados.');
     return;
   }
-  if (confirm('Tem certeza que deseja excluir esta categoria?')) {
-    const form = document.getElementById('deleteForm');
-    form.action = '/admin/categories/' + id + '/delete';
-    form.submit();
+  if (confirm('Excluir esta categoria?')) {
+    document.getElementById('deleteForm').action = '/admin/categories/' + id + '/delete';
+    document.getElementById('deleteForm').submit();
   }
 }
 </script>

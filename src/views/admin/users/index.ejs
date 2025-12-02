@@ -1,64 +1,270 @@
 <%- include('../layouts/main', { body: `
 <div class="page-header">
-  <h1><i class="bi bi-people me-2"></i>Usuários</h1>
-  <a href="/admin/users/create" class="btn btn-primary">
-    <i class="bi bi-plus-lg me-1"></i>Novo Usuário
+  <div>
+    <h1>Usuários</h1>
+    <p>Gerencie os usuários do sistema</p>
+  </div>
+  <a href="/admin/users/create" class="btn-action">
+    <i class="bi bi-plus"></i>
+    Novo Usuário
   </a>
 </div>
 
-<div class="card">
-  <div class="card-body p-0">
-    <div class="table-responsive">
-      <table class="table table-hover mb-0">
-        <thead>
-          <tr>
-            <th style="width: 50px;"></th>
-            <th>Nome</th>
-            <th>Email</th>
-            <th>Função</th>
-            <th>Status</th>
-            <th>Último Acesso</th>
-            <th style="width: 120px;">Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${users && users.length > 0 
-            ? users.map(u => '<tr>' +
-                '<td>' +
-                  (u.avatar 
-                    ? '<img src="' + u.avatar + '" alt="" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">'
-                    : '<div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">' + u.name.charAt(0).toUpperCase() + '</div>'
-                  ) +
-                '</td>' +
-                '<td><strong>' + u.name + '</strong></td>' +
-                '<td>' + u.email + '</td>' +
-                '<td><span class="badge ' + (u.role === 'admin' ? 'bg-danger' : 'bg-primary') + '">' + (u.role === 'admin' ? 'Admin' : 'Editor') + '</span></td>' +
-                '<td>' + (u.active ? '<span class="badge bg-success">Ativo</span>' : '<span class="badge bg-secondary">Inativo</span>') + '</td>' +
-                '<td>' + (u.last_login ? new Date(u.last_login).toLocaleString('pt-BR') : 'Nunca') + '</td>' +
-                '<td>' +
-                  '<div class="btn-group btn-group-sm">' +
-                    '<a href="/admin/users/' + u.id + '/edit" class="btn btn-outline-primary" title="Editar"><i class="bi bi-pencil"></i></a>' +
-                    '<button type="button" class="btn btn-outline-danger" onclick="deleteUser(' + u.id + ')" title="Excluir"><i class="bi bi-trash"></i></button>' +
-                  '</div>' +
-                '</td>' +
-              '</tr>').join('')
-            : '<tr><td colspan="7" class="text-center text-muted py-5">Nenhum usuário encontrado</td></tr>'
-          }
-        </tbody>
-      </table>
-    </div>
-  </div>
+<div class="data-card">
+  ${users && users.length > 0 
+    ? '<div class="data-list">' +
+        users.map(u => 
+          '<div class="data-item">' +
+            '<div class="item-avatar">' +
+              (u.avatar 
+                ? '<img src="' + u.avatar + '" alt="">'
+                : '<span>' + u.name.charAt(0).toUpperCase() + '</span>'
+              ) +
+            '</div>' +
+            '<div class="item-info">' +
+              '<h3>' + u.name + '</h3>' +
+              '<span class="item-meta">' + u.email + '</span>' +
+            '</div>' +
+            '<div class="item-badges">' +
+              '<span class="badge ' + (u.role === 'admin' ? 'danger' : 'primary') + '">' + 
+                (u.role === 'admin' ? 'Admin' : 'Editor') + 
+              '</span>' +
+              (u.active 
+                ? '<span class="badge success">Ativo</span>'
+                : '<span class="badge muted">Inativo</span>'
+              ) +
+            '</div>' +
+            '<div class="item-extra">' +
+              '<span class="last-login">' +
+                '<i class="bi bi-clock"></i> ' +
+                (u.last_login ? new Date(u.last_login).toLocaleDateString('pt-BR') : 'Nunca acessou') +
+              '</span>' +
+            '</div>' +
+            '<div class="item-actions">' +
+              '<a href="/admin/users/' + u.id + '/edit" class="btn-icon" title="Editar"><i class="bi bi-pencil"></i></a>' +
+              '<button type="button" class="btn-icon danger" onclick="deleteItem(' + u.id + ')" title="Excluir"><i class="bi bi-trash"></i></button>' +
+            '</div>' +
+          '</div>'
+        ).join('') +
+      '</div>'
+    : '<div class="empty-state">' +
+        '<i class="bi bi-people"></i>' +
+        '<h3>Nenhum usuário</h3>' +
+        '<p>Adicione usuários para gerenciar o portal</p>' +
+        '<a href="/admin/users/create" class="btn-action"><i class="bi bi-plus"></i> Novo Usuário</a>' +
+      '</div>'
+  }
 </div>
 
-<!-- Delete Form -->
 <form id="deleteForm" method="POST" style="display: none;"></form>
 
+<style>
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.page-header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 4px;
+}
+.page-header p {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+.btn-action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: #3b82f6;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.btn-action:hover {
+  background: #2563eb;
+  color: #fff;
+}
+
+.data-card {
+  background: #fff;
+  border-radius: 12px;
+}
+.data-list {
+  display: flex;
+  flex-direction: column;
+}
+.data-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background 0.2s;
+}
+.data-item:last-child {
+  border-bottom: none;
+}
+.data-item:hover {
+  background: #f8fafc;
+}
+.item-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #3b82f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.item-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.item-avatar span {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+}
+.item-info {
+  flex: 1;
+  min-width: 0;
+}
+.item-info h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 4px;
+}
+.item-meta {
+  font-size: 12px;
+  color: #64748b;
+}
+.item-badges {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge.success {
+  background: #dcfce7;
+  color: #16a34a;
+}
+.badge.muted {
+  background: #f1f5f9;
+  color: #64748b;
+}
+.badge.primary {
+  background: #dbeafe;
+  color: #2563eb;
+}
+.badge.danger {
+  background: #fee2e2;
+  color: #dc2626;
+}
+.item-extra {
+  flex-shrink: 0;
+}
+.last-login {
+  font-size: 12px;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.item-actions {
+  display: flex;
+  gap: 4px;
+}
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+.btn-icon:hover {
+  background: #f8fafc;
+  color: #0f172a;
+}
+.btn-icon.danger:hover {
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+}
+.empty-state i {
+  font-size: 48px;
+  color: #cbd5e1;
+  margin-bottom: 16px;
+}
+.empty-state h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #475569;
+  margin: 0 0 8px;
+}
+.empty-state p {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0 0 20px;
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .btn-action {
+    width: 100%;
+    justify-content: center;
+  }
+  .data-item {
+    flex-wrap: wrap;
+  }
+  .item-badges, .item-extra {
+    order: 3;
+  }
+  .item-extra {
+    width: 100%;
+    margin-top: 8px;
+  }
+}
+</style>
+
 <script>
-function deleteUser(id) {
-  if (confirm('Tem certeza que deseja excluir este usuário?')) {
-    const form = document.getElementById('deleteForm');
-    form.action = '/admin/users/' + id + '/delete';
-    form.submit();
+function deleteItem(id) {
+  if (confirm('Excluir este usuário?')) {
+    document.getElementById('deleteForm').action = '/admin/users/' + id + '/delete';
+    document.getElementById('deleteForm').submit();
   }
 }
 </script>

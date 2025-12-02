@@ -203,11 +203,18 @@ class MediaController {
         });
       }
 
-      // Deletar arquivos físicos
-      deleteImage(media.filename);
+      // Guardar filename antes de deletar
+      const filename = media.filename;
 
-      // Deletar registro do banco
+      // Deletar registro do banco primeiro
       await media.destroy();
+
+      // Depois deletar arquivos físicos (não crítico se falhar)
+      try {
+        deleteImage(filename);
+      } catch (fileError) {
+        console.error('Erro ao deletar arquivo físico:', fileError);
+      }
 
       return res.json({
         success: true,
@@ -217,7 +224,7 @@ class MediaController {
       console.error('Erro ao excluir mídia:', error);
       return res.status(500).json({ 
         success: false, 
-        message: 'Erro ao excluir mídia.' 
+        message: 'Erro ao excluir mídia: ' + error.message
       });
     }
   }

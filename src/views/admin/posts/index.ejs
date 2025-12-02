@@ -1,326 +1,490 @@
 <%- include('../layouts/main', { body: `
-<style>
-  .page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-  }
-  .page-header h1 {
-    font-size: 24px;
-    font-weight: 700;
-    color: #1e293b;
-    margin: 0;
-  }
-  .stats-row {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 24px;
-  }
-  .stat-card {
-    flex: 1;
-    background: #fff;
-    border-radius: 12px;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-  .stat-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-  }
-  .stat-icon.blue { background: #dbeafe; color: #3b82f6; }
-  .stat-icon.green { background: #dcfce7; color: #22c55e; }
-  .stat-icon.yellow { background: #fef3c7; color: #f59e0b; }
-  .stat-icon.gray { background: #f1f5f9; color: #64748b; }
-  .stat-info h3 { font-size: 24px; font-weight: 700; margin: 0; color: #1e293b; }
-  .stat-info p { font-size: 13px; color: #64748b; margin: 0; }
-  
-  .filter-card {
-    background: #fff;
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 24px;
-  }
-  .filter-row {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-  .filter-row .form-control,
-  .filter-row .form-select {
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 14px;
-  }
-  .filter-row .form-control:focus,
-  .filter-row .form-select:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
-  }
-  
-  .posts-table {
-    background: #fff;
-    border-radius: 12px;
-    overflow: hidden;
-  }
-  .posts-table table {
-    margin: 0;
-  }
-  .posts-table th {
-    background: #f8fafc;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #64748b;
-    padding: 14px 16px;
-    border: none;
-  }
-  .posts-table td {
-    padding: 16px;
-    vertical-align: middle;
-    border-color: #f1f5f9;
-  }
-  .posts-table tbody tr:hover {
-    background: #f8fafc;
-  }
-  
-  .post-thumb {
-    width: 56px;
-    height: 56px;
-    border-radius: 10px;
-    object-fit: cover;
-  }
-  .post-thumb-placeholder {
-    width: 56px;
-    height: 56px;
-    border-radius: 10px;
-    background: #f1f5f9;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #94a3b8;
-  }
-  
-  .post-title {
-    font-weight: 600;
-    color: #1e293b;
-    text-decoration: none;
-    display: block;
-    margin-bottom: 4px;
-  }
-  .post-title:hover { color: #3b82f6; }
-  .post-meta { font-size: 12px; color: #94a3b8; }
-  
-  .category-badge {
-    padding: 5px 10px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 600;
-  }
-  
-  .status-badge {
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-  }
-  .status-published { background: #dcfce7; color: #16a34a; }
-  .status-draft { background: #f1f5f9; color: #64748b; }
-  .status-scheduled { background: #dbeafe; color: #2563eb; }
-  
-  .action-btn {
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #e2e8f0;
-    background: #fff;
-    color: #64748b;
-    transition: all 0.2s;
-  }
-  .action-btn:hover { background: #f8fafc; color: #1e293b; border-color: #cbd5e1; }
-  .action-btn.delete:hover { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
-  
-  .pagination-wrapper {
-    padding: 16px;
-    border-top: 1px solid #f1f5f9;
-    display: flex;
-    justify-content: center;
-  }
-  .pagination { margin: 0; }
-  .page-link {
-    border: none;
-    padding: 8px 14px;
-    border-radius: 8px;
-    margin: 0 2px;
-    color: #64748b;
-    font-weight: 500;
-    font-size: 14px;
-  }
-  .page-link:hover { background: #f1f5f9; color: #1e293b; }
-  .page-item.active .page-link { background: #3b82f6; color: #fff; }
-  
-  .empty-state {
-    text-align: center;
-    padding: 60px 20px;
-  }
-  .empty-state i { font-size: 48px; color: #cbd5e1; margin-bottom: 16px; }
-  .empty-state h3 { font-size: 18px; color: #64748b; margin-bottom: 8px; }
-  .empty-state p { color: #94a3b8; margin-bottom: 20px; }
-  
-  @media (max-width: 768px) {
-    .stats-row { flex-direction: column; }
-    .filter-row { flex-direction: column; }
-    .filter-row > * { width: 100%; }
-  }
-</style>
-
 <div class="page-header">
-  <h1>Posts</h1>
-  <a href="/admin/posts/create" class="btn btn-primary rounded-pill px-4">
-    <i class="bi bi-plus-lg me-2"></i>Novo Post
+  <div>
+    <h1>Posts</h1>
+    <p>Gerencie os posts do portal</p>
+  </div>
+  <a href="/admin/posts/create" class="btn-action">
+    <i class="bi bi-plus"></i>
+    Novo Post
   </a>
 </div>
 
 <!-- Stats -->
 <div class="stats-row">
-  <div class="stat-card">
+  <div class="stat-item">
     <div class="stat-icon blue"><i class="bi bi-file-text"></i></div>
-    <div class="stat-info">
-      <h3>${pagination.total || 0}</h3>
-      <p>Total de Posts</p>
+    <div class="stat-data">
+      <span class="stat-value">${pagination.total || 0}</span>
+      <span class="stat-label">Total</span>
     </div>
   </div>
-  <div class="stat-card">
+  <div class="stat-item">
     <div class="stat-icon green"><i class="bi bi-check-circle"></i></div>
-    <div class="stat-info">
-      <h3>${posts.filter(p => p.status === 'published').length}</h3>
-      <p>Publicados</p>
+    <div class="stat-data">
+      <span class="stat-value">${posts.filter(p => p.status === 'published').length}</span>
+      <span class="stat-label">Publicados</span>
     </div>
   </div>
-  <div class="stat-card">
+  <div class="stat-item">
     <div class="stat-icon yellow"><i class="bi bi-pencil"></i></div>
-    <div class="stat-info">
-      <h3>${posts.filter(p => p.status === 'draft').length}</h3>
-      <p>Rascunhos</p>
+    <div class="stat-data">
+      <span class="stat-value">${posts.filter(p => p.status === 'draft').length}</span>
+      <span class="stat-label">Rascunhos</span>
     </div>
   </div>
 </div>
 
 <!-- Filters -->
-<div class="filter-card">
-  <form action="/admin/posts" method="GET" class="filter-row">
-    <div style="flex: 2; min-width: 200px;">
-      <input type="text" name="search" class="form-control" placeholder="Buscar por título..." value="${filters.search || ''}">
+<div class="filter-bar">
+  <form action="/admin/posts" method="GET" class="filter-form">
+    <div class="filter-search">
+      <i class="bi bi-search"></i>
+      <input type="text" name="search" placeholder="Buscar posts..." value="${filters.search || ''}">
     </div>
-    <div style="flex: 1; min-width: 150px;">
-      <select name="category" class="form-select">
-        <option value="">Todas categorias</option>
-        ${categories.map(cat => 
-          '<option value="' + cat.id + '"' + (filters.category == cat.id ? ' selected' : '') + '>' + cat.name + '</option>'
-        ).join('')}
-      </select>
-    </div>
-    <div style="flex: 1; min-width: 150px;">
-      <select name="status" class="form-select">
-        <option value="">Todos status</option>
-        <option value="published"${filters.status === 'published' ? ' selected' : ''}>Publicado</option>
-        <option value="draft"${filters.status === 'draft' ? ' selected' : ''}>Rascunho</option>
-        <option value="scheduled"${filters.status === 'scheduled' ? ' selected' : ''}>Agendado</option>
-      </select>
-    </div>
-    <button type="submit" class="btn btn-primary px-4">
-      <i class="bi bi-search me-2"></i>Buscar
-    </button>
+    <select name="category" class="filter-select">
+      <option value="">Categoria</option>
+      ${categories.map(cat => 
+        '<option value="' + cat.id + '"' + (filters.category == cat.id ? ' selected' : '') + '>' + cat.name + '</option>'
+      ).join('')}
+    </select>
+    <select name="status" class="filter-select">
+      <option value="">Status</option>
+      <option value="published"${filters.status === 'published' ? ' selected' : ''}>Publicado</option>
+      <option value="draft"${filters.status === 'draft' ? ' selected' : ''}>Rascunho</option>
+      <option value="scheduled"${filters.status === 'scheduled' ? ' selected' : ''}>Agendado</option>
+    </select>
+    <button type="submit" class="filter-btn">Filtrar</button>
   </form>
 </div>
 
-<!-- Posts Table -->
-<div class="posts-table">
-  ${posts && posts.length > 0 ? '<div class="table-responsive"><table class="table">' +
-    '<thead><tr>' +
-      '<th style="width: 80px;">Imagem</th>' +
-      '<th>Post</th>' +
-      '<th>Categoria</th>' +
-      '<th>Status</th>' +
-      '<th>Views</th>' +
-      '<th style="width: 100px;">Ações</th>' +
-    '</tr></thead>' +
-    '<tbody>' +
-    posts.map(post => '<tr>' +
-      '<td>' + 
-        (post.featured_image 
-          ? '<img src="' + post.featured_image + '" alt="" class="post-thumb">'
-          : '<div class="post-thumb-placeholder"><i class="bi bi-image"></i></div>'
-        ) + 
-      '</td>' +
-      '<td>' +
-        '<a href="/admin/posts/' + post.id + '/edit" class="post-title">' + 
-          post.title.substring(0, 60) + (post.title.length > 60 ? '...' : '') +
-          (post.featured ? ' <i class="bi bi-star-fill text-warning"></i>' : '') +
-        '</a>' +
-        '<div class="post-meta">' +
-          '<i class="bi bi-person me-1"></i>' + (post.author ? post.author.name : 'Anônimo') +
-          ' &bull; ' + new Date(post.created_at).toLocaleDateString('pt-BR') +
-        '</div>' +
-      '</td>' +
-      '<td>' + 
-        (post.category 
-          ? '<span class="category-badge" style="background:' + post.category.color + '20; color:' + post.category.color + '">' + post.category.name + '</span>' 
-          : '<span class="text-muted">—</span>'
-        ) + 
-      '</td>' +
-      '<td><span class="status-badge status-' + post.status + '">' + 
-        (post.status === 'published' ? 'Publicado' : post.status === 'draft' ? 'Rascunho' : 'Agendado') + 
-      '</span></td>' +
-      '<td><strong>' + post.views.toLocaleString('pt-BR') + '</strong></td>' +
-      '<td>' +
-        '<div class="d-flex gap-1">' +
-          '<a href="/admin/posts/' + post.id + '/edit" class="action-btn" title="Editar"><i class="bi bi-pencil"></i></a>' +
-          '<a href="/noticia/' + post.slug + '" target="_blank" class="action-btn" title="Ver"><i class="bi bi-eye"></i></a>' +
-          '<button type="button" class="action-btn delete" onclick="deletePost(' + post.id + ')" title="Excluir"><i class="bi bi-trash"></i></button>' +
-        '</div>' +
-      '</td>' +
-    '</tr>').join('') +
-    '</tbody></table></div>' +
-    
-    (pagination.totalPages > 1 ? '<div class="pagination-wrapper">' +
-      '<ul class="pagination">' +
-        (pagination.hasPrev ? '<li class="page-item"><a class="page-link" href="?page=' + (pagination.page - 1) + '&search=' + (filters.search || '') + '&category=' + (filters.category || '') + '&status=' + (filters.status || '') + '"><i class="bi bi-chevron-left"></i></a></li>' : '') +
-        '<li class="page-item active"><span class="page-link">' + pagination.page + '</span></li>' +
-        '<li class="page-item disabled"><span class="page-link">de ' + pagination.totalPages + '</span></li>' +
-        (pagination.hasNext ? '<li class="page-item"><a class="page-link" href="?page=' + (pagination.page + 1) + '&search=' + (filters.search || '') + '&category=' + (filters.category || '') + '&status=' + (filters.status || '') + '"><i class="bi bi-chevron-right"></i></a></li>' : '') +
-      '</ul>' +
-    '</div>' : '')
-    
-  : '<div class="empty-state">' +
-      '<i class="bi bi-file-earmark-text"></i>' +
-      '<h3>Nenhum post encontrado</h3>' +
-      '<p>Comece criando seu primeiro post</p>' +
-      '<a href="/admin/posts/create" class="btn btn-primary rounded-pill px-4"><i class="bi bi-plus-lg me-2"></i>Criar Post</a>' +
-    '</div>'
+<!-- Posts List -->
+<div class="posts-card">
+  ${posts && posts.length > 0 
+    ? '<div class="posts-list">' +
+        posts.map(post => 
+          '<div class="post-item">' +
+            '<div class="post-thumb">' +
+              (post.featured_image 
+                ? '<img src="' + post.featured_image + '" alt="">'
+                : '<div class="thumb-placeholder"><i class="bi bi-image"></i></div>'
+              ) +
+            '</div>' +
+            '<div class="post-info">' +
+              '<a href="/admin/posts/' + post.id + '/edit" class="post-title">' + 
+                post.title + 
+                (post.featured ? ' <i class="bi bi-star-fill text-warning"></i>' : '') +
+              '</a>' +
+              '<div class="post-meta">' +
+                (post.category 
+                  ? '<span class="post-cat" style="color: ' + post.category.color + '"><i class="bi bi-circle-fill"></i> ' + post.category.name + '</span>'
+                  : ''
+                ) +
+                '<span><i class="bi bi-person"></i> ' + (post.author ? post.author.name : 'Anônimo') + '</span>' +
+                '<span><i class="bi bi-calendar"></i> ' + new Date(post.created_at).toLocaleDateString('pt-BR') + '</span>' +
+              '</div>' +
+            '</div>' +
+            '<div class="post-stats">' +
+              '<span class="views"><i class="bi bi-eye"></i> ' + post.views.toLocaleString('pt-BR') + '</span>' +
+            '</div>' +
+            '<div class="post-status">' +
+              '<span class="status-badge ' + post.status + '">' + 
+                (post.status === 'published' ? 'Publicado' : post.status === 'draft' ? 'Rascunho' : 'Agendado') + 
+              '</span>' +
+            '</div>' +
+            '<div class="post-actions">' +
+              '<a href="/admin/posts/' + post.id + '/edit" class="btn-icon" title="Editar"><i class="bi bi-pencil"></i></a>' +
+              '<a href="/noticia/' + post.slug + '" target="_blank" class="btn-icon" title="Ver"><i class="bi bi-eye"></i></a>' +
+              '<button type="button" class="btn-icon danger" onclick="deletePost(' + post.id + ')" title="Excluir"><i class="bi bi-trash"></i></button>' +
+            '</div>' +
+          '</div>'
+        ).join('') +
+      '</div>' +
+      (pagination.totalPages > 1 
+        ? '<div class="pagination-bar">' +
+            (pagination.hasPrev ? '<a href="?page=' + (pagination.page - 1) + '&search=' + (filters.search || '') + '&category=' + (filters.category || '') + '&status=' + (filters.status || '') + '" class="page-btn"><i class="bi bi-chevron-left"></i></a>' : '') +
+            '<span class="page-info">Página ' + pagination.page + ' de ' + pagination.totalPages + '</span>' +
+            (pagination.hasNext ? '<a href="?page=' + (pagination.page + 1) + '&search=' + (filters.search || '') + '&category=' + (filters.category || '') + '&status=' + (filters.status || '') + '" class="page-btn"><i class="bi bi-chevron-right"></i></a>' : '') +
+          '</div>'
+        : ''
+      )
+    : '<div class="empty-state">' +
+        '<i class="bi bi-file-earmark-text"></i>' +
+        '<h3>Nenhum post encontrado</h3>' +
+        '<p>Crie seu primeiro post agora</p>' +
+        '<a href="/admin/posts/create" class="btn-action"><i class="bi bi-plus"></i> Novo Post</a>' +
+      '</div>'
   }
 </div>
 
 <form id="deleteForm" method="POST" style="display: none;"></form>
 
+<style>
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.page-header > div {
+  flex: 1;
+}
+.page-header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 4px;
+}
+.page-header p {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+.btn-action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: #3b82f6;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.btn-action:hover {
+  background: #2563eb;
+  color: #fff;
+}
+
+/* Stats */
+.stats-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.stat-item {
+  flex: 1;
+  background: #fff;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.stat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+.stat-icon.blue { background: #dbeafe; color: #3b82f6; }
+.stat-icon.green { background: #dcfce7; color: #22c55e; }
+.stat-icon.yellow { background: #fef3c7; color: #f59e0b; }
+.stat-data {
+  display: flex;
+  flex-direction: column;
+}
+.stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1;
+}
+.stat-label {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+/* Filters */
+.filter-bar {
+  background: #fff;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+.filter-form {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.filter-search {
+  flex: 2;
+  min-width: 200px;
+  position: relative;
+}
+.filter-search i {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+}
+.filter-search input {
+  width: 100%;
+  padding: 10px 12px 10px 38px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 13px;
+}
+.filter-search input:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+.filter-select {
+  flex: 1;
+  min-width: 130px;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 13px;
+  background: #fff;
+}
+.filter-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+.filter-btn {
+  padding: 10px 20px;
+  background: #0f172a;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.filter-btn:hover {
+  background: #1e293b;
+}
+
+/* Posts List */
+.posts-card {
+  background: #fff;
+  border-radius: 12px;
+}
+.posts-list {
+  display: flex;
+  flex-direction: column;
+}
+.post-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background 0.2s;
+}
+.post-item:last-child {
+  border-bottom: none;
+}
+.post-item:hover {
+  background: #f8fafc;
+}
+.post-thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.post-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.thumb-placeholder {
+  width: 100%;
+  height: 100%;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+}
+.post-info {
+  flex: 1;
+  min-width: 0;
+}
+.post-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  text-decoration: none;
+  display: block;
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.post-title:hover {
+  color: #3b82f6;
+}
+.post-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: #64748b;
+}
+.post-meta i {
+  margin-right: 4px;
+}
+.post-cat {
+  font-weight: 500;
+}
+.post-cat i {
+  font-size: 6px;
+  vertical-align: middle;
+}
+.post-stats {
+  flex-shrink: 0;
+}
+.views {
+  font-size: 12px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.post-status {
+  flex-shrink: 0;
+}
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.status-badge.published { background: #dcfce7; color: #16a34a; }
+.status-badge.draft { background: #f1f5f9; color: #64748b; }
+.status-badge.scheduled { background: #dbeafe; color: #2563eb; }
+.post-actions {
+  display: flex;
+  gap: 4px;
+}
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+.btn-icon:hover {
+  background: #f8fafc;
+  color: #0f172a;
+}
+.btn-icon.danger:hover {
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+/* Pagination */
+.pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px;
+  border-top: 1px solid #f1f5f9;
+}
+.page-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: #f1f5f9;
+  color: #475569;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.page-btn:hover {
+  background: #3b82f6;
+  color: #fff;
+}
+.page-info {
+  font-size: 13px;
+  color: #64748b;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+}
+.empty-state i {
+  font-size: 48px;
+  color: #cbd5e1;
+  margin-bottom: 16px;
+}
+.empty-state h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #475569;
+  margin: 0 0 8px;
+}
+.empty-state p {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0 0 20px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .post-stats, .post-meta span:not(.post-cat) {
+    display: none;
+  }
+}
+@media (max-width: 640px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .btn-action {
+    width: 100%;
+    justify-content: center;
+  }
+  .stats-row {
+    flex-direction: column;
+  }
+  .filter-form {
+    flex-direction: column;
+  }
+  .filter-search, .filter-select {
+    width: 100%;
+  }
+  .post-item {
+    flex-wrap: wrap;
+  }
+  .post-status {
+    order: 3;
+    width: 100%;
+    margin-top: 8px;
+  }
+}
+</style>
+
 <script>
 function deletePost(id) {
-  if (confirm('Tem certeza que deseja excluir este post?')) {
-    const form = document.getElementById('deleteForm');
-    form.action = '/admin/posts/' + id + '/delete';
-    form.submit();
+  if (confirm('Excluir este post?')) {
+    document.getElementById('deleteForm').action = '/admin/posts/' + id + '/delete';
+    document.getElementById('deleteForm').submit();
   }
 }
 </script>
