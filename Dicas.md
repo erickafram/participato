@@ -5,7 +5,7 @@ git push -u origin main
 
 
 Servidor de Produção
-cd /home/portalconvictos/htdocs/portalconvictos.com.br/portalconvictos#
+cd /home/portalconvictos/htdocs/portalconvictos.com.br/portalconvictos
 git pull origin main
 
 # Rodar migrations pendentes
