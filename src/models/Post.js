@@ -35,6 +35,10 @@ module.exports = (sequelize) => {
         notEmpty: { msg: 'O conteúdo é obrigatório' }
       }
     },
+    embed_code: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
     excerpt: {
       type: DataTypes.TEXT,
       allowNull: true

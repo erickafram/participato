@@ -92,6 +92,7 @@ class PostController {
         subtitle,
         slug,
         content,
+        embed_code,
         excerpt,
         category_id,
         tags,
@@ -116,6 +117,7 @@ class PostController {
         subtitle,
         slug: postSlug,
         content,
+        embed_code: embed_code || null,
         excerpt,
         category_id: category_id || null,
         tags: tags || '',
@@ -185,6 +187,7 @@ class PostController {
         subtitle,
         slug,
         content,
+        embed_code,
         excerpt,
         category_id,
         tags,
@@ -211,6 +214,7 @@ class PostController {
       post.subtitle = subtitle;
       post.slug = slug || post.slug;
       post.content = content;
+      post.embed_code = embed_code || null;
       post.excerpt = excerpt;
       post.category_id = category_id || null;
       post.tags = tags || '';

@@ -106,6 +106,36 @@
             </div>
           </div>
 
+          <!-- Embed de Redes Sociais -->
+          <div class="card mb-3">
+            <div class="card-header" data-bs-toggle="collapse" data-bs-target="#embedSection" style="cursor: pointer;">
+              <i class="bi bi-play-circle me-2"></i>Embed de Mídia <small class="text-muted ms-2">(YouTube, Instagram, Facebook)</small>
+              <i class="bi bi-chevron-down float-end"></i>
+            </div>
+            <div class="collapse" id="embedSection">
+              <div class="card-body">
+                <div class="mb-2">
+                  <label class="form-label">Código Embed</label>
+                  <textarea name="embed_code" class="form-control" rows="4" 
+                            placeholder="Cole aqui o código embed do YouTube, Instagram, Facebook ou TikTok..."><%= post ? (post.embed_code || '') : '' %></textarea>
+                  <small class="text-muted">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Cole o código de incorporação (embed) da publicação. O embed será exibido após o conteúdo do post.
+                  </small>
+                </div>
+                <div class="embed-help mt-3 p-2 bg-light rounded" style="font-size: 0.75rem;">
+                  <strong>Como obter o código embed:</strong>
+                  <ul class="mb-0 mt-1 ps-3">
+                    <li><strong>YouTube:</strong> Clique em "Compartilhar" → "Incorporar" → Copie o código</li>
+                    <li><strong>Instagram:</strong> Clique nos 3 pontos → "Incorporar" → Copie o código</li>
+                    <li><strong>Facebook:</strong> Clique nos 3 pontos → "Incorporar" → Copie o código</li>
+                    <li><strong>TikTok:</strong> Clique em "Compartilhar" → "Incorporar" → Copie o código</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- SEO (Colapsável) -->
           <div class="card">
             <div class="card-header" data-bs-toggle="collapse" data-bs-target="#seoSection" style="cursor: pointer;">

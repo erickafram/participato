@@ -559,3 +559,46 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* ========================================
+   POST EMBED (YouTube, Instagram, etc)
+   ======================================== */
+.post-embed {
+  margin: 30px 0;
+  padding: 20px;
+  background: #f8fafc;
+  border-radius: var(--radius-md);
+  display: flex;
+  justify-content: center;
+}
+
+.post-embed iframe {
+  max-width: 100%;
+  border-radius: var(--radius-sm);
+}
+
+/* YouTube responsive */
+.post-embed iframe[src*="youtube"],
+.post-embed iframe[src*="youtu.be"] {
+  width: 100%;
+  aspect-ratio: 16/9;
+  height: auto;
+}
+
+/* Instagram responsive */
+.post-embed .instagram-media {
+  margin: 0 auto !important;
+  max-width: 540px !important;
+}
+
+/* TikTok responsive */
+.post-embed blockquote[class*="tiktok"] {
+  margin: 0 auto !important;
+}
+
+/* Facebook responsive */
+.post-embed .fb-post,
+.post-embed .fb-video {
+  margin: 0 auto;
+}

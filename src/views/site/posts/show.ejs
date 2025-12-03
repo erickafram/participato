@@ -46,6 +46,13 @@
           ${post.content}
         </div>
         
+        <!-- Embed de Mídia -->
+        ${post.embed_code ? `
+          <div class="post-embed">
+            ${post.embed_code}
+          </div>
+        ` : ''}
+        
         <!-- Tags -->
         ${post.tags && post.tags.length > 0 ? `
           <div class="post-tags">
