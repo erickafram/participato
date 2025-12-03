@@ -346,8 +346,8 @@
 
 .related-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
 }
 
 .related-item {
@@ -556,6 +556,12 @@
   
   .post-meta {
     flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 900px) {
+  .related-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
