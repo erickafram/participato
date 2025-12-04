@@ -58,12 +58,36 @@
   </form>
 </div>
 
+<!-- Bulk Actions -->
+<div class="bulk-actions" id="bulkActions" style="display: none;">
+  <div class="bulk-info">
+    <span id="selectedCount">0</span> selecionado(s)
+  </div>
+  <button type="button" class="btn-bulk-delete" onclick="deleteSelected()">
+    <i class="bi bi-trash"></i> Excluir Selecionados
+  </button>
+  <button type="button" class="btn-bulk-cancel" onclick="clearSelection()">
+    Cancelar
+  </button>
+</div>
+
 <!-- Posts List -->
 <div class="posts-card">
   ${posts && posts.length > 0 
     ? '<div class="posts-list">' +
+        '<div class="posts-header">' +
+          '<label class="checkbox-wrapper select-all">' +
+            '<input type="checkbox" id="selectAll" onchange="toggleSelectAll()">' +
+            '<span class="checkmark"></span>' +
+          '</label>' +
+          '<span class="header-label">Selecionar todos</span>' +
+        '</div>' +
         posts.map(post => 
           '<div class="post-item">' +
+            '<label class="checkbox-wrapper">' +
+              '<input type="checkbox" class="post-checkbox" value="' + post.id + '" onchange="updateSelection()">' +
+              '<span class="checkmark"></span>' +
+            '</label>' +
             '<div class="post-thumb">' +
               (post.featured_image 
                 ? '<img src="' + post.featured_image + '" alt="">'
@@ -118,6 +142,9 @@
 </div>
 
 <form id="deleteForm" method="POST" style="display: none;"></form>
+<form id="bulkDeleteForm" method="POST" action="/admin/posts/delete-multiple" style="display: none;">
+  <div id="bulkDeleteInputs"></div>
+</form>
 
 <style>
 .page-header {
@@ -444,6 +471,112 @@
   margin: 0 0 20px;
 }
 
+/* Bulk Actions */
+.bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #1e293b;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+.bulk-info {
+  font-size: 13px;
+  font-weight: 500;
+}
+.btn-bulk-delete {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: #dc2626;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-bulk-delete:hover {
+  background: #b91c1c;
+}
+.btn-bulk-cancel {
+  padding: 8px 16px;
+  background: transparent;
+  color: #94a3b8;
+  border: 1px solid #475569;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-bulk-cancel:hover {
+  background: #334155;
+  color: #fff;
+}
+
+/* Posts Header */
+.posts-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+.header-label {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* Checkbox */
+.checkbox-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.checkbox-wrapper input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+.checkmark {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #cbd5e1;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+.checkbox-wrapper:hover .checkmark {
+  border-color: #3b82f6;
+}
+.checkbox-wrapper input:checked ~ .checkmark {
+  background: #3b82f6;
+  border-color: #3b82f6;
+}
+.checkbox-wrapper input:checked ~ .checkmark::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
 /* Responsive */
 @media (max-width: 900px) {
   .post-stats, .post-meta span:not(.post-cat) {
@@ -485,6 +618,52 @@ function deletePost(id) {
   if (confirm('Excluir este post?')) {
     document.getElementById('deleteForm').action = '/admin/posts/' + id + '/delete';
     document.getElementById('deleteForm').submit();
+  }
+}
+
+function toggleSelectAll() {
+  const selectAll = document.getElementById('selectAll');
+  const checkboxes = document.querySelectorAll('.post-checkbox');
+  checkboxes.forEach(cb => cb.checked = selectAll.checked);
+  updateSelection();
+}
+
+function updateSelection() {
+  const checkboxes = document.querySelectorAll('.post-checkbox:checked');
+  const count = checkboxes.length;
+  const bulkActions = document.getElementById('bulkActions');
+  const selectedCount = document.getElementById('selectedCount');
+  const selectAll = document.getElementById('selectAll');
+  const allCheckboxes = document.querySelectorAll('.post-checkbox');
+  
+  selectedCount.textContent = count;
+  bulkActions.style.display = count > 0 ? 'flex' : 'none';
+  selectAll.checked = count === allCheckboxes.length && count > 0;
+}
+
+function clearSelection() {
+  document.getElementById('selectAll').checked = false;
+  document.querySelectorAll('.post-checkbox').forEach(cb => cb.checked = false);
+  updateSelection();
+}
+
+function deleteSelected() {
+  const checkboxes = document.querySelectorAll('.post-checkbox:checked');
+  const count = checkboxes.length;
+  
+  if (count === 0) return;
+  
+  if (confirm('Excluir ' + count + ' post(s) selecionado(s)?')) {
+    const container = document.getElementById('bulkDeleteInputs');
+    container.innerHTML = '';
+    checkboxes.forEach(cb => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'ids[]';
+      input.value = cb.value;
+      container.appendChild(input);
+    });
+    document.getElementById('bulkDeleteForm').submit();
   }
 }
 </script>

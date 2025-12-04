@@ -51,6 +51,7 @@ router.post('/profile', ...uploadSingle('avatar'), AuthController.updateProfile)
 router.get('/posts', PostController.index);
 router.get('/posts/create', PostController.create);
 router.post('/posts', ...uploadSingle('featured_image'), PostController.store);
+router.post('/posts/delete-multiple', PostController.destroyMultiple);
 router.get('/posts/:id/edit', PostController.edit);
 router.post('/posts/:id', ...uploadSingle('featured_image'), PostController.update);
 router.post('/posts/:id/delete', PostController.destroy);

@@ -309,6 +309,29 @@ class PostController {
       return res.json({ success: false, message: 'Erro ao alternar status.' });
     }
   }
+
+  // Excluir múltiplos posts
+  async destroyMultiple(req, res) {
+    try {
+      const { ids } = req.body;
+
+      if (!ids || !Array.isArray(ids) || ids.length === 0) {
+        req.flash('error', 'Nenhum post selecionado.');
+        return res.redirect('/admin/posts');
+      }
+
+      const deleted = await Post.destroy({
+        where: { id: { [Op.in]: ids } }
+      });
+
+      req.flash('success', `${deleted} post(s) excluído(s) com sucesso!`);
+      res.redirect('/admin/posts');
+    } catch (error) {
+      console.error('Erro ao excluir posts:', error);
+      req.flash('error', 'Erro ao excluir posts.');
+      res.redirect('/admin/posts');
+    }
+  }
 }
 
 module.exports = new PostController();
