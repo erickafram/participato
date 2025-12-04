@@ -4,6 +4,7 @@
 const express = require('express');
 const router = express.Router();
 const SiteController = require('../controllers/SiteController');
+const BannerController = require('../controllers/BannerController');
 const { SitemapStream, streamToPromise } = require('sitemap');
 const { Post, Category, Page } = require('../models');
 
@@ -27,6 +28,9 @@ router.get('/tag/:tag', SiteController.tag);
 
 // Busca
 router.get('/busca', SiteController.search);
+
+// Registrar clique em banner (API)
+router.post('/api/banner/:id/click', BannerController.registerClick);
 
 // Sitemap XML
 router.get('/sitemap.xml', async (req, res) => {

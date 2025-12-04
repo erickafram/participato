@@ -1,4 +1,13 @@
 <%- include('layouts/main', { body: `
+<!-- Banner Topo Categoria -->
+${banners && banners.category_top && banners.category_top.length > 0 ? `
+<div class="banner-area banner-top">
+  <div class="container">
+    ${banners.category_top.map(b => '<a href="' + (b.link || '#') + '" target="' + b.target + '" class="banner-link" data-banner-id="' + b.id + '"><img src="' + b.image + '" alt="' + (b.alt_text || b.title) + '" class="banner-img banner-' + b.size + '"></a>').join('')}
+  </div>
+</div>
+` : ''}
+
 <!-- Header da Categoria -->
 <section class="py-5" style="background: linear-gradient(135deg, ${category.color} 0%, ${category.color}dd 100%); color: #fff;">
   <div class="container">
@@ -87,6 +96,13 @@
     <!-- Sidebar -->
     <div class="col-lg-4">
       <div class="position-sticky" style="top: 100px;">
+        <!-- Banner Sidebar Categoria -->
+        ${banners && banners.category_sidebar && banners.category_sidebar.length > 0 ? `
+        <div class="sidebar-widget mb-4 p-0">
+          ${banners.category_sidebar.map(b => '<a href="' + (b.link || '#') + '" target="' + b.target + '" class="banner-link" data-banner-id="' + b.id + '"><img src="' + b.image + '" alt="' + (b.alt_text || b.title) + '" class="banner-img w-100 rounded-3"></a>').join('')}
+        </div>
+        ` : ''}
+        
         <!-- Search Widget -->
         <div class="sidebar-widget mb-4">
           <form action="/busca" method="GET">
@@ -130,6 +146,15 @@
     </div>
   </div>
 </div>
+
+<!-- Banner Rodapé Categoria -->
+${banners && banners.category_bottom && banners.category_bottom.length > 0 ? `
+<div class="banner-area banner-top">
+  <div class="container">
+    ${banners.category_bottom.map(b => '<a href="' + (b.link || '#') + '" target="' + b.target + '" class="banner-link" data-banner-id="' + b.id + '"><img src="' + b.image + '" alt="' + (b.alt_text || b.title) + '" class="banner-img banner-' + b.size + '"></a>').join('')}
+  </div>
+</div>
+` : ''}
 
 <style>
 .hover-shadow:hover {

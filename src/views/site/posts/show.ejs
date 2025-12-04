@@ -1,4 +1,13 @@
 <%- include('../layouts/main', { body: `
+<!-- Banner Topo Post -->
+${banners && banners.post_top && banners.post_top.length > 0 ? `
+<div class="banner-area banner-top">
+  <div class="container">
+    ${banners.post_top.map(b => '<a href="' + (b.link || '#') + '" target="' + b.target + '" class="banner-link" data-banner-id="' + b.id + '"><img src="' + b.image + '" alt="' + (b.alt_text || b.title) + '" class="banner-img banner-' + b.size + '"></a>').join('')}
+  </div>
+</div>
+` : ''}
+
 <article class="post-article">
   <div class="container">
     <!-- Header do Post -->
@@ -42,9 +51,23 @@
           </figure>
         ` : ''}
         
+        <!-- Banner Topo Conteúdo -->
+        ${banners && banners.post_middle && banners.post_middle.length > 0 ? `
+        <div class="banner-area banner-content">
+          ${banners.post_middle.map(b => '<a href="' + (b.link || '#') + '" target="' + b.target + '" class="banner-link" data-banner-id="' + b.id + '"><img src="' + b.image + '" alt="' + (b.alt_text || b.title) + '" class="banner-img banner-' + b.size + '"></a>').join('')}
+        </div>
+        ` : ''}
+        
         <div class="post-content">
           ${post.content}
         </div>
+        
+        <!-- Banner Após Conteúdo -->
+        ${banners && banners.post_bottom && banners.post_bottom.length > 0 ? `
+        <div class="banner-area banner-content">
+          ${banners.post_bottom.map(b => '<a href="' + (b.link || '#') + '" target="' + b.target + '" class="banner-link" data-banner-id="' + b.id + '"><img src="' + b.image + '" alt="' + (b.alt_text || b.title) + '" class="banner-img banner-' + b.size + '"></a>').join('')}
+        </div>
+        ` : ''}
         
         <!-- Embed de Mídia -->
         ${post.embed_code ? `
@@ -115,6 +138,13 @@
 
       <!-- Sidebar -->
       <aside class="post-sidebar">
+        <!-- Banner Sidebar -->
+        ${banners && banners.post_sidebar && banners.post_sidebar.length > 0 ? `
+        <div class="sidebar-box banner-sidebar">
+          ${banners.post_sidebar.map(b => '<a href="' + (b.link || '#') + '" target="' + b.target + '" class="banner-link" data-banner-id="' + b.id + '"><img src="' + b.image + '" alt="' + (b.alt_text || b.title) + '" class="banner-img banner-' + b.size + '"></a>').join('')}
+        </div>
+        ` : ''}
+        
         <!-- Mais Lidas -->
         <div class="sidebar-box">
           <h3>Mais Lidas</h3>

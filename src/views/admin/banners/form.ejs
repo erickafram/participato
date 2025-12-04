@@ -1,0 +1,420 @@
+<%- include('../layouts/main', { body: `
+<div class="page-header">
+  <div>
+    <nav class="breadcrumb-nav">
+      <a href="/admin/banners">Banners</a>
+      <i class="bi bi-chevron-right"></i>
+      <span>${isEdit ? 'Editar' : 'Novo'}</span>
+    </nav>
+    <h1>${isEdit ? 'Editar Banner' : 'Novo Banner'}</h1>
+  </div>
+</div>
+
+<form action="${isEdit ? '/admin/banners/' + banner.id : '/admin/banners'}" method="POST" enctype="multipart/form-data" class="form-card">
+  <div class="form-grid">
+    <!-- Coluna Principal -->
+    <div class="form-main">
+      <div class="card">
+        <div class="card-body">
+          <div class="form-group">
+            <label for="title">Título do Banner *</label>
+            <input type="text" id="title" name="title" value="${banner ? banner.title : ''}" required placeholder="Ex: Banner Parceiro XYZ">
+            <small>Nome para identificação interna</small>
+          </div>
+          
+          <div class="form-group">
+            <label for="image">Imagem do Banner ${isEdit ? '' : '*'}</label>
+            <div class="image-upload">
+              <input type="file" id="image" name="image" accept="image/*" ${isEdit ? '' : 'required'} onchange="previewImage(this)">
+              <div class="upload-placeholder" id="uploadPlaceholder">
+                ${banner && banner.image 
+                  ? '<img src="' + banner.image + '" alt="Preview" id="imagePreview">'
+                  : '<i class="bi bi-cloud-arrow-up"></i><span>Clique para selecionar ou arraste a imagem</span>'
+                }
+              </div>
+            </div>
+            <small>Formatos: JPG, PNG, GIF, WebP. Tamanho recomendado conforme seleção abaixo.</small>
+          </div>
+          
+          <div class="form-group">
+            <label for="link">Link de Destino</label>
+            <input type="url" id="link" name="link" value="${banner ? banner.link || '' : ''}" placeholder="https://exemplo.com">
+            <small>URL para onde o usuário será direcionado ao clicar</small>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="alt_text">Texto Alternativo</label>
+              <input type="text" id="alt_text" name="alt_text" value="${banner ? banner.alt_text || '' : ''}" placeholder="Descrição da imagem">
+              <small>Para acessibilidade e SEO</small>
+            </div>
+            
+            <div class="form-group">
+              <label for="target">Abrir Link</label>
+              <select id="target" name="target">
+                <option value="_blank" ${banner && banner.target === '_blank' ? 'selected' : ''}>Nova aba</option>
+                <option value="_self" ${banner && banner.target === '_self' ? 'selected' : ''}>Mesma aba</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="form-sidebar">
+      <div class="card">
+        <div class="card-header">
+          <h3>Configurações</h3>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label for="position">Posição *</label>
+            <select id="position" name="position" required>
+              <option value="">Selecione...</option>
+              <optgroup label="Home">
+                ${Object.entries(positions).filter(([k]) => k.startsWith('home_')).map(([key, label]) => 
+                  '<option value="' + key + '" ' + (banner && banner.position === key ? 'selected' : '') + '>' + label + '</option>'
+                ).join('')}
+              </optgroup>
+              <optgroup label="Post/Notícia">
+                ${Object.entries(positions).filter(([k]) => k.startsWith('post_')).map(([key, label]) => 
+                  '<option value="' + key + '" ' + (banner && banner.position === key ? 'selected' : '') + '>' + label + '</option>'
+                ).join('')}
+              </optgroup>
+              <optgroup label="Categoria">
+                ${Object.entries(positions).filter(([k]) => k.startsWith('category_')).map(([key, label]) => 
+                  '<option value="' + key + '" ' + (banner && banner.position === key ? 'selected' : '') + '>' + label + '</option>'
+                ).join('')}
+              </optgroup>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="size">Tamanho *</label>
+            <select id="size" name="size" required onchange="updateSizePreview(this.value)">
+              ${Object.entries(sizes).map(([key, label]) => 
+                '<option value="' + key + '" ' + (banner && banner.size === key ? 'selected' : '') + '>' + label + '</option>'
+              ).join('')}
+            </select>
+            <div class="size-preview" id="sizePreview">
+              <div class="size-box" id="sizeBox"></div>
+              <span id="sizeLabel"></span>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="order">Ordem</label>
+            <input type="number" id="order" name="order" value="${banner ? banner.order : 0}" min="0">
+            <small>Menor número = exibido primeiro</small>
+          </div>
+          
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" name="active" ${!banner || banner.active ? 'checked' : ''}>
+              <span>Banner ativo</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <h3>Agendamento</h3>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label for="start_date">Data de Início</label>
+            <input type="datetime-local" id="start_date" name="start_date" value="${banner && banner.start_date ? new Date(banner.start_date).toISOString().slice(0, 16) : ''}">
+            <small>Deixe vazio para exibir imediatamente</small>
+          </div>
+          
+          <div class="form-group">
+            <label for="end_date">Data de Término</label>
+            <input type="datetime-local" id="end_date" name="end_date" value="${banner && banner.end_date ? new Date(banner.end_date).toISOString().slice(0, 16) : ''}">
+            <small>Deixe vazio para exibir indefinidamente</small>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-actions">
+        <button type="submit" class="btn-save">
+          <i class="bi bi-check-lg"></i>
+          ${isEdit ? 'Salvar Alterações' : 'Criar Banner'}
+        </button>
+        <a href="/admin/banners" class="btn-cancel">Cancelar</a>
+      </div>
+    </div>
+  </div>
+</form>
+
+<style>
+.page-header {
+  margin-bottom: 24px;
+}
+.breadcrumb-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+.breadcrumb-nav a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+.breadcrumb-nav a:hover {
+  text-decoration: underline;
+}
+.breadcrumb-nav i {
+  font-size: 10px;
+}
+.page-header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+  align-items: start;
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f5f9;
+}
+.card-header h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0;
+}
+.card-body {
+  padding: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+.form-group:last-child {
+  margin-bottom: 0;
+}
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 8px;
+}
+.form-group input[type="text"],
+.form-group input[type="url"],
+.form-group input[type="number"],
+.form-group input[type="datetime-local"],
+.form-group select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+.form-group small {
+  display: block;
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 6px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.image-upload {
+  position: relative;
+}
+.image-upload input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+.upload-placeholder {
+  border: 2px dashed #e2e8f0;
+  border-radius: 12px;
+  padding: 40px;
+  text-align: center;
+  color: #94a3b8;
+  transition: all 0.2s;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: #f8fafc;
+}
+.upload-placeholder:hover {
+  border-color: #3b82f6;
+  background: #eff6ff;
+}
+.upload-placeholder i {
+  font-size: 36px;
+  color: #cbd5e1;
+}
+.upload-placeholder img {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 8px;
+}
+
+.size-preview {
+  margin-top: 12px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 8px;
+  text-align: center;
+}
+.size-box {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  margin: 0 auto 8px;
+  border-radius: 4px;
+  max-width: 100%;
+}
+.size-preview span {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.checkbox-label {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+.checkbox-label input {
+  width: 18px;
+  height: 18px;
+  accent-color: #3b82f6;
+}
+.checkbox-label span {
+  font-weight: 500;
+}
+
+.form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.btn-save {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-save:hover {
+  background: #2563eb;
+}
+.btn-cancel {
+  display: block;
+  text-align: center;
+  padding: 12px 20px;
+  color: #64748b;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+.btn-cancel:hover {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+@media (max-width: 991px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-sidebar {
+    order: -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+
+<script>
+function previewImage(input) {
+  const placeholder = document.getElementById('uploadPlaceholder');
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      placeholder.innerHTML = '<img src="' + e.target.result + '" alt="Preview" id="imagePreview">';
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function updateSizePreview(size) {
+  const box = document.getElementById('sizeBox');
+  const label = document.getElementById('sizeLabel');
+  
+  const sizes = {
+    '728x90': { w: 200, h: 25, label: '728 x 90 pixels' },
+    '300x250': { w: 120, h: 100, label: '300 x 250 pixels' },
+    '336x280': { w: 134, h: 112, label: '336 x 280 pixels' },
+    '300x600': { w: 75, h: 150, label: '300 x 600 pixels' },
+    '320x100': { w: 160, h: 50, label: '320 x 100 pixels' },
+    '970x90': { w: 200, h: 19, label: '970 x 90 pixels' },
+    '970x250': { w: 200, h: 52, label: '970 x 250 pixels' },
+    '160x600': { w: 40, h: 150, label: '160 x 600 pixels' },
+    '300x50': { w: 150, h: 25, label: '300 x 50 pixels' },
+    'responsive': { w: 200, h: 50, label: 'Largura 100%' }
+  };
+  
+  const s = sizes[size] || sizes['728x90'];
+  box.style.width = s.w + 'px';
+  box.style.height = s.h + 'px';
+  label.textContent = s.label;
+}
+
+// Inicializar preview do tamanho
+document.addEventListener('DOMContentLoaded', function() {
+  const sizeSelect = document.getElementById('size');
+  if (sizeSelect) {
+    updateSizePreview(sizeSelect.value);
+  }
+});
+</script>
+`}) %>

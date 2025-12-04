@@ -1,4 +1,13 @@
 <%- include('layouts/main', { body: `
+<!-- Banner Topo Home -->
+${banners && banners.home_top && banners.home_top.length > 0 ? `
+<div class="banner-area banner-top">
+  <div class="container">
+    ${banners.home_top.map(b => '<a href="' + (b.link || '#') + '" target="' + b.target + '" class="banner-link" data-banner-id="' + b.id + '"><img src="' + b.image + '" alt="' + (b.alt_text || b.title) + '" class="banner-img banner-' + b.size + '"></a>').join('')}
+  </div>
+</div>
+` : ''}
+
 <!-- Featured Section -->
 ${featuredPosts && featuredPosts.length > 0 ? `
 <section class="featured-section">
@@ -81,6 +90,13 @@ ${featuredPosts && featuredPosts.length > 0 ? `
         </div>
       </section>
       
+      <!-- Banner Meio Home -->
+      ${banners && banners.home_middle && banners.home_middle.length > 0 ? `
+      <div class="banner-area banner-middle">
+        ${banners.home_middle.map(b => '<a href="' + (b.link || '#') + '" target="' + b.target + '" class="banner-link" data-banner-id="' + b.id + '"><img src="' + b.image + '" alt="' + (b.alt_text || b.title) + '" class="banner-img banner-' + b.size + '"></a>').join('')}
+      </div>
+      ` : ''}
+      
       <!-- Seções por Categoria -->
       ${categoriesWithPosts && categoriesWithPosts.filter(c => c.posts && c.posts.length > 0).slice(0, 2).map(cat => `
         <section class="category-section">
@@ -138,6 +154,13 @@ ${featuredPosts && featuredPosts.length > 0 ? `
     
     <!-- Sidebar -->
     <aside class="sidebar">
+      <!-- Banner Sidebar Home -->
+      ${banners && banners.home_sidebar && banners.home_sidebar.length > 0 ? `
+      <div class="widget banner-widget">
+        ${banners.home_sidebar.map(b => '<a href="' + (b.link || '#') + '" target="' + b.target + '" class="banner-link" data-banner-id="' + b.id + '"><img src="' + b.image + '" alt="' + (b.alt_text || b.title) + '" class="banner-img banner-' + b.size + '"></a>').join('')}
+      </div>
+      ` : ''}
+      
       <!-- Busca Mobile -->
       <div class="widget search-widget d-lg-none">
         <form action="/busca" method="GET">
@@ -798,6 +821,43 @@ ${featuredPosts && featuredPosts.length > 0 ? `
     align-items: flex-start;
     gap: 12px;
   }
+}
+
+/* Banner Styles */
+.banner-area {
+  text-align: center;
+  margin: 20px 0;
+}
+.banner-top {
+  padding: 15px 0;
+  background: #f8fafc;
+}
+.banner-middle {
+  padding: 30px 0;
+  margin: 30px 0;
+  background: #f8fafc;
+  border-radius: 12px;
+}
+.banner-link {
+  display: inline-block;
+  transition: opacity 0.2s;
+}
+.banner-link:hover {
+  opacity: 0.9;
+}
+.banner-img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+.banner-widget {
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.banner-widget .banner-img {
+  width: 100%;
+  border-radius: 12px;
 }
 </style>
 `}) %>

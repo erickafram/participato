@@ -4,6 +4,7 @@
  */
 const { Post, Category, Page, User, Setting, sequelize } = require('../models');
 const { Op } = require('sequelize');
+const { getBanners } = require('../helpers/bannerHelper');
 
 class SiteController {
   // Página inicial
@@ -56,13 +57,17 @@ class SiteController {
         order: [['order', 'ASC']]
       });
 
+      // Buscar banners da home
+      const banners = await getBanners(['home_top', 'home_middle', 'home_bottom', 'home_sidebar']);
+
       res.render('site/home', {
         title: res.locals.settings.site_name || 'Portal Convictos',
         metaDescription: res.locals.settings.site_description,
         featuredPosts,
         latestPosts,
         popularPosts,
-        categoriesWithPosts
+        categoriesWithPosts,
+        banners
       });
     } catch (error) {
       console.error('Erro na página inicial:', error);
@@ -174,12 +179,16 @@ class SiteController {
         limit: 5
       });
 
+      // Buscar banners do post
+      const banners = await getBanners(['post_top', 'post_middle', 'post_bottom', 'post_sidebar']);
+
       res.render('site/posts/show', {
         title: post.meta_title || post.title,
         metaDescription: post.meta_description || post.excerpt,
         post,
         relatedPosts,
-        popularPosts
+        popularPosts,
+        banners
       });
     } catch (error) {
       console.error('Erro ao carregar post:', error);
@@ -220,6 +229,9 @@ class SiteController {
 
       const totalPages = Math.ceil(count / limit);
 
+      // Buscar banners da categoria
+      const banners = await getBanners(['category_top', 'category_bottom', 'category_sidebar']);
+
       res.render('site/category', {
         title: category.name,
         metaDescription: category.description || `Notícias sobre ${category.name}`,
@@ -231,7 +243,8 @@ class SiteController {
           total: count,
           hasNext: page < totalPages,
           hasPrev: page > 1
-        }
+        },
+        banners
       });
     } catch (error) {
       console.error('Erro ao carregar categoria:', error);

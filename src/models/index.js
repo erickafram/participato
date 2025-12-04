@@ -29,6 +29,7 @@ const Post = require('./Post')(sequelize);
 const Page = require('./Page')(sequelize);
 const Media = require('./Media')(sequelize);
 const Setting = require('./Setting')(sequelize);
+const Banner = require('./Banner')(sequelize);
 
 // Definir associações
 // User -> Posts (um usuário pode ter muitos posts)
@@ -55,5 +56,6 @@ module.exports = {
   Post,
   Page,
   Media,
-  Setting
+  Setting,
+  Banner
 };

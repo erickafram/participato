@@ -13,6 +13,7 @@ const PageController = require('../controllers/PageController');
 const UserController = require('../controllers/UserController');
 const MediaController = require('../controllers/MediaController');
 const SettingController = require('../controllers/SettingController');
+const BannerController = require('../controllers/BannerController');
 
 // Middlewares
 const { isAuthenticated, isNotAuthenticated, isAdmin } = require('../middlewares/auth');
@@ -90,6 +91,17 @@ router.get('/media/browse', MediaController.browse);
 router.get('/media/:id', MediaController.show);
 router.post('/media/:id', MediaController.update);
 router.post('/media/:id/delete', MediaController.destroy);
+
+// ==========================================
+// BANNERS
+// ==========================================
+router.get('/banners', BannerController.index);
+router.get('/banners/create', BannerController.create);
+router.post('/banners', ...uploadSingle('image'), BannerController.store);
+router.get('/banners/:id/edit', BannerController.edit);
+router.post('/banners/:id', ...uploadSingle('image'), BannerController.update);
+router.post('/banners/:id/delete', BannerController.destroy);
+router.post('/banners/:id/toggle-active', BannerController.toggleActive);
 
 // ==========================================
 // ROTAS APENAS PARA ADMIN

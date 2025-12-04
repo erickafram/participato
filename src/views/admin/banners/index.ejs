@@ -1,0 +1,362 @@
+<%- include('../layouts/main', { body: `
+<div class="page-header">
+  <div>
+    <h1>Banners</h1>
+    <p>Gerencie os banners publicitários do site</p>
+  </div>
+  <a href="/admin/banners/create" class="btn-action">
+    <i class="bi bi-plus"></i>
+    Novo Banner
+  </a>
+</div>
+
+<div class="data-card">
+  ${banners && banners.length > 0 
+    ? '<div class="data-list">' +
+        banners.map(banner => 
+          '<div class="data-item">' +
+            '<div class="item-thumb">' +
+              '<img src="' + banner.image + '" alt="' + banner.title + '">' +
+            '</div>' +
+            '<div class="item-info">' +
+              '<h3>' + banner.title + '</h3>' +
+              '<span class="item-meta">' +
+                '<span class="badge-position">' + (positions[banner.position] || banner.position) + '</span>' +
+                ' • ' + (sizes[banner.size] || banner.size) +
+              '</span>' +
+              '<span class="item-stats">' +
+                '<i class="bi bi-eye"></i> ' + banner.views.toLocaleString('pt-BR') + ' views' +
+                ' • <i class="bi bi-cursor"></i> ' + banner.clicks.toLocaleString('pt-BR') + ' cliques' +
+              '</span>' +
+            '</div>' +
+            '<div class="item-status">' +
+              (banner.active 
+                ? '<span class="badge success">Ativo</span>'
+                : '<span class="badge muted">Inativo</span>'
+              ) +
+            '</div>' +
+            '<div class="item-actions">' +
+              '<a href="/admin/banners/' + banner.id + '/edit" class="btn-icon" title="Editar"><i class="bi bi-pencil"></i></a>' +
+              '<button type="button" class="btn-icon" onclick="toggleActive(' + banner.id + ', this)" title="' + (banner.active ? 'Desativar' : 'Ativar') + '"><i class="bi bi-' + (banner.active ? 'toggle-on text-success' : 'toggle-off') + '"></i></button>' +
+              '<button type="button" class="btn-icon danger" onclick="deleteItem(' + banner.id + ')" title="Excluir"><i class="bi bi-trash"></i></button>' +
+            '</div>' +
+          '</div>'
+        ).join('') +
+      '</div>'
+    : '<div class="empty-state">' +
+        '<i class="bi bi-badge-ad"></i>' +
+        '<h3>Nenhum banner cadastrado</h3>' +
+        '<p>Crie banners para exibir em diferentes áreas do site</p>' +
+        '<a href="/admin/banners/create" class="btn-action"><i class="bi bi-plus"></i> Novo Banner</a>' +
+      '</div>'
+  }
+</div>
+
+<div class="info-card">
+  <h4><i class="bi bi-info-circle"></i> Tamanhos de Banner</h4>
+  <div class="sizes-grid">
+    <div class="size-item">
+      <strong>728x90</strong>
+      <span>Leaderboard - Ideal para topo</span>
+    </div>
+    <div class="size-item">
+      <strong>300x250</strong>
+      <span>Medium Rectangle - Sidebar</span>
+    </div>
+    <div class="size-item">
+      <strong>336x280</strong>
+      <span>Large Rectangle - Conteúdo</span>
+    </div>
+    <div class="size-item">
+      <strong>300x600</strong>
+      <span>Half Page - Sidebar grande</span>
+    </div>
+    <div class="size-item">
+      <strong>970x90</strong>
+      <span>Large Leaderboard - Topo wide</span>
+    </div>
+    <div class="size-item">
+      <strong>320x100</strong>
+      <span>Mobile Banner - Dispositivos móveis</span>
+    </div>
+  </div>
+</div>
+
+<form id="deleteForm" method="POST" style="display: none;"></form>
+
+<style>
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.page-header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 4px;
+}
+.page-header p {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+.btn-action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: #3b82f6;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.btn-action:hover {
+  background: #2563eb;
+  color: #fff;
+}
+.btn-action i {
+  font-size: 16px;
+}
+
+.data-card {
+  background: #fff;
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+.data-list {
+  display: flex;
+  flex-direction: column;
+}
+.data-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background 0.2s;
+}
+.data-item:last-child {
+  border-bottom: none;
+}
+.data-item:hover {
+  background: #f8fafc;
+}
+.item-thumb {
+  width: 120px;
+  height: 70px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #f1f5f9;
+}
+.item-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.item-info {
+  flex: 1;
+  min-width: 0;
+}
+.item-info h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 6px;
+}
+.item-meta {
+  display: block;
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+.item-stats {
+  display: block;
+  font-size: 11px;
+  color: #94a3b8;
+}
+.item-stats i {
+  margin-right: 2px;
+}
+.badge-position {
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+}
+.item-status {
+  flex-shrink: 0;
+}
+.badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge.success {
+  background: #dcfce7;
+  color: #16a34a;
+}
+.badge.muted {
+  background: #f1f5f9;
+  color: #64748b;
+}
+.item-actions {
+  display: flex;
+  gap: 4px;
+}
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+.btn-icon:hover {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+.btn-icon.danger:hover {
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+.text-success {
+  color: #16a34a !important;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #64748b;
+}
+.empty-state i {
+  font-size: 48px;
+  color: #cbd5e1;
+  margin-bottom: 16px;
+}
+.empty-state h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #475569;
+  margin: 0 0 8px;
+}
+.empty-state p {
+  font-size: 13px;
+  margin: 0 0 20px;
+}
+
+.info-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+}
+.info-card h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.info-card h4 i {
+  color: #3b82f6;
+}
+.sizes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+.size-item {
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+.size-item strong {
+  display: block;
+  font-size: 13px;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+.size-item span {
+  font-size: 11px;
+  color: #64748b;
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .btn-action {
+    width: 100%;
+    justify-content: center;
+  }
+  .data-item {
+    flex-wrap: wrap;
+  }
+  .item-thumb {
+    width: 80px;
+    height: 50px;
+  }
+  .item-status {
+    order: 3;
+    width: 100%;
+    margin-top: 8px;
+  }
+}
+</style>
+
+<script>
+function deleteItem(id) {
+  if (confirm('Excluir este banner?')) {
+    document.getElementById('deleteForm').action = '/admin/banners/' + id + '/delete';
+    document.getElementById('deleteForm').submit();
+  }
+}
+
+function toggleActive(id, btn) {
+  fetch('/admin/banners/' + id + '/toggle-active', { method: 'POST' })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        const icon = btn.querySelector('i');
+        if (data.active) {
+          icon.className = 'bi bi-toggle-on text-success';
+          btn.title = 'Desativar';
+        } else {
+          icon.className = 'bi bi-toggle-off';
+          btn.title = 'Ativar';
+        }
+        // Atualizar badge de status
+        const item = btn.closest('.data-item');
+        const badge = item.querySelector('.item-status .badge');
+        if (data.active) {
+          badge.className = 'badge success';
+          badge.textContent = 'Ativo';
+        } else {
+          badge.className = 'badge muted';
+          badge.textContent = 'Inativo';
+        }
+      }
+    });
+}
+</script>
+`}) %>
