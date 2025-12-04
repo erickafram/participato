@@ -10,7 +10,7 @@ ${featuredPosts && featuredPosts.length > 0 ? `
           <img src="${featuredPosts[0].featured_image || '/images/placeholder.jpg'}" alt="${featuredPosts[0].title}">
           <div class="featured-content">
             ${featuredPosts[0].category ? '<span class="card-category" style="background: ' + featuredPosts[0].category.color + '; position: static; margin-bottom: 15px; display: inline-block;">' + featuredPosts[0].category.name + '</span>' : ''}
-            <h2 class="display-5 fw-bold mb-3"><a href="/noticia/${featuredPosts[0].slug}" class="text-white">${featuredPosts[0].title}</a></h2>
+            <h2 class="display-6 fw-bold mb-3"><a href="/noticia/${featuredPosts[0].slug}" class="text-white">${featuredPosts[0].title}</a></h2>
             <div class="text-white-50 mb-0">
               <i class="bi bi-calendar3 me-2"></i>${new Date(featuredPosts[0].published_at || featuredPosts[0].created_at).toLocaleDateString('pt-BR')}
               <span class="mx-2">•</span>
