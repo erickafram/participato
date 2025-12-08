@@ -81,7 +81,17 @@ class SiteController {
           }
 
           const whereClause = { status: 'published' };
-          if (block.category_id) {
+
+          if (block.category_ids) {
+            const ids = String(block.category_ids)
+              .split(',')
+              .map(id => parseInt(id, 10))
+              .filter(id => !Number.isNaN(id));
+
+            if (ids.length > 0) {
+              whereClause.category_id = { [require('sequelize').Op.in]: ids };
+            }
+          } else if (block.category_id) {
             whereClause.category_id = block.category_id;
           }
 
@@ -92,7 +102,8 @@ class SiteController {
               { model: Category, as: 'category', attributes: ['id', 'name', 'slug', 'color'] }
             ],
             order: [['published_at', 'DESC']],
-            limit: block.posts_count || 4
+            limit: block.posts_count || 4,
+            offset: block.offset || 0
           });
 
           blockData.posts = posts;

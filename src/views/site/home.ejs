@@ -191,7 +191,7 @@ ${featuredPosts && featuredPosts.length > 0 ? `
         <div class="categories-list">
           ${categories.map(cat => `
             <a href="/categoria/${cat.slug}" class="category-item">
-              <span class="category-dot" style="background: ${cat.color}"></span>
+              <span class="category-dot" style="background-color: ${cat.color}"></span>
               <span class="category-name">${cat.name}</span>
               <span class="category-count">${cat.postCount || 0}</span>
             </a>
@@ -360,6 +360,7 @@ ${featuredPosts && featuredPosts.length > 0 ? `
   margin-bottom: 16px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -495,6 +496,7 @@ ${featuredPosts && featuredPosts.length > 0 ? `
   margin-bottom: 6px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -612,6 +614,7 @@ ${featuredPosts && featuredPosts.length > 0 ? `
   margin-bottom: 6px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -1420,6 +1423,18 @@ ${user && (user.role === 'admin' || user.role === 'editor') ? `
         <input type="number" id="liveBlockPostsCount" value="4" min="1" max="12">
       </div>
       
+      <div class="live-form-group" id="liveCategoriesMultiGroup">
+        <label>Categorias (pode marcar mais de uma)</label>
+        <select id="liveBlockCategoryMulti" multiple size="5">
+          ${categories.map(function(cat) { return '<option value="' + cat.id + '">' + cat.name + '</option>'; }).join('')}
+        </select>
+      </div>
+      
+      <div class="live-form-group" id="liveOffsetGroup">
+        <label>Offset (quantos posts pular)</label>
+        <input type="number" id="liveBlockOffset" value="0" min="0" max="100">
+      </div>
+      
       <div class="live-form-actions">
         <button type="button" onclick="closeLiveModal()">Cancelar</button>
         <button type="submit" class="primary"><i class="bi bi-check-lg"></i> Salvar</button>
@@ -1994,7 +2009,9 @@ function handleLiveTypeChange() {
   const type = checkedRadio ? checkedRadio.value : '';
   document.getElementById('liveBannerGroup').style.display = type === 'banner' ? 'block' : 'none';
   document.getElementById('liveCategoryGroup').style.display = type === 'banner' ? 'none' : 'block';
+  document.getElementById('liveCategoriesMultiGroup').style.display = type === 'banner' ? 'none' : 'block';
   document.getElementById('livePostsCountGroup').style.display = type === 'banner' ? 'none' : 'block';
+  document.getElementById('liveOffsetGroup').style.display = type === 'banner' ? 'none' : 'block';
 }
 
 // Open Add Block Modal
@@ -2024,6 +2041,22 @@ async function editBlockInline(id) {
       document.getElementById('liveBlockTitle').value = block.title || '';
       document.getElementById('liveBlockCategory').value = block.category_id || '';
       document.getElementById('liveBlockPostsCount').value = block.posts_count || 4;
+      document.getElementById('liveBlockOffset').value = block.offset || 0;
+      
+      // Preencher categorias múltiplas
+      const multiSelect = document.getElementById('liveBlockCategoryMulti');
+      if (multiSelect) {
+        Array.from(multiSelect.options).forEach(function(opt) { opt.selected = false; });
+        if (block.category_ids) {
+          const ids = String(block.category_ids).split(',').map(function(id) { return id.trim(); });
+          Array.from(multiSelect.options).forEach(function(opt) {
+            if (ids.includes(String(opt.value))) {
+              opt.selected = true;
+            }
+          });
+        }
+      }
+      
       // Set radio button
       const radio = document.querySelector('input[name="liveType"][value="' + block.type + '"]');
       if (radio) radio.checked = true;
@@ -2103,12 +2136,23 @@ async function saveLiveBlock(e) {
     return;
   }
   
+  // Coletar categorias múltiplas
+  const categoryMulti = document.getElementById('liveBlockCategoryMulti');
+  const selectedCategoryIds = [];
+  if (categoryMulti) {
+    Array.from(categoryMulti.selectedOptions).forEach(function(opt) {
+      if (opt.value) selectedCategoryIds.push(opt.value);
+    });
+  }
+  
   const data = {
     type: checkedRadio.value,
     title: document.getElementById('liveBlockTitle').value,
     category_id: document.getElementById('liveBlockCategory').value,
+    category_ids: selectedCategoryIds.length ? selectedCategoryIds.join(',') : null,
     banner_id: document.getElementById('liveBlockBanner').value,
     posts_count: document.getElementById('liveBlockPostsCount').value,
+    offset: document.getElementById('liveBlockOffset').value,
     show_title: true,
     show_category: true,
     show_excerpt: true,

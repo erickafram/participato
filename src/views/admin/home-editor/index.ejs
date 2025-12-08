@@ -307,9 +307,16 @@
       </div>
 
       <div class="form-group" id="categoryGroup">
-        <label>Categoria</label>
+        <label>Categoria principal</label>
         <select name="category_id" id="blockCategory">
           <option value="">Todas as categorias</option>
+          ` + categories.map(function(cat) { return '<option value="' + cat.id + '">' + cat.name + '</option>'; }).join('') + `
+        </select>
+      </div>
+
+      <div class="form-group" id="categoriesMultiGroup">
+        <label>Categorias (pode marcar mais de uma)</label>
+        <select name="category_ids" id="blockCategoryMulti" multiple size="5">
           ` + categories.map(function(cat) { return '<option value="' + cat.id + '">' + cat.name + '</option>'; }).join('') + `
         </select>
       </div>
@@ -325,6 +332,11 @@
       <div class="form-group" id="postsCountGroup">
         <label>Quantidade de Posts</label>
         <input type="number" name="posts_count" id="blockPostsCount" value="4" min="1" max="12">
+      </div>
+
+      <div class="form-group" id="offsetGroup">
+        <label>Offset (quantos posts pular)</label>
+        <input type="number" name="offset" id="blockOffset" value="0" min="0" max="100">
       </div>
 
       <div class="form-group">
@@ -1275,16 +1287,22 @@ function closeModal() {
 function handleTypeChange(type) {
   var bannerGroup = document.getElementById('bannerGroup');
   var categoryGroup = document.getElementById('categoryGroup');
+  var categoriesMultiGroup = document.getElementById('categoriesMultiGroup');
   var postsCountGroup = document.getElementById('postsCountGroup');
+  var offsetGroup = document.getElementById('offsetGroup');
   
   if (type === 'banner') {
     bannerGroup.style.display = 'block';
     categoryGroup.style.display = 'none';
+    categoriesMultiGroup.style.display = 'none';
     postsCountGroup.style.display = 'none';
+    offsetGroup.style.display = 'none';
   } else {
     bannerGroup.style.display = 'none';
     categoryGroup.style.display = 'block';
+    categoriesMultiGroup.style.display = 'block';
     postsCountGroup.style.display = 'block';
+    offsetGroup.style.display = 'block';
   }
 }
 
@@ -1312,13 +1330,23 @@ async function saveBlock(e) {
   var form = document.getElementById('blockForm');
   var formData = new FormData(form);
   var blockId = document.getElementById('blockId').value;
+  var categoryMulti = document.getElementById('blockCategoryMulti');
+
+  var selectedCategoryIds = [];
+  if (categoryMulti) {
+    Array.from(categoryMulti.selectedOptions).forEach(function(opt) {
+      if (opt.value) selectedCategoryIds.push(opt.value);
+    });
+  }
   
   var data = {
     type: formData.get('type'),
     title: formData.get('title'),
     category_id: formData.get('category_id'),
+    category_ids: selectedCategoryIds.length ? selectedCategoryIds.join(',') : null,
     banner_id: formData.get('banner_id'),
     posts_count: formData.get('posts_count'),
+    offset: formData.get('offset'),
     show_title: document.getElementById('showTitle').checked,
     show_category: document.getElementById('showCategory').checked,
     show_excerpt: document.getElementById('showExcerpt').checked,
@@ -1362,12 +1390,27 @@ async function editBlock(id) {
       document.getElementById('blockCategory').value = block.category_id || '';
       document.getElementById('blockBanner').value = block.banner_id || '';
       document.getElementById('blockPostsCount').value = block.posts_count || 4;
+      document.getElementById('blockOffset').value = block.offset || 0;
       document.getElementById('showTitle').checked = block.show_title;
       document.getElementById('showCategory').checked = block.show_category;
       document.getElementById('showExcerpt').checked = block.show_excerpt;
       document.getElementById('showDate').checked = block.show_date;
       document.getElementById('bgColor').value = block.background_color || '#ffffff';
       document.getElementById('bgColorText').value = block.background_color || '#ffffff';
+
+      // Preencher categorias múltiplas
+      var multiSelect = document.getElementById('blockCategoryMulti');
+      if (multiSelect) {
+        Array.from(multiSelect.options).forEach(function(opt) { opt.selected = false; });
+        if (block.category_ids) {
+          var ids = String(block.category_ids).split(',').map(function(id) { return id.trim(); });
+          Array.from(multiSelect.options).forEach(function(opt) {
+            if (ids.includes(String(opt.value))) {
+              opt.selected = true;
+            }
+          });
+        }
+      }
       
       var radio = document.querySelector('input[name="type"][value="' + block.type + '"]');
       if (radio) radio.checked = true;

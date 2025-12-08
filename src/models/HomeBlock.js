@@ -34,6 +34,10 @@ module.exports = (sequelize) => {
     type: DataTypes.INTEGER,
     allowNull: true // null = todas as categorias
   },
+  category_ids: {
+    type: DataTypes.STRING(255),
+    allowNull: true // IDs de múltiplas categorias, separados por vírgula
+  },
   banner_id: {
     type: DataTypes.INTEGER,
     allowNull: true // Para blocos do tipo banner
@@ -61,6 +65,10 @@ module.exports = (sequelize) => {
   background_color: {
     type: DataTypes.STRING(20),
     defaultValue: '#ffffff'
+  },
+  offset: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
   },
   order: {
     type: DataTypes.INTEGER,

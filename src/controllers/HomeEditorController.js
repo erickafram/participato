@@ -29,7 +29,6 @@ class HomeEditorController {
       });
 
       const banners = await Banner.findAll({
-        where: { active: true },
         order: [['title', 'ASC']]
       });
 
@@ -59,7 +58,7 @@ class HomeEditorController {
   // Adicionar novo bloco
   async addBlock(req, res) {
     try {
-      const { type, title, category_id, banner_id, posts_count, show_title, show_excerpt, show_date, show_category, background_color } = req.body;
+      const { type, title, category_id, category_ids, banner_id, posts_count, show_title, show_excerpt, show_date, show_category, background_color, offset } = req.body;
 
       // Pegar a maior ordem atual
       const maxOrder = await HomeBlock.max('order') || 0;
@@ -68,6 +67,7 @@ class HomeEditorController {
         type,
         title: title || null,
         category_id: category_id || null,
+        category_ids: category_ids || null,
         banner_id: type === 'banner' ? banner_id : null,
         posts_count: posts_count || 4,
         show_title: show_title !== 'false',
@@ -75,6 +75,7 @@ class HomeEditorController {
         show_date: show_date !== 'false',
         show_category: show_category !== 'false',
         background_color: background_color || '#ffffff',
+        offset: offset || 0,
         order: maxOrder + 1,
         active: true
       });
@@ -90,7 +91,7 @@ class HomeEditorController {
   async updateBlock(req, res) {
     try {
       const { id } = req.params;
-      const { type, title, category_id, banner_id, posts_count, show_title, show_excerpt, show_date, show_category, background_color, active } = req.body;
+      const { type, title, category_id, category_ids, banner_id, posts_count, show_title, show_excerpt, show_date, show_category, background_color, offset, active } = req.body;
 
       const block = await HomeBlock.findByPk(id);
       if (!block) {
@@ -101,6 +102,7 @@ class HomeEditorController {
         type,
         title: title || null,
         category_id: category_id || null,
+        category_ids: category_ids || null,
         banner_id: type === 'banner' ? banner_id : null,
         posts_count: posts_count || 4,
         show_title: show_title !== 'false',
@@ -108,6 +110,7 @@ class HomeEditorController {
         show_date: show_date !== 'false',
         show_category: show_category !== 'false',
         background_color: background_color || '#ffffff',
+        offset: offset || 0,
         active: active !== 'false'
       });
 
@@ -195,7 +198,17 @@ class HomeEditorController {
 
       // Buscar posts para o preview
       const whereClause = { status: 'published' };
-      if (block.category_id) {
+
+      if (block.category_ids) {
+        const ids = String(block.category_ids)
+          .split(',')
+          .map(id => parseInt(id, 10))
+          .filter(id => !Number.isNaN(id));
+
+        if (ids.length > 0) {
+          whereClause.category_id = { [require('sequelize').Op.in]: ids };
+        }
+      } else if (block.category_id) {
         whereClause.category_id = block.category_id;
       }
 
@@ -203,7 +216,8 @@ class HomeEditorController {
         where: whereClause,
         include: [{ model: Category, as: 'category', attributes: ['id', 'name', 'color', 'slug'] }],
         order: [['published_at', 'DESC']],
-        limit: block.posts_count || 4
+        limit: block.posts_count || 4,
+        offset: block.offset || 0
       });
 
       res.json({ success: true, block, posts });
