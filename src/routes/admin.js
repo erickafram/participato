@@ -66,6 +66,7 @@ router.post('/posts/:id/toggle-status', PostController.toggleStatus);
 router.get('/categories', CategoryController.index);
 router.get('/categories/create', CategoryController.create);
 router.post('/categories', CategoryController.store);
+router.post('/categories/reorder', CategoryController.reorder);
 router.get('/categories/:id/edit', CategoryController.edit);
 router.post('/categories/:id', CategoryController.update);
 router.post('/categories/:id/delete', CategoryController.destroy);

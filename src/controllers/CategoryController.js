@@ -10,8 +10,10 @@ class CategoryController {
   // Listar todas as categorias (admin)
   async index(req, res) {
     try {
-      const categories = await Category.findAll({
-        order: [['parent_id', 'ASC'], ['order', 'ASC'], ['name', 'ASC']],
+      // Buscar categorias principais (sem parent_id)
+      const mainCategories = await Category.findAll({
+        where: { parent_id: null },
+        order: [['order', 'ASC'], ['name', 'ASC']],
         include: [
           {
             model: Post,
@@ -20,26 +22,83 @@ class CategoryController {
           },
           {
             model: Category,
-            as: 'parent',
-            attributes: ['id', 'name', 'color']
+            as: 'children',
+            include: [{ model: Post, as: 'posts', attributes: ['id'] }],
+            order: [['order', 'ASC'], ['name', 'ASC']]
           }
         ]
       });
 
-      // Adicionar contagem de posts
-      const categoriesWithCount = categories.map(cat => ({
-        ...cat.toJSON(),
-        postCount: cat.posts ? cat.posts.length : 0
-      }));
+      // Organizar categorias com subcategorias logo abaixo
+      const organizedCategories = [];
+      mainCategories.forEach(cat => {
+        const catData = {
+          ...cat.toJSON(),
+          postCount: cat.posts ? cat.posts.length : 0
+        };
+        organizedCategories.push(catData);
+        
+        // Adicionar subcategorias logo após a categoria pai
+        if (cat.children && cat.children.length > 0) {
+          const sortedChildren = cat.children.sort((a, b) => {
+            if (a.order !== b.order) return a.order - b.order;
+            return a.name.localeCompare(b.name);
+          });
+          sortedChildren.forEach(child => {
+            organizedCategories.push({
+              ...child.toJSON(),
+              postCount: child.posts ? child.posts.length : 0,
+              parent: { id: cat.id, name: cat.name, color: cat.color }
+            });
+          });
+        }
+      });
 
       res.render('admin/categories/index', {
         title: 'Categorias',
-        categories: categoriesWithCount
+        categories: organizedCategories
       });
     } catch (error) {
       console.error('Erro ao listar categorias:', error);
       req.flash('error', 'Erro ao carregar categorias.');
       res.redirect('/admin');
+    }
+  }
+
+  // Reordenar categorias via drag-and-drop
+  async reorder(req, res) {
+    try {
+      const { items, subItems } = req.body;
+      
+      // Atualizar ordem das categorias principais
+      if (items && Array.isArray(items)) {
+        for (let i = 0; i < items.length; i++) {
+          await Category.update(
+            { order: i },
+            { where: { id: items[i] } }
+          );
+        }
+      }
+
+      // Atualizar ordem das subcategorias
+      if (subItems && typeof subItems === 'object') {
+        for (const parentId in subItems) {
+          const subs = subItems[parentId];
+          if (Array.isArray(subs)) {
+            for (let i = 0; i < subs.length; i++) {
+              await Category.update(
+                { order: i },
+                { where: { id: subs[i] } }
+              );
+            }
+          }
+        }
+      }
+
+      return res.json({ success: true, message: 'Ordem atualizada!' });
+    } catch (error) {
+      console.error('Erro ao reordenar:', error);
+      return res.json({ success: false, message: 'Erro ao reordenar.' });
     }
   }
 

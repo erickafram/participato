@@ -12,9 +12,10 @@
 
 <div class="data-card">
   ${categories && categories.length > 0
-    ? '<div class="data-list">' +
+    ? '<div class="data-list" id="sortableList">' +
       categories.map(cat =>
-        '<div class="data-item' + (cat.parent_id ? ' subcategory-item' : '') + '">' +
+        '<div class="data-item' + (cat.parent_id ? ' subcategory-item' : ' main-category') + '" data-id="' + cat.id + '" data-parent="' + (cat.parent_id || '') + '">' +
+          '<div class="drag-handle" title="Arraste para reordenar"><i class="bi bi-grip-vertical"></i></div>' +
           '<div class="item-color" style="background: ' + (cat.color || '#3b82f6') + '">' +
             (cat.parent_id ? '<i class="bi bi-arrow-return-right text-white"></i>' : '') +
           '</div>' +
@@ -22,7 +23,7 @@
             '<h3>' + (cat.parent_id ? '<i class="bi bi-folder2-open me-1 text-muted"></i>' : '') + cat.name + '</h3>' +
             '<span class="item-meta">' +
               (cat.parent && cat.parent.name ? '<span class="parent-badge" style="color: ' + cat.parent.color + '"><i class="bi bi-folder me-1"></i>' + cat.parent.name + '</span> | ' : '') +
-              '<code>/' + cat.slug + '</code> | ' + cat.postCount + ' posts | Ordem: ' + cat.order +
+              '<code>/' + cat.slug + '</code> | ' + cat.postCount + ' posts' +
             '</span>' +
           '</div>' +
           '<div class="item-status">' +
@@ -63,223 +64,407 @@
     margin: 0 0 4px;
   }
 
-    .page-header p {
-      font-size: 13px;
-      color: #64748b;
-      margin: 0;
+  .page-header p {
+    font-size: 13px;
+    color: #64748b;
+    margin: 0;
+  }
+
+  .btn-action {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: #3b82f6;
+    color: #fff;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+
+  .btn-action:hover {
+    background: #2563eb;
+    color: #fff;
+  }
+
+  .btn-action i {
+    font-size: 16px;
+  }
+
+  .data-card {
+    background: #fff;
+    border-radius: 12px;
+  }
+
+  .data-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .data-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f1f5f9;
+    transition: background 0.2s;
+  }
+
+  .data-item:last-child {
+    border-bottom: none;
+  }
+
+  .data-item:hover {
+    background: #f8fafc;
+  }
+
+  .drag-handle {
+    cursor: grab;
+    color: #cbd5e1;
+    padding: 8px;
+    margin: -8px 0;
+    transition: color 0.2s;
+  }
+
+  .drag-handle:hover {
+    color: #64748b;
+  }
+
+  .drag-handle:active {
+    cursor: grabbing;
+  }
+
+  .data-item.dragging {
+    opacity: 0.5;
+    background: #e2e8f0;
+  }
+
+  .data-item.drag-over {
+    border-top: 2px solid #3b82f6;
+  }
+
+  .item-color {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+  }
+
+  .item-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .item-info h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 0 0 4px;
+  }
+
+  .item-meta {
+    font-size: 12px;
+    color: #64748b;
+  }
+
+  .item-meta code {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+  }
+
+  .parent-badge {
+    font-weight: 600;
+  }
+
+  .item-status {
+    flex-shrink: 0;
+  }
+
+  .badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    display: inline-block;
+  }
+
+  .badge.success {
+    background: #dcfce7;
+    color: #16a34a;
+  }
+
+  .badge.muted {
+    background: #f1f5f9;
+    color: #64748b;
+  }
+
+  .badge.info {
+    background: #dbeafe;
+    color: #2563eb;
+  }
+
+  .subcategory-item {
+    background: #fafbfc;
+    padding-left: 60px;
+  }
+
+  .main-category {
+    background: #fff;
+  }
+
+  .item-actions {
+    display: flex;
+    gap: 4px;
+  }
+
+  .btn-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+
+  .btn-icon:hover {
+    background: #f8fafc;
+    color: #0f172a;
+    border-color: #cbd5e1;
+  }
+
+  .btn-icon.danger:hover {
+    background: #fef2f2;
+    color: #dc2626;
+    border-color: #fecaca;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #64748b;
+  }
+
+  .empty-state i {
+    font-size: 48px;
+    color: #cbd5e1;
+    margin-bottom: 16px;
+  }
+
+  .empty-state h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #475569;
+    margin: 0 0 8px;
+  }
+
+  .empty-state p {
+    font-size: 13px;
+    margin: 0 0 20px;
+  }
+
+  @media (max-width: 640px) {
+    .page-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
     }
 
     .btn-action {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 18px;
-      background: #3b82f6;
-      color: #fff;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      text-decoration: none;
-      transition: background 0.2s;
-    }
-
-    .btn-action:hover {
-      background: #2563eb;
-      color: #fff;
-    }
-
-    .btn-action i {
-      font-size: 16px;
-    }
-
-    .data-card {
-      background: #fff;
-      border-radius: 12px;
-    }
-
-    .data-list {
-      display: flex;
-      flex-direction: column;
+      width: 100%;
+      justify-content: center;
     }
 
     .data-item {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 16px 20px;
-      border-bottom: 1px solid #f1f5f9;
-      transition: background 0.2s;
-    }
-
-    .data-item:last-child {
-      border-bottom: none;
-    }
-
-    .data-item:hover {
-      background: #f8fafc;
-    }
-
-    .item-color {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-    }
-
-    .item-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .item-info h3 {
-      font-size: 14px;
-      font-weight: 600;
-      color: #0f172a;
-      margin: 0 0 4px;
-    }
-
-    .item-meta {
-      font-size: 12px;
-      color: #64748b;
-    }
-
-    .item-meta code {
-      background: #f1f5f9;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 11px;
-    }
-
-    .parent-badge {
-      font-weight: 600;
+      flex-wrap: wrap;
     }
 
     .item-status {
-      flex-shrink: 0;
+      order: 3;
+      width: 100%;
+      margin-top: 8px;
     }
 
-    .badge {
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
-      display: inline-block;
+    .drag-handle {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  function deleteItem(id, postCount) {
+    if (postCount > 0) {
+      alert('Nao e possivel excluir: existem ' + postCount + ' posts vinculados.');
+      return;
+    }
+    if (confirm('Excluir esta categoria?')) {
+      document.getElementById('deleteForm').action = '/admin/categories/' + id + '/delete';
+      document.getElementById('deleteForm').submit();
+    }
+  }
+
+  // Drag and Drop para reordenar
+  document.addEventListener('DOMContentLoaded', function() {
+    const list = document.getElementById('sortableList');
+    if (!list) return;
+
+    let draggedItem = null;
+    let draggedChildren = [];
+
+    // Função para obter subcategorias de uma categoria principal
+    function getChildrenOf(parentId) {
+      return Array.from(list.querySelectorAll('.subcategory-item[data-parent="' + parentId + '"]'));
     }
 
-    .badge.success {
-      background: #dcfce7;
-      color: #16a34a;
+    list.querySelectorAll('.data-item').forEach(item => {
+      const handle = item.querySelector('.drag-handle');
+      
+      handle.addEventListener('mousedown', function() {
+        item.setAttribute('draggable', 'true');
+      });
+
+      item.addEventListener('dragstart', function(e) {
+        draggedItem = this;
+        this.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        
+        // Se for categoria principal, marcar as subcategorias também
+        if (this.classList.contains('main-category')) {
+          draggedChildren = getChildrenOf(this.dataset.id);
+          draggedChildren.forEach(child => child.classList.add('dragging'));
+        } else {
+          draggedChildren = [];
+        }
+      });
+
+      item.addEventListener('dragend', function() {
+        this.classList.remove('dragging');
+        this.removeAttribute('draggable');
+        draggedChildren.forEach(child => child.classList.remove('dragging'));
+        document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+        
+        // Salvar nova ordem
+        saveOrder();
+      });
+
+      item.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        
+        // Não mostrar indicador se estiver sobre si mesmo ou suas subcategorias
+        if (this !== draggedItem && !draggedChildren.includes(this)) {
+          this.classList.add('drag-over');
+        }
+      });
+
+      item.addEventListener('dragleave', function() {
+        this.classList.remove('drag-over');
+      });
+
+      item.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('drag-over');
+        
+        if (this === draggedItem || draggedChildren.includes(this)) return;
+
+        const draggedIsMain = draggedItem.classList.contains('main-category');
+        const targetIsMain = this.classList.contains('main-category');
+        const draggedParent = draggedItem.dataset.parent;
+        const targetParent = this.dataset.parent;
+
+        // Categoria principal sendo movida
+        if (draggedIsMain) {
+          // Só pode soltar em outra categoria principal ou na primeira subcategoria de outra categoria
+          if (targetIsMain) {
+            // Mover categoria principal (e suas subcategorias) antes ou depois do target
+            const allMains = Array.from(list.querySelectorAll('.main-category'));
+            const draggedIndex = allMains.indexOf(draggedItem);
+            const targetIndex = allMains.indexOf(this);
+            
+            // Encontrar onde inserir (após o target e suas subcategorias)
+            const targetChildren = getChildrenOf(this.dataset.id);
+            const insertAfter = targetChildren.length > 0 ? targetChildren[targetChildren.length - 1] : this;
+            
+            if (draggedIndex < targetIndex) {
+              // Movendo para baixo: inserir após o target e suas subcategorias
+              insertAfter.after(draggedItem);
+              // Mover subcategorias junto
+              let lastInserted = draggedItem;
+              draggedChildren.forEach(child => {
+                lastInserted.after(child);
+                lastInserted = child;
+              });
+            } else {
+              // Movendo para cima: inserir antes do target
+              this.before(draggedItem);
+              let lastInserted = draggedItem;
+              draggedChildren.forEach(child => {
+                lastInserted.after(child);
+                lastInserted = child;
+              });
+            }
+          }
+        } 
+        // Subcategoria sendo movida
+        else if (draggedParent === targetParent) {
+          // Subcategorias só podem ser reordenadas dentro do mesmo grupo
+          const allItems = Array.from(list.querySelectorAll('.data-item'));
+          const draggedIndex = allItems.indexOf(draggedItem);
+          const targetIndex = allItems.indexOf(this);
+          
+          if (draggedIndex < targetIndex) {
+            this.after(draggedItem);
+          } else {
+            this.before(draggedItem);
+          }
+        }
+      });
+    });
+
+    function saveOrder() {
+      // Coletar IDs das categorias principais na ordem atual
+      const mainItems = Array.from(list.querySelectorAll('.main-category')).map(el => el.dataset.id);
+      
+      // Coletar IDs das subcategorias agrupadas por parent
+      const subItems = {};
+      list.querySelectorAll('.subcategory-item').forEach(el => {
+        const parentId = el.dataset.parent;
+        if (!subItems[parentId]) subItems[parentId] = [];
+        subItems[parentId].push(el.dataset.id);
+      });
+
+      // Enviar para o servidor
+      fetch('/admin/categories/reorder', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          items: mainItems,
+          subItems: subItems
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          // Feedback visual opcional
+        }
+      })
+      .catch(err => console.error('Erro ao salvar ordem:', err));
     }
-
-    .badge.muted {
-      background: #f1f5f9;
-      color: #64748b;
-    }
-
-    .badge.info {
-      background: #dbeafe;
-      color: #2563eb;
-    }
-
-    .subcategory-item {
-      background: #fafbfc;
-      padding-left: 40px;
-    }
-
-    .item-actions {
-      display: flex;
-      gap: 4px;
-    }
-
-    .btn-icon {
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 6px;
-      border: 1px solid #e2e8f0;
-      background: #fff;
-      color: #64748b;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-decoration: none;
-    }
-
-    .btn-icon:hover {
-      background: #f8fafc;
-      color: #0f172a;
-      border-color: #cbd5e1;
-    }
-
-    .btn-icon.danger:hover {
-      background: #fef2f2;
-      color: #dc2626;
-      border-color: #fecaca;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      color: #64748b;
-    }
-
-    .empty-state i {
-      font-size: 48px;
-      color: #cbd5e1;
-      margin-bottom: 16px;
-    }
-
-    .empty-state h3 {
-      font-size: 16px;
-      font-weight: 600;
-      color: #475569;
-      margin: 0 0 8px;
-    }
-
-    .empty-state p {
-      font-size: 13px;
-      margin: 0 0 20px;
-    }
-
-    @media (max-width: 640px) {
-      .page-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 16px;
-      }
-
-      .btn-action {
-        width: 100%;
-        justify-content: center;
-      }
-
-      .data-item {
-        flex-wrap: wrap;
-      }
-
-      .item-status {
-        order: 3;
-        width: 100%;
-        margin-top: 8px;
-      }
-    }
-  </style>
-
-  <script>
-    function deleteItem(id, postCount) {
-      if (postCount > 0) {
-        alert('Nao e possivel excluir: existem ' + postCount + ' posts vinculados.');
-        return;
-      }
-      if (confirm('Excluir esta categoria?')) {
-        document.getElementById('deleteForm').action = '/admin/categories/' + id + '/delete';
-        document.getElementById('deleteForm').submit();
-      }
-    }
-  </script>
-  `}) %>
+  });
+</script>
+`}) %>
