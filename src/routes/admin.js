@@ -15,6 +15,7 @@ const UserController = require('../controllers/UserController');
 const MediaController = require('../controllers/MediaController');
 const SettingController = require('../controllers/SettingController');
 const BannerController = require('../controllers/BannerController');
+const HomeEditorController = require('../controllers/HomeEditorController');
 
 // Middlewares
 const { isAuthenticated, isNotAuthenticated, isAdmin } = require('../middlewares/auth');
@@ -138,5 +139,16 @@ router.post('/users/:id/toggle-active', UserController.toggleActive);
 // ==========================================
 router.get('/settings', SettingController.index);
 router.post('/settings', SettingController.update);
+
+// ==========================================
+// EDITOR DA HOME
+// ==========================================
+router.get('/home-editor', HomeEditorController.index);
+router.post('/home-editor/blocks', HomeEditorController.addBlock);
+router.post('/home-editor/blocks/:id', HomeEditorController.updateBlock);
+router.post('/home-editor/blocks/:id/delete', HomeEditorController.deleteBlock);
+router.post('/home-editor/blocks/:id/toggle', HomeEditorController.toggleActive);
+router.post('/home-editor/reorder', HomeEditorController.reorderBlocks);
+router.get('/home-editor/blocks/:id/preview', HomeEditorController.previewBlock);
 
 module.exports = router;

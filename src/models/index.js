@@ -31,6 +31,7 @@ const Page = require('./Page')(sequelize);
 const Media = require('./Media')(sequelize);
 const Setting = require('./Setting')(sequelize);
 const Banner = require('./Banner')(sequelize);
+const HomeBlock = require('./HomeBlock')(sequelize);
 
 // Definir associações
 // User -> Posts (um usuário pode ter muitos posts)
@@ -57,6 +58,13 @@ Page.belongsTo(User, { foreignKey: 'author_id', as: 'author' });
 User.hasMany(Media, { foreignKey: 'user_id', as: 'medias' });
 Media.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 
+// HomeBlock -> Category
+HomeBlock.belongsTo(Category, { foreignKey: 'category_id', as: 'category' });
+Category.hasMany(HomeBlock, { foreignKey: 'category_id', as: 'homeBlocks' });
+
+// HomeBlock -> Banner
+HomeBlock.belongsTo(Banner, { foreignKey: 'banner_id', as: 'banner' });
+
 module.exports = {
   sequelize,
   Sequelize,
@@ -67,5 +75,6 @@ module.exports = {
   Page,
   Media,
   Setting,
-  Banner
+  Banner,
+  HomeBlock
 };

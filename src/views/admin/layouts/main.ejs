@@ -420,6 +420,11 @@
         <span>Banners</span>
       </a>
 
+      <a href="/admin/home-editor" class="nav-item <%= currentPath.startsWith('/admin/home-editor') ? 'active' : '' %>">
+        <i class="bi bi-layout-wtf"></i>
+        <span>Editor da Home</span>
+      </a>
+
       <% if (user && user.role==='admin' ) { %>
         <div class="menu-label">Sistema</div>
 

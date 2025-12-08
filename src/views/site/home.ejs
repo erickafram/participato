@@ -53,103 +53,93 @@ ${featuredPosts && featuredPosts.length > 0 ? `
   <div class="content-grid">
     <!-- Coluna Principal -->
     <div class="main-column">
-      <!-- Últimas Notícias -->
-      <section class="news-section">
-        <div class="section-header">
-          <h2 class="section-title">
-            <i class="bi bi-lightning-charge-fill"></i>
-            Últimas Notícias
-          </h2>
-          <a href="/noticias" class="see-all-btn">
-            Ver Todas <i class="bi bi-arrow-right"></i>
-          </a>
-        </div>
-        
-        <div class="news-grid">
-          ${latestPosts && latestPosts.length > 0 
-            ? latestPosts.map(post => `
-              <article class="news-card">
-                <a href="/noticia/${post.slug}" class="news-image">
-                  ${post.category ? '<span class="news-category" style="background: ' + post.category.color + '">' + post.category.name + '</span>' : ''}
-                  <img src="${post.featured_image || '/images/placeholder.jpg'}" alt="${post.title}">
-                </a>
-                <div class="news-body">
-                  <h3 class="news-title">
-                    <a href="/noticia/${post.slug}">${post.title}</a>
-                  </h3>
-                  <p class="news-excerpt">${post.excerpt ? post.excerpt.substring(0, 120) + '...' : ''}</p>
-                  <div class="news-meta">
-                    <span><i class="bi bi-calendar3"></i> ${new Date(post.published_at || post.created_at).toLocaleDateString('pt-BR')}</span>
-                    <span><i class="bi bi-eye"></i> ${post.views.toLocaleString('pt-BR')}</span>
-                  </div>
-                </div>
-              </article>
-            `).join('')
-            : '<div class="empty-message"><i class="bi bi-newspaper"></i><p>Nenhuma notícia encontrada.</p></div>'
-          }
-        </div>
-      </section>
-      
-      <!-- Banner Meio Home -->
-      ${banners && banners.home_middle && banners.home_middle.length > 0 ? `
-      <div class="banner-area banner-middle">
-        ${banners.home_middle.map(b => '<a href="' + (b.link || '#') + '" target="' + b.target + '" class="banner-link" data-banner-id="' + b.id + '"><img src="' + b.image + '" alt="' + (b.alt_text || b.title) + '" class="banner-img banner-' + b.size + '"></a>').join('')}
-      </div>
-      ` : ''}
-      
-      <!-- Seções por Categoria -->
-      ${categoriesWithPosts && categoriesWithPosts.filter(c => c.posts && c.posts.length > 0).slice(0, 2).map(cat => `
-        <section class="category-section">
-          <div class="section-header">
-            <h2 class="section-title" style="--accent-color: ${cat.color}">
-              <i class="${cat.icon || 'bi bi-folder-fill'}"></i>
-              ${cat.name}
-            </h2>
-            <a href="/categoria/${cat.slug}" class="see-all-btn">
-              Ver Mais <i class="bi bi-arrow-right"></i>
-            </a>
-          </div>
-          
-          <div class="category-grid">
-            <!-- Post Grande -->
-            ${cat.posts[0] ? `
-              <article class="cat-main-card">
-                <a href="/noticia/${cat.posts[0].slug}" class="cat-main-image">
-                  <img src="${cat.posts[0].featured_image || '/images/placeholder.jpg'}" alt="${cat.posts[0].title}">
-                </a>
-                <div class="cat-main-body">
-                  <h3 class="cat-main-title">
-                    <a href="/noticia/${cat.posts[0].slug}">${cat.posts[0].title}</a>
-                  </h3>
-                  <p class="cat-main-excerpt">${cat.posts[0].excerpt ? cat.posts[0].excerpt.substring(0, 150) + '...' : ''}</p>
-                  <div class="cat-main-meta">
-                    <span><i class="bi bi-calendar3"></i> ${new Date(cat.posts[0].published_at || cat.posts[0].created_at).toLocaleDateString('pt-BR')}</span>
-                  </div>
-                </div>
-              </article>
-            ` : ''}
+      <!-- Blocos Dinâmicos da Home -->
+      ${homeBlocks && homeBlocks.length > 0 
+        ? homeBlocks.map(block => {
+            // Banner Block
+            if (block.type === 'banner' && block.banner) {
+              return '<div class="home-block block-banner" style="background: ' + block.background_color + '"><a href="' + (block.banner.link || '#') + '" target="' + (block.banner.target || '_blank') + '" class="banner-link" data-banner-id="' + block.banner.id + '"><img src="' + block.banner.image + '" alt="' + (block.banner.alt_text || block.banner.title) + '" class="banner-img"></a></div>';
+            }
             
-            <!-- Posts Pequenos -->
-            <div class="cat-side-list">
-              ${cat.posts.slice(1, 5).map(post => `
-                <article class="cat-side-card">
-                  <a href="/noticia/${post.slug}" class="cat-side-image">
-                    <img src="${post.featured_image || '/images/placeholder.jpg'}" alt="${post.title}">
-                  </a>
-                  <div class="cat-side-body">
-                    <h4 class="cat-side-title">
-                      <a href="/noticia/${post.slug}">${post.title}</a>
-                    </h4>
-                    <span class="cat-side-date">
-                      <i class="bi bi-clock"></i> ${new Date(post.published_at || post.created_at).toLocaleDateString('pt-BR')}
-                    </span>
-                  </div>
-                </article>
-              `).join('')}
+            if (!block.posts || block.posts.length === 0) return '';
+            
+            const sectionTitle = block.show_title !== false ? '<div class="section-header"><h2 class="section-title" style="--accent-color: ' + (block.category ? block.category.color : '#3b82f6') + '"><i class="bi bi-lightning-charge-fill"></i>' + (block.title || (block.category ? block.category.name : 'Últimas Notícias')) + '</h2>' + (block.category ? '<a href="/categoria/' + block.category.slug + '" class="see-all-btn">Ver Mais <i class="bi bi-arrow-right"></i></a>' : '') + '</div>' : '';
+            
+            // Grid 2 Colunas
+            if (block.type === 'grid-2') {
+              return '<section class="home-block news-section" style="background: ' + block.background_color + '">' + sectionTitle + '<div class="news-grid grid-2">' + block.posts.map(function(post) { return '<article class="news-card"><a href="/noticia/' + post.slug + '" class="news-image">' + (block.show_category !== false && post.category ? '<span class="news-category" style="background: ' + post.category.color + '">' + post.category.name + '</span>' : '') + '<img src="' + (post.featured_image || '/images/placeholder.jpg') + '" alt="' + post.title + '"></a><div class="news-body"><h3 class="news-title"><a href="/noticia/' + post.slug + '">' + post.title + '</a></h3>' + (block.show_excerpt !== false && post.excerpt ? '<p class="news-excerpt">' + post.excerpt.substring(0, 120) + '...</p>' : '') + (block.show_date !== false ? '<div class="news-meta"><span><i class="bi bi-calendar3"></i> ' + new Date(post.published_at || post.created_at).toLocaleDateString('pt-BR') + '</span></div>' : '') + '</div></article>'; }).join('') + '</div></section>';
+            }
+            
+            // 2 Destaques lado a lado
+            if (block.type === 'highlight-2') {
+              return '<section class="home-block highlight-section" style="background: ' + block.background_color + '">' + sectionTitle + '<div class="highlight-grid">' + block.posts.slice(0, 2).map(function(post) { return '<article class="highlight-card"><a href="/noticia/' + post.slug + '" class="highlight-link">' + (block.show_category !== false && post.category ? '<span class="news-category" style="background: ' + post.category.color + '">' + post.category.name + '</span>' : '') + '<img src="' + (post.featured_image || '/images/placeholder.jpg') + '" alt="' + post.title + '"><div class="highlight-overlay"><h2>' + post.title + '</h2>' + (block.show_date !== false ? '<span><i class="bi bi-calendar3"></i> ' + new Date(post.published_at || post.created_at).toLocaleDateString('pt-BR') + '</span>' : '') + '</div></a></article>'; }).join('') + '</div></section>';
+            }
+            
+            // Grid 3 Colunas
+            if (block.type === 'grid-3') {
+              return '<section class="home-block news-section" style="background: ' + block.background_color + '">' + sectionTitle + '<div class="news-grid grid-3">' + block.posts.map(function(post) { return '<article class="news-card"><a href="/noticia/' + post.slug + '" class="news-image">' + (block.show_category !== false && post.category ? '<span class="news-category" style="background: ' + post.category.color + '">' + post.category.name + '</span>' : '') + '<img src="' + (post.featured_image || '/images/placeholder.jpg') + '" alt="' + post.title + '"></a><div class="news-body"><h3 class="news-title"><a href="/noticia/' + post.slug + '">' + post.title + '</a></h3>' + (block.show_excerpt !== false && post.excerpt ? '<p class="news-excerpt">' + post.excerpt.substring(0, 100) + '...</p>' : '') + (block.show_date !== false ? '<div class="news-meta"><span><i class="bi bi-calendar3"></i> ' + new Date(post.published_at || post.created_at).toLocaleDateString('pt-BR') + '</span></div>' : '') + '</div></article>'; }).join('') + '</div></section>';
+            }
+            
+            // Grid 4 Colunas
+            if (block.type === 'grid-4') {
+              return '<section class="home-block news-section" style="background: ' + block.background_color + '">' + sectionTitle + '<div class="news-grid grid-4">' + block.posts.map(function(post) { return '<article class="news-card small"><a href="/noticia/' + post.slug + '" class="news-image">' + (block.show_category !== false && post.category ? '<span class="news-category" style="background: ' + post.category.color + '">' + post.category.name + '</span>' : '') + '<img src="' + (post.featured_image || '/images/placeholder.jpg') + '" alt="' + post.title + '"></a><div class="news-body"><h3 class="news-title"><a href="/noticia/' + post.slug + '">' + post.title + '</a></h3>' + (block.show_date !== false ? '<div class="news-meta"><span><i class="bi bi-calendar3"></i> ' + new Date(post.published_at || post.created_at).toLocaleDateString('pt-BR') + '</span></div>' : '') + '</div></article>'; }).join('') + '</div></section>';
+            }
+            
+            // Lista Vertical
+            if (block.type === 'list-vertical') {
+              return '<section class="home-block news-section" style="background: ' + block.background_color + '">' + sectionTitle + '<div class="list-vertical">' + block.posts.map(function(post) { return '<article class="list-item"><a href="/noticia/' + post.slug + '" class="list-image"><img src="' + (post.featured_image || '/images/placeholder.jpg') + '" alt="' + post.title + '"></a><div class="list-body">' + (block.show_category !== false && post.category ? '<span class="list-category" style="color: ' + post.category.color + '">' + post.category.name + '</span>' : '') + '<h3 class="list-title"><a href="/noticia/' + post.slug + '">' + post.title + '</a></h3>' + (block.show_excerpt !== false && post.excerpt ? '<p class="list-excerpt">' + post.excerpt.substring(0, 120) + '...</p>' : '') + (block.show_date !== false ? '<span class="list-date"><i class="bi bi-calendar3"></i> ' + new Date(post.published_at || post.created_at).toLocaleDateString('pt-BR') + '</span>' : '') + '</div></article>'; }).join('') + '</div></section>';
+            }
+            
+            // Grande à Esquerda
+            if (block.type === 'big-left') {
+              const mainPost = block.posts[0];
+              const sidePosts = block.posts.slice(1);
+              return '<section class="home-block category-section" style="background: ' + block.background_color + '">' + sectionTitle + '<div class="category-grid">' + (mainPost ? '<article class="cat-main-card"><a href="/noticia/' + mainPost.slug + '" class="cat-main-image">' + (block.show_category !== false && mainPost.category ? '<span class="news-category" style="background: ' + mainPost.category.color + '">' + mainPost.category.name + '</span>' : '') + '<img src="' + (mainPost.featured_image || '/images/placeholder.jpg') + '" alt="' + mainPost.title + '"></a><div class="cat-main-body"><h3 class="cat-main-title"><a href="/noticia/' + mainPost.slug + '">' + mainPost.title + '</a></h3>' + (block.show_excerpt !== false && mainPost.excerpt ? '<p class="cat-main-excerpt">' + mainPost.excerpt.substring(0, 150) + '...</p>' : '') + (block.show_date !== false ? '<div class="cat-main-meta"><span><i class="bi bi-calendar3"></i> ' + new Date(mainPost.published_at || mainPost.created_at).toLocaleDateString('pt-BR') + '</span></div>' : '') + '</div></article>' : '') + '<div class="cat-side-list">' + sidePosts.map(function(post) { return '<article class="cat-side-card"><a href="/noticia/' + post.slug + '" class="cat-side-image"><img src="' + (post.featured_image || '/images/placeholder.jpg') + '" alt="' + post.title + '"></a><div class="cat-side-body"><h4 class="cat-side-title"><a href="/noticia/' + post.slug + '">' + post.title + '</a></h4>' + (block.show_date !== false ? '<span class="cat-side-date"><i class="bi bi-clock"></i> ' + new Date(post.published_at || post.created_at).toLocaleDateString('pt-BR') + '</span>' : '') + '</div></article>'; }).join('') + '</div></div></section>';
+            }
+            
+            // Grande à Direita
+            if (block.type === 'big-right') {
+              const mainPost = block.posts[0];
+              const sidePosts = block.posts.slice(1);
+              return '<section class="home-block category-section" style="background: ' + block.background_color + '">' + sectionTitle + '<div class="category-grid reverse"><div class="cat-side-list">' + sidePosts.map(function(post) { return '<article class="cat-side-card"><a href="/noticia/' + post.slug + '" class="cat-side-image"><img src="' + (post.featured_image || '/images/placeholder.jpg') + '" alt="' + post.title + '"></a><div class="cat-side-body"><h4 class="cat-side-title"><a href="/noticia/' + post.slug + '">' + post.title + '</a></h4>' + (block.show_date !== false ? '<span class="cat-side-date"><i class="bi bi-clock"></i> ' + new Date(post.published_at || post.created_at).toLocaleDateString('pt-BR') + '</span>' : '') + '</div></article>'; }).join('') + '</div>' + (mainPost ? '<article class="cat-main-card"><a href="/noticia/' + mainPost.slug + '" class="cat-main-image">' + (block.show_category !== false && mainPost.category ? '<span class="news-category" style="background: ' + mainPost.category.color + '">' + mainPost.category.name + '</span>' : '') + '<img src="' + (mainPost.featured_image || '/images/placeholder.jpg') + '" alt="' + mainPost.title + '"></a><div class="cat-main-body"><h3 class="cat-main-title"><a href="/noticia/' + mainPost.slug + '">' + mainPost.title + '</a></h3>' + (block.show_excerpt !== false && mainPost.excerpt ? '<p class="cat-main-excerpt">' + mainPost.excerpt.substring(0, 150) + '...</p>' : '') + (block.show_date !== false ? '<div class="cat-main-meta"><span><i class="bi bi-calendar3"></i> ' + new Date(mainPost.published_at || mainPost.created_at).toLocaleDateString('pt-BR') + '</span></div>' : '') + '</div></article>' : '') + '</div></section>';
+            }
+            
+            // Carrossel
+            if (block.type === 'carousel') {
+              return '<section class="home-block carousel-section" style="background: ' + block.background_color + '">' + sectionTitle + '<div class="carousel-container"><div class="carousel-track" id="carousel-' + block.id + '">' + block.posts.map(function(post) { return '<article class="carousel-item"><a href="/noticia/' + post.slug + '" class="carousel-image">' + (block.show_category !== false && post.category ? '<span class="news-category" style="background: ' + post.category.color + '">' + post.category.name + '</span>' : '') + '<img src="' + (post.featured_image || '/images/placeholder.jpg') + '" alt="' + post.title + '"></a><div class="carousel-body"><h3 class="carousel-title"><a href="/noticia/' + post.slug + '">' + post.title + '</a></h3></div></article>'; }).join('') + '</div><button class="carousel-btn prev" onclick="scrollCarousel(this.parentElement.querySelector(`.carousel-track`).id, -1)"><i class="bi bi-chevron-left"></i></button><button class="carousel-btn next" onclick="scrollCarousel(this.parentElement.querySelector(`.carousel-track`).id, 1)"><i class="bi bi-chevron-right"></i></button></div></section>';
+            }
+            
+            // Featured (padrão)
+            if (block.type === 'featured') {
+              const mainPost = block.posts[0];
+              const sidePosts = block.posts.slice(1, 3);
+              return '<section class="home-block featured-block" style="background: ' + block.background_color + '">' + sectionTitle + '<div class="featured-grid"><div class="featured-main-item">' + (mainPost ? '<a href="/noticia/' + mainPost.slug + '" class="featured-link">' + (block.show_category !== false && mainPost.category ? '<span class="news-category" style="background: ' + mainPost.category.color + '">' + mainPost.category.name + '</span>' : '') + '<img src="' + (mainPost.featured_image || '/images/placeholder.jpg') + '" alt="' + mainPost.title + '"><div class="featured-overlay"><h2>' + mainPost.title + '</h2>' + (block.show_date !== false ? '<span><i class="bi bi-calendar3"></i> ' + new Date(mainPost.published_at || mainPost.created_at).toLocaleDateString('pt-BR') + '</span>' : '') + '</div></a>' : '') + '</div><div class="featured-side">' + sidePosts.map(function(post) { return '<div class="featured-side-item"><a href="/noticia/' + post.slug + '" class="featured-link">' + (block.show_category !== false && post.category ? '<span class="news-category small" style="background: ' + post.category.color + '">' + post.category.name + '</span>' : '') + '<img src="' + (post.featured_image || '/images/placeholder.jpg') + '" alt="' + post.title + '"><div class="featured-overlay"><h3>' + post.title + '</h3></div></a></div>'; }).join('') + '</div></div></section>';
+            }
+            
+            return '';
+          }).join('')
+        : `
+          <!-- Fallback: Últimas Notícias -->
+          <section class="news-section">
+            <div class="section-header">
+              <h2 class="section-title">
+                <i class="bi bi-lightning-charge-fill"></i>
+                Últimas Notícias
+              </h2>
+              <a href="/noticias" class="see-all-btn">
+                Ver Todas <i class="bi bi-arrow-right"></i>
+              </a>
             </div>
-          </div>
-        </section>
-      `).join('')}
+            
+            <div class="news-grid">
+              ${latestPosts && latestPosts.length > 0 
+                ? latestPosts.map(post => '<article class="news-card"><a href="/noticia/' + post.slug + '" class="news-image">' + (post.category ? '<span class="news-category" style="background: ' + post.category.color + '">' + post.category.name + '</span>' : '') + '<img src="' + (post.featured_image || '/images/placeholder.jpg') + '" alt="' + post.title + '"></a><div class="news-body"><h3 class="news-title"><a href="/noticia/' + post.slug + '">' + post.title + '</a></h3><p class="news-excerpt">' + (post.excerpt ? post.excerpt.substring(0, 120) + '...' : '') + '</p><div class="news-meta"><span><i class="bi bi-calendar3"></i> ' + new Date(post.published_at || post.created_at).toLocaleDateString('pt-BR') + '</span></div></div></article>').join('')
+                : '<div class="empty-message"><i class="bi bi-newspaper"></i><p>Nenhuma notícia encontrada.</p></div>'
+              }
+            </div>
+          </section>
+        `
+      }
     </div>
     
     <!-- Sidebar -->
@@ -184,7 +174,6 @@ ${featuredPosts && featuredPosts.length > 0 ? `
                 <span class="popular-rank">${String(index + 1).padStart(2, '0')}</span>
                 <div class="popular-content">
                   <h5 class="popular-title">${post.title}</h5>
-                  <span class="popular-views"><i class="bi bi-eye"></i> ${post.views.toLocaleString('pt-BR')}</span>
                 </div>
               </a>
             `).join('')
@@ -859,5 +848,1304 @@ ${featuredPosts && featuredPosts.length > 0 ? `
   width: 100%;
   border-radius: 12px;
 }
+
+/* ========================================
+   DYNAMIC BLOCKS STYLES
+   ======================================== */
+
+/* Home Block Base */
+.home-block {
+  margin-bottom: 40px;
+  padding: 20px;
+  border-radius: 16px;
+}
+
+.block-banner {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.block-banner .banner-img {
+  max-width: 100%;
+  border-radius: 12px;
+}
+
+/* Grid Variations */
+.news-grid.grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.news-grid.grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.news-grid.grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* Highlight 2 */
+.highlight-section {
+  margin-bottom: 40px;
+}
+
+.highlight-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.highlight-card {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  height: 320px;
+}
+
+.highlight-link {
+  display: block;
+  height: 100%;
+}
+
+.highlight-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s;
+}
+
+.highlight-card:hover img {
+  transform: scale(1.05);
+}
+
+.highlight-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 24px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.8));
+  color: #fff;
+}
+
+.highlight-overlay h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.highlight-overlay span {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.news-grid.grid-4 .news-card.small .news-image {
+  height: 160px;
+}
+
+.news-grid.grid-4 .news-card.small .news-title {
+  font-size: 14px;
+}
+
+/* List Vertical */
+.list-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.list-item {
+  display: flex;
+  gap: 20px;
+  background: #fff;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  transition: transform 0.2s;
+}
+
+.list-item:hover {
+  transform: translateX(4px);
+}
+
+.list-image {
+  width: 180px;
+  height: 120px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.list-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.list-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.list-category {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.list-title {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+.list-title a {
+  color: #0f172a;
+  text-decoration: none;
+}
+
+.list-title a:hover {
+  color: #3b82f6;
+}
+
+.list-excerpt {
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.list-date {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+/* Category Grid Reverse */
+.category-grid.reverse {
+  direction: rtl;
+}
+
+.category-grid.reverse > * {
+  direction: ltr;
+}
+
+/* Featured Block */
+.featured-block {
+  padding: 0;
+  background: transparent !important;
+}
+
+.featured-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+  height: 450px;
+}
+
+.featured-main-item {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.featured-main-item .featured-link {
+  display: block;
+  height: 100%;
+}
+
+.featured-main-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s;
+}
+
+.featured-main-item:hover img {
+  transform: scale(1.05);
+}
+
+.featured-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 30px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.8));
+  color: #fff;
+}
+
+.featured-overlay h2 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+
+.featured-overlay h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.featured-overlay span {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.featured-side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.featured-side-item {
+  flex: 1;
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.featured-side-item .featured-link {
+  display: block;
+  height: 100%;
+}
+
+.featured-side-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s;
+}
+
+.featured-side-item:hover img {
+  transform: scale(1.05);
+}
+
+.featured-side-item .featured-overlay {
+  padding: 20px;
+}
+
+.news-category.small {
+  font-size: 9px;
+  padding: 3px 8px;
+}
+
+/* Carousel */
+.carousel-section {
+  padding: 20px 0;
+}
+
+.carousel-container {
+  position: relative;
+}
+
+.carousel-track {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 10px 0;
+}
+
+.carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel-item {
+  flex: 0 0 300px;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  transition: transform 0.3s;
+}
+
+.carousel-item:hover {
+  transform: translateY(-4px);
+}
+
+.carousel-image {
+  display: block;
+  height: 180px;
+  position: relative;
+  overflow: hidden;
+}
+
+.carousel-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.carousel-body {
+  padding: 16px;
+}
+
+.carousel-title {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.carousel-title a {
+  color: #0f172a;
+  text-decoration: none;
+}
+
+.carousel-title a:hover {
+  color: #3b82f6;
+}
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  background: #fff;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #0f172a;
+  transition: all 0.2s;
+  z-index: 10;
+}
+
+.carousel-btn:hover {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.carousel-btn.prev {
+  left: -10px;
+}
+
+.carousel-btn.next {
+  right: -10px;
+}
+
+/* Responsive for Blocks */
+@media (max-width: 1200px) {
+  .news-grid.grid-4 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .featured-grid {
+    height: 400px;
+  }
+}
+
+@media (max-width: 991px) {
+  .news-grid.grid-3,
+  .news-grid.grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .featured-grid {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  
+  .featured-main-item {
+    height: 300px;
+  }
+  
+  .featured-side {
+    flex-direction: row;
+  }
+  
+  .featured-side-item {
+    height: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .news-grid.grid-3,
+  .news-grid.grid-4 {
+    grid-template-columns: 1fr;
+  }
+  
+  .list-item {
+    flex-direction: column;
+  }
+  
+  .list-image {
+    width: 100%;
+    height: 180px;
+  }
+  
+  .featured-side {
+    flex-direction: column;
+  }
+  
+  .carousel-item {
+    flex: 0 0 260px;
+  }
+  
+  .carousel-btn {
+    display: none;
+  }
+}
 </style>
+
+<script>
+// Carousel scroll function
+function scrollCarousel(id, direction) {
+  const track = document.getElementById(id);
+  if (track) {
+    const scrollAmount = 320 * direction;
+    track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+  }
+}
+</script>
+
+<!-- Editor Visual Inline (apenas para admin/editor logado) -->
+${user && (user.role === 'admin' || user.role === 'editor') ? `
+<div class="live-editor-fab" id="liveEditorFab" onclick="toggleLiveEditor()">
+  <i class="bi bi-pencil-square"></i>
+  <span>Editar Home</span>
+</div>
+
+<div class="live-editor-panel" id="liveEditorPanel">
+  <div class="live-editor-header">
+    <h3><i class="bi bi-layout-wtf"></i> Editor Visual</h3>
+    <button class="live-editor-close" onclick="toggleLiveEditor()"><i class="bi bi-x-lg"></i></button>
+  </div>
+  
+  <div class="live-editor-body">
+    <div class="live-editor-section">
+      <h4>Blocos da Home</h4>
+      <div class="live-blocks-list" id="liveBlocksList">
+        ${homeBlocks && homeBlocks.length > 0 
+          ? homeBlocks.map(function(block) {
+              var typeLabels = {'featured':'Destaque','highlight-2':'2 Destaques','grid-2':'Grid 2','grid-3':'Grid 3','grid-4':'Grid 4','list-vertical':'Lista','big-left':'Grande Esq.','big-right':'Grande Dir.','carousel':'Carrossel','banner':'Banner'};
+              return '<div class="live-block-item ' + (!block.active ? 'inactive' : '') + '" data-id="' + block.id + '">' +
+                '<div class="live-block-drag"><i class="bi bi-grip-vertical"></i></div>' +
+                '<div class="live-block-preview live-preview-' + block.type + '"></div>' +
+                '<div class="live-block-info">' +
+                  '<span class="live-block-type">' + (typeLabels[block.type] || block.type) + '</span>' +
+                  '<span class="live-block-name">' + (block.title || (block.category ? block.category.name : 'Todas')) + '</span>' +
+                  (!block.active ? '<span class="live-block-status">Inativo</span>' : '') +
+                '</div>' +
+                '<div class="live-block-actions">' +
+                  '<button onclick="editBlockInline(' + block.id + ')" title="Editar"><i class="bi bi-pencil"></i></button>' +
+                  '<button class="toggle-btn ' + (block.active ? 'active' : '') + '" onclick="toggleBlockInline(' + block.id + ')" title="' + (block.active ? 'Desativar' : 'Ativar') + '"><i class="bi bi-' + (block.active ? 'eye' : 'eye-slash') + '"></i></button>' +
+                  '<button class="danger" onclick="deleteBlockInline(' + block.id + ')" title="Excluir"><i class="bi bi-trash"></i></button>' +
+                '</div>' +
+              '</div>';
+            }).join('')
+          : '<p class="live-empty">Nenhum bloco configurado</p>'
+        }
+      </div>
+      <button class="live-add-block" onclick="openAddBlockInline()">
+        <i class="bi bi-plus-lg"></i> Adicionar Bloco
+      </button>
+    </div>
+    
+    <div class="live-editor-section">
+      <h4>Ações Rápidas</h4>
+      <a href="/admin/home-editor" class="live-action-btn">
+        <i class="bi bi-gear"></i> Editor Completo
+      </a>
+      <a href="/admin/posts/create" class="live-action-btn">
+        <i class="bi bi-plus"></i> Novo Post
+      </a>
+      <a href="/admin/banners" class="live-action-btn">
+        <i class="bi bi-badge-ad"></i> Gerenciar Banners
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Inline para Adicionar/Editar Bloco -->
+<div class="live-modal-overlay" id="liveBlockModal">
+  <div class="live-modal">
+    <div class="live-modal-header">
+      <h4 id="liveModalTitle"><i class="bi bi-plus-lg"></i> Adicionar Bloco</h4>
+      <button onclick="closeLiveModal()"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <form id="liveBlockForm" onsubmit="saveLiveBlock(event)">
+      <input type="hidden" id="liveBlockId">
+      
+      <div class="live-form-group">
+        <label>Tipo de Bloco</label>
+        <div class="live-type-grid">
+          <label class="live-type-option"><input type="radio" name="liveType" value="featured" onchange="handleLiveTypeChange()"><div class="live-type-box"><div class="live-type-icon featured-icon"></div><span>Destaque</span></div></label>
+          <label class="live-type-option"><input type="radio" name="liveType" value="highlight-2" onchange="handleLiveTypeChange()"><div class="live-type-box"><div class="live-type-icon highlight2-icon"></div><span>2 Destaques</span></div></label>
+          <label class="live-type-option"><input type="radio" name="liveType" value="grid-2" onchange="handleLiveTypeChange()"><div class="live-type-box"><div class="live-type-icon grid2-icon"></div><span>Grid 2</span></div></label>
+          <label class="live-type-option"><input type="radio" name="liveType" value="grid-3" onchange="handleLiveTypeChange()"><div class="live-type-box"><div class="live-type-icon grid3-icon"></div><span>Grid 3</span></div></label>
+          <label class="live-type-option"><input type="radio" name="liveType" value="grid-4" onchange="handleLiveTypeChange()"><div class="live-type-box"><div class="live-type-icon grid4-icon"></div><span>Grid 4</span></div></label>
+          <label class="live-type-option"><input type="radio" name="liveType" value="list-vertical" onchange="handleLiveTypeChange()"><div class="live-type-box"><div class="live-type-icon list-icon"></div><span>Lista</span></div></label>
+          <label class="live-type-option"><input type="radio" name="liveType" value="big-left" onchange="handleLiveTypeChange()"><div class="live-type-box"><div class="live-type-icon bigleft-icon"></div><span>Grande Esq.</span></div></label>
+          <label class="live-type-option"><input type="radio" name="liveType" value="big-right" onchange="handleLiveTypeChange()"><div class="live-type-box"><div class="live-type-icon bigright-icon"></div><span>Grande Dir.</span></div></label>
+          <label class="live-type-option"><input type="radio" name="liveType" value="carousel" onchange="handleLiveTypeChange()"><div class="live-type-box"><div class="live-type-icon carousel-icon"></div><span>Carrossel</span></div></label>
+          <label class="live-type-option"><input type="radio" name="liveType" value="banner" onchange="handleLiveTypeChange()"><div class="live-type-box"><div class="live-type-icon banner-icon"></div><span>Banner</span></div></label>
+        </div>
+      </div>
+      
+      <div class="live-form-group">
+        <label>Título (opcional)</label>
+        <input type="text" id="liveBlockTitle" placeholder="Ex: Últimas Notícias">
+      </div>
+      
+      <div class="live-form-group" id="liveCategoryGroup">
+        <label>Categoria</label>
+        <select id="liveBlockCategory">
+          <option value="">Todas as categorias</option>
+          ${categories.map(function(cat) { return '<option value="' + cat.id + '">' + cat.name + '</option>'; }).join('')}
+        </select>
+      </div>
+      
+      <div class="live-form-group" id="liveBannerGroup" style="display:none;">
+        <label>Banner</label>
+        <select id="liveBlockBanner">
+          <option value="">Selecione um banner</option>
+        </select>
+      </div>
+      
+      <div class="live-form-group" id="livePostsCountGroup">
+        <label>Quantidade de Posts</label>
+        <input type="number" id="liveBlockPostsCount" value="4" min="1" max="12">
+      </div>
+      
+      <div class="live-form-actions">
+        <button type="button" onclick="closeLiveModal()">Cancelar</button>
+        <button type="submit" class="primary"><i class="bi bi-check-lg"></i> Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+/* Live Editor FAB */
+.live-editor-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: #fff;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+  z-index: 9990;
+  transition: all 0.3s;
+}
+
+.live-editor-fab:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(59, 130, 246, 0.5);
+}
+
+.live-editor-fab i {
+  font-size: 18px;
+}
+
+/* Live Editor Panel */
+.live-editor-panel {
+  position: fixed;
+  top: 0;
+  right: -380px;
+  width: 360px;
+  height: 100vh;
+  background: #fff;
+  box-shadow: -4px 0 20px rgba(0,0,0,0.1);
+  z-index: 9995;
+  display: flex;
+  flex-direction: column;
+  transition: right 0.3s ease;
+}
+
+.live-editor-panel.active {
+  right: 0;
+}
+
+.live-editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: #fff;
+}
+
+.live-editor-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.live-editor-close {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.live-editor-close:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+.live-editor-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.live-editor-section {
+  margin-bottom: 24px;
+}
+
+.live-editor-section h4 {
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+/* Live Blocks List */
+.live-blocks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.live-block-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.live-block-item:hover {
+  border-color: #3b82f6;
+  background: #eff6ff;
+}
+
+.live-block-drag {
+  color: #cbd5e1;
+  cursor: grab;
+}
+
+.live-block-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.live-block-type {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  color: #3b82f6;
+  text-transform: uppercase;
+}
+
+.live-block-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.live-block-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.live-block-actions button {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  color: #64748b;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.live-block-actions button:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.live-block-actions button.danger:hover {
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+.live-block-actions button.toggle-btn.active {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.live-block-item.inactive {
+  opacity: 0.6;
+}
+
+.live-block-status {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 600;
+  color: #94a3b8;
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 2px;
+}
+
+/* Live Block Preview Icons */
+.live-block-preview {
+  width: 36px;
+  height: 24px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  flex-shrink: 0;
+}
+
+.live-preview-featured::before { content: ''; flex: 2; background: #3b82f6; border-radius: 2px; }
+.live-preview-featured::after { content: ''; flex: 1; background: #94a3b8; border-radius: 2px; }
+
+.live-preview-highlight-2::before, .live-preview-highlight-2::after { content: ''; flex: 1; background: #3b82f6; border-radius: 2px; }
+
+.live-preview-grid-2::before, .live-preview-grid-2::after { content: ''; flex: 1; background: #94a3b8; border-radius: 2px; }
+
+.live-preview-grid-3 { gap: 1px; }
+.live-preview-grid-3::before { content: ''; flex: 1; background: #94a3b8; border-radius: 2px; }
+.live-preview-grid-3::after { content: ''; flex: 2; background: #94a3b8; border-radius: 2px; }
+
+.live-preview-grid-4 { gap: 1px; }
+.live-preview-grid-4::before, .live-preview-grid-4::after { content: ''; flex: 1; background: #94a3b8; border-radius: 2px; }
+
+.live-preview-list-vertical { flex-direction: column; gap: 2px; }
+.live-preview-list-vertical::before, .live-preview-list-vertical::after { content: ''; flex: 1; background: #94a3b8; border-radius: 2px; }
+
+.live-preview-big-left::before { content: ''; flex: 2; background: #3b82f6; border-radius: 2px; }
+.live-preview-big-left::after { content: ''; flex: 1; background: #94a3b8; border-radius: 2px; }
+
+.live-preview-big-right::before { content: ''; flex: 1; background: #94a3b8; border-radius: 2px; }
+.live-preview-big-right::after { content: ''; flex: 2; background: #3b82f6; border-radius: 2px; }
+
+.live-preview-carousel::before { content: ''; flex: 0 0 40%; background: #94a3b8; border-radius: 2px; }
+.live-preview-carousel::after { content: ''; flex: 0 0 40%; background: #94a3b8; border-radius: 2px; opacity: 0.5; }
+
+.live-preview-banner { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+
+/* Live Type Grid */
+.live-type-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+
+.live-type-option input { display: none; }
+
+.live-type-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px;
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.live-type-option input:checked + .live-type-box {
+  background: #eff6ff;
+  border-color: #3b82f6;
+}
+
+.live-type-box span {
+  font-size: 9px;
+  font-weight: 600;
+  color: #64748b;
+  text-align: center;
+}
+
+.live-type-option input:checked + .live-type-box span {
+  color: #3b82f6;
+}
+
+.live-type-icon {
+  width: 32px;
+  height: 20px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+}
+
+.featured-icon::before { content: ''; flex: 2; background: #3b82f6; border-radius: 2px; }
+.featured-icon::after { content: ''; flex: 1; background: #94a3b8; border-radius: 2px; }
+
+.highlight2-icon::before, .highlight2-icon::after { content: ''; flex: 1; background: #3b82f6; border-radius: 2px; }
+
+.grid2-icon::before, .grid2-icon::after { content: ''; flex: 1; background: #94a3b8; border-radius: 2px; }
+
+.grid3-icon { gap: 1px; }
+.grid3-icon::before { content: ''; flex: 1; background: #94a3b8; border-radius: 2px; }
+.grid3-icon::after { content: ''; flex: 2; background: #94a3b8; border-radius: 2px; }
+
+.grid4-icon { gap: 1px; }
+.grid4-icon::before, .grid4-icon::after { content: ''; flex: 1; background: #94a3b8; border-radius: 2px; }
+
+.list-icon { flex-direction: column; gap: 2px; }
+.list-icon::before, .list-icon::after { content: ''; flex: 1; background: #94a3b8; border-radius: 2px; }
+
+.bigleft-icon::before { content: ''; flex: 2; background: #3b82f6; border-radius: 2px; }
+.bigleft-icon::after { content: ''; flex: 1; background: #94a3b8; border-radius: 2px; }
+
+.bigright-icon::before { content: ''; flex: 1; background: #94a3b8; border-radius: 2px; }
+.bigright-icon::after { content: ''; flex: 2; background: #3b82f6; border-radius: 2px; }
+
+.carousel-icon::before { content: ''; flex: 0 0 45%; background: #94a3b8; border-radius: 2px; }
+.carousel-icon::after { content: ''; flex: 0 0 45%; background: #94a3b8; border-radius: 2px; opacity: 0.5; }
+
+.banner-icon { background: linear-gradient(135deg, #f59e0b, #ef4444) !important; }
+
+.live-empty {
+  text-align: center;
+  color: #94a3b8;
+  font-size: 13px;
+  padding: 20px;
+}
+
+.live-add-block {
+  width: 100%;
+  padding: 10px;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background 0.2s;
+}
+
+.live-add-block:hover {
+  background: #2563eb;
+}
+
+/* Live Action Buttons */
+.live-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  margin-bottom: 8px;
+  transition: all 0.2s;
+}
+
+.live-action-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+.live-action-btn i {
+  font-size: 16px;
+  color: #3b82f6;
+}
+
+/* Live Modal */
+.live-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s;
+}
+
+.live-modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.live-modal {
+  background: #fff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 420px;
+  max-height: 90vh;
+  overflow-y: auto;
+  margin: 20px;
+}
+
+.live-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.live-modal-header h4 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.live-modal-header h4 i {
+  color: #3b82f6;
+}
+
+.live-modal-header button {
+  background: #f1f5f9;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+}
+
+.live-modal-header button:hover {
+  background: #e2e8f0;
+}
+
+#liveBlockForm {
+  padding: 20px;
+}
+
+.live-form-group {
+  margin-bottom: 16px;
+}
+
+.live-form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+.live-form-group input,
+.live-form-group select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.live-form-group input:focus,
+.live-form-group select:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.live-form-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
+  margin-top: 20px;
+}
+
+.live-form-actions button {
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.live-form-actions button:first-child {
+  background: #f1f5f9;
+  border: none;
+  color: #64748b;
+}
+
+.live-form-actions button.primary {
+  background: #3b82f6;
+  border: none;
+  color: #fff;
+}
+
+.live-form-actions button.primary:hover {
+  background: #2563eb;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .live-editor-fab span {
+    display: none;
+  }
+  
+  .live-editor-fab {
+    padding: 14px;
+    border-radius: 50%;
+  }
+  
+  .live-editor-panel {
+    width: 100%;
+    right: -100%;
+  }
+  
+  .live-type-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .live-modal {
+    max-width: 95%;
+    margin: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .highlight-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .highlight-card {
+    height: 250px;
+  }
+}
+</style>
+
+<script>
+// Toggle Live Editor Panel
+function toggleLiveEditor() {
+  const panel = document.getElementById('liveEditorPanel');
+  const fab = document.getElementById('liveEditorFab');
+  panel.classList.toggle('active');
+  fab.style.display = panel.classList.contains('active') ? 'none' : 'flex';
+}
+
+// Handle type change
+function handleLiveTypeChange() {
+  const checkedRadio = document.querySelector('input[name="liveType"]:checked');
+  const type = checkedRadio ? checkedRadio.value : '';
+  document.getElementById('liveBannerGroup').style.display = type === 'banner' ? 'block' : 'none';
+  document.getElementById('liveCategoryGroup').style.display = type === 'banner' ? 'none' : 'block';
+  document.getElementById('livePostsCountGroup').style.display = type === 'banner' ? 'none' : 'block';
+}
+
+// Open Add Block Modal
+function openAddBlockInline() {
+  document.getElementById('liveModalTitle').innerHTML = '<i class="bi bi-plus-lg"></i> Adicionar Bloco';
+  document.getElementById('liveBlockForm').reset();
+  document.getElementById('liveBlockId').value = '';
+  // Reset radio buttons
+  document.querySelectorAll('input[name="liveType"]').forEach(r => r.checked = false);
+  document.getElementById('liveBlockModal').classList.add('active');
+}
+
+// Close Modal
+function closeLiveModal() {
+  document.getElementById('liveBlockModal').classList.remove('active');
+}
+
+// Edit Block
+async function editBlockInline(id) {
+  try {
+    const res = await fetch('/admin/home-editor/blocks/' + id + '/preview');
+    const data = await res.json();
+    if (data.success) {
+      const block = data.block;
+      document.getElementById('liveModalTitle').innerHTML = '<i class="bi bi-pencil"></i> Editar Bloco';
+      document.getElementById('liveBlockId').value = block.id;
+      document.getElementById('liveBlockTitle').value = block.title || '';
+      document.getElementById('liveBlockCategory').value = block.category_id || '';
+      document.getElementById('liveBlockPostsCount').value = block.posts_count || 4;
+      // Set radio button
+      const radio = document.querySelector('input[name="liveType"][value="' + block.type + '"]');
+      if (radio) radio.checked = true;
+      handleLiveTypeChange();
+      document.getElementById('liveBlockModal').classList.add('active');
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+// Toggle Block Active (apenas desativa/ativa, NÃO exclui)
+async function toggleBlockInline(id) {
+  try {
+    const res = await fetch('/admin/home-editor/blocks/' + id + '/toggle', { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+      // Atualizar visualmente sem recarregar
+      const blockEl = document.querySelector('.live-block-item[data-id="' + id + '"]');
+      if (blockEl) {
+        blockEl.classList.toggle('inactive');
+        const toggleBtn = blockEl.querySelector('.toggle-btn');
+        const icon = toggleBtn.querySelector('i');
+        const statusEl = blockEl.querySelector('.live-block-status');
+        
+        if (blockEl.classList.contains('inactive')) {
+          toggleBtn.classList.remove('active');
+          icon.className = 'bi bi-eye-slash';
+          if (!statusEl) {
+            const info = blockEl.querySelector('.live-block-info');
+            info.insertAdjacentHTML('beforeend', '<span class="live-block-status">Inativo</span>');
+          }
+        } else {
+          toggleBtn.classList.add('active');
+          icon.className = 'bi bi-eye';
+          if (statusEl) statusEl.remove();
+        }
+      }
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+// Delete Block (remove do DOM sem fechar o editor)
+async function deleteBlockInline(id) {
+  if (!confirm('Excluir este bloco?')) return;
+  try {
+    const res = await fetch('/admin/home-editor/blocks/' + id + '/delete', { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+      // Remover elemento do DOM sem recarregar
+      const blockEl = document.querySelector('.live-block-item[data-id="' + id + '"]');
+      if (blockEl) {
+        blockEl.remove();
+      }
+      // Se não houver mais blocos, mostrar mensagem
+      const list = document.getElementById('liveBlocksList');
+      if (list && list.querySelectorAll('.live-block-item').length === 0) {
+        list.innerHTML = '<p class="live-empty">Nenhum bloco configurado</p>';
+      }
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+// Save Block
+async function saveLiveBlock(e) {
+  e.preventDefault();
+  
+  const blockId = document.getElementById('liveBlockId').value;
+  const checkedRadio = document.querySelector('input[name="liveType"]:checked');
+  
+  if (!checkedRadio) {
+    alert('Selecione um tipo de bloco');
+    return;
+  }
+  
+  const data = {
+    type: checkedRadio.value,
+    title: document.getElementById('liveBlockTitle').value,
+    category_id: document.getElementById('liveBlockCategory').value,
+    banner_id: document.getElementById('liveBlockBanner').value,
+    posts_count: document.getElementById('liveBlockPostsCount').value,
+    show_title: true,
+    show_category: true,
+    show_excerpt: true,
+    show_date: true
+  };
+  
+  const url = blockId ? '/admin/home-editor/blocks/' + blockId : '/admin/home-editor/blocks';
+  
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const result = await res.json();
+    if (result.success) {
+      location.reload();
+    } else {
+      alert(result.message || 'Erro ao salvar');
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Erro ao salvar bloco');
+  }
+}
+
+// Close modal on ESC
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeLiveModal();
+  }
+});
+
+// Close modal on overlay click
+document.getElementById('liveBlockModal')?.addEventListener('click', function(e) {
+  if (e.target === this) closeLiveModal();
+});
+</script>
+` : ''}
 `}) %>
