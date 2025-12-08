@@ -201,6 +201,62 @@
       box-shadow: none;
     }
     
+    /* Dropdown Menu Styles */
+    .nav-item.dropdown {
+      position: relative;
+    }
+    
+    .nav-item.dropdown .dropdown-toggle::after {
+      margin-left: 6px;
+      vertical-align: middle;
+      border-top: 5px solid;
+      border-right: 5px solid transparent;
+      border-left: 5px solid transparent;
+      transition: transform 0.2s ease;
+    }
+    
+    .nav-item.dropdown:hover .dropdown-toggle::after {
+      transform: rotate(180deg);
+    }
+    
+    .dropdown-menu {
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+      padding: 8px;
+      min-width: 220px;
+      margin-top: 0;
+      animation: dropdownFade 0.2s ease;
+    }
+    
+    @keyframes dropdownFade {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .dropdown-item {
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-dark);
+      transition: all 0.2s ease;
+    }
+    
+    .dropdown-item:hover {
+      background: var(--primary-light);
+      color: var(--primary-color);
+    }
+    
+    .dropdown-item i {
+      color: var(--primary-color);
+    }
+    
+    .dropdown-divider {
+      margin: 6px 8px;
+      border-color: var(--border-color);
+    }
+    
     .header-login {
       width: 36px;
       height: 36px;
@@ -429,6 +485,25 @@
         margin-top: 12px;
         border: 1px solid #f1f5f9;
       }
+      
+      /* Mobile Dropdown Styles */
+      .nav-item.dropdown .dropdown-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+      }
+      
+      .nav-item.dropdown .dropdown-menu {
+        position: static !important;
+        transform: none !important;
+        box-shadow: none;
+        border: none;
+        background: var(--bg-light);
+        border-radius: 8px;
+        margin: 8px 0;
+        padding: 8px;
+      }
     }
     
     @media (max-width: 767px) {
@@ -504,9 +579,28 @@
               <a href="/" class="nav-link<%= currentPath === '/' ? ' active' : '' %>">Início</a>
             </li>
             <% categories.forEach(cat => { %>
-              <li class="nav-item">
-                <a href="/categoria/<%= cat.slug %>" class="nav-link<%= currentPath === '/categoria/' + cat.slug ? ' active' : '' %>"><%= cat.name %></a>
-              </li>
+              <% const hasSubcats = (cat.subcategories && cat.subcategories.length > 0) || (cat.children && cat.children.length > 0); %>
+              <% if (hasSubcats) { %>
+                <li class="nav-item dropdown">
+                  <a href="/categoria/<%= cat.slug %>" class="nav-link dropdown-toggle<%= currentPath && currentPath.startsWith('/categoria/' + cat.slug) ? ' active' : '' %>" data-bs-toggle="dropdown" aria-expanded="false">
+                    <%= cat.name %>
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/categoria/<%= cat.slug %>"><i class="bi bi-folder me-2"></i>Ver tudo em <%= cat.name %></a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <% if (cat.subcategories && cat.subcategories.length > 0) { cat.subcategories.forEach(sub => { %>
+                      <li><a class="dropdown-item" href="/subcategoria/<%= sub.slug %>"><%= sub.name %></a></li>
+                    <% }); } %>
+                    <% if (cat.children && cat.children.length > 0) { cat.children.forEach(child => { %>
+                      <li><a class="dropdown-item" href="/categoria/<%= child.slug %>"><%= child.name %></a></li>
+                    <% }); } %>
+                  </ul>
+                </li>
+              <% } else { %>
+                <li class="nav-item">
+                  <a href="/categoria/<%= cat.slug %>" class="nav-link<%= currentPath === '/categoria/' + cat.slug ? ' active' : '' %>"><%= cat.name %></a>
+                </li>
+              <% } %>
             <% }) %>
             <% menuPages.forEach(page => { %>
               <li class="nav-item">

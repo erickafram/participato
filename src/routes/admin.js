@@ -9,6 +9,7 @@ const AuthController = require('../controllers/AuthController');
 const DashboardController = require('../controllers/DashboardController');
 const PostController = require('../controllers/PostController');
 const CategoryController = require('../controllers/CategoryController');
+const SubcategoryController = require('../controllers/SubcategoryController');
 const PageController = require('../controllers/PageController');
 const UserController = require('../controllers/UserController');
 const MediaController = require('../controllers/MediaController');
@@ -18,13 +19,13 @@ const BannerController = require('../controllers/BannerController');
 // Middlewares
 const { isAuthenticated, isNotAuthenticated, isAdmin } = require('../middlewares/auth');
 const { uploadSingle, uploadMultiple } = require('../middlewares/upload');
-const { 
-  validate, 
-  loginValidation, 
-  postValidation, 
-  categoryValidation, 
+const {
+  validate,
+  loginValidation,
+  postValidation,
+  categoryValidation,
   pageValidation,
-  userValidation 
+  userValidation
 } = require('../middlewares/validators');
 
 // ==========================================
@@ -69,6 +70,17 @@ router.get('/categories/:id/edit', CategoryController.edit);
 router.post('/categories/:id', CategoryController.update);
 router.post('/categories/:id/delete', CategoryController.destroy);
 router.post('/categories/:id/toggle-active', CategoryController.toggleActive);
+
+// ==========================================
+// SUBCATEGORIAS
+// ==========================================
+router.get('/subcategories', SubcategoryController.index);
+router.get('/subcategories/create', SubcategoryController.create);
+router.post('/subcategories', SubcategoryController.store);
+router.get('/subcategories/:id/edit', SubcategoryController.edit);
+router.post('/subcategories/:id', SubcategoryController.update);
+router.post('/subcategories/:id/delete', SubcategoryController.destroy);
+router.post('/subcategories/:id/toggle-active', SubcategoryController.toggleActive);
 
 // ==========================================
 // PÁGINAS

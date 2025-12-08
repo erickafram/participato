@@ -47,6 +47,14 @@ module.exports = (sequelize) => {
     active: {
       type: DataTypes.BOOLEAN,
       defaultValue: true
+    },
+    parent_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'categories',
+        key: 'id'
+      }
     }
   }, {
     tableName: 'categories',

@@ -25,6 +25,7 @@ const sequelize = new Sequelize(
 // Importar models
 const User = require('./User')(sequelize);
 const Category = require('./Category')(sequelize);
+const Subcategory = require('./Subcategory')(sequelize);
 const Post = require('./Post')(sequelize);
 const Page = require('./Page')(sequelize);
 const Media = require('./Media')(sequelize);
@@ -40,6 +41,14 @@ Post.belongsTo(User, { foreignKey: 'author_id', as: 'author' });
 Category.hasMany(Post, { foreignKey: 'category_id', as: 'posts' });
 Post.belongsTo(Category, { foreignKey: 'category_id', as: 'category' });
 
+// Category -> Subcategories (uma categoria pode ter muitas subcategorias)
+Category.hasMany(Subcategory, { foreignKey: 'category_id', as: 'subcategories' });
+Subcategory.belongsTo(Category, { foreignKey: 'category_id', as: 'category' });
+
+// Category -> Category (hierarquia: categoria pai -> subcategorias)
+Category.hasMany(Category, { foreignKey: 'parent_id', as: 'children' });
+Category.belongsTo(Category, { foreignKey: 'parent_id', as: 'parent' });
+
 // User -> Pages (um usuário pode criar muitas páginas)
 User.hasMany(Page, { foreignKey: 'author_id', as: 'pages' });
 Page.belongsTo(User, { foreignKey: 'author_id', as: 'author' });
@@ -53,6 +62,7 @@ module.exports = {
   Sequelize,
   User,
   Category,
+  Subcategory,
   Post,
   Page,
   Media,

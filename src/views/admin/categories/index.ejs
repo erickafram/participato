@@ -2,7 +2,7 @@
 <div class="page-header">
   <div>
     <h1>Categorias</h1>
-    <p>Organize seus posts por categorias</p>
+    <p>Organize seus posts por categorias e subcategorias</p>
   </div>
   <a href="/admin/categories/create" class="btn-action">
     <i class="bi bi-plus"></i>
@@ -11,32 +11,31 @@
 </div>
 
 <div class="data-card">
-  ${categories && categories.length > 0 
+  ${categories && categories.length > 0
     ? '<div class="data-list">' +
-        categories.map(cat => 
-          '<div class="data-item">' +
-            '<div class="item-color" style="background: ' + (cat.color || '#3b82f6') + '"></div>' +
-            '<div class="item-info">' +
-              '<h3>' + cat.name + '</h3>' +
-              '<span class="item-meta">' +
-                '<code>/' + cat.slug + '</code>' +
-                ' • ' + cat.postCount + ' posts' +
-                ' • Ordem: ' + cat.order +
-              '</span>' +
-            '</div>' +
-            '<div class="item-status">' +
-              (cat.active 
-                ? '<span class="badge success">Ativa</span>'
-                : '<span class="badge muted">Inativa</span>'
-              ) +
-            '</div>' +
-            '<div class="item-actions">' +
-              '<a href="/admin/categories/' + cat.id + '/edit" class="btn-icon" title="Editar"><i class="bi bi-pencil"></i></a>' +
-              '<a href="/categoria/' + cat.slug + '" target="_blank" class="btn-icon" title="Ver"><i class="bi bi-eye"></i></a>' +
-              '<button type="button" class="btn-icon danger" onclick="deleteItem(' + cat.id + ', ' + cat.postCount + ')" title="Excluir"><i class="bi bi-trash"></i></button>' +
-            '</div>' +
-          '</div>'
-        ).join('') +
+      categories.map(cat =>
+        '<div class="data-item' + (cat.parent_id ? ' subcategory-item' : '') + '">' +
+          '<div class="item-color" style="background: ' + (cat.color || '#3b82f6') + '">' +
+            (cat.parent_id ? '<i class="bi bi-arrow-return-right text-white"></i>' : '') +
+          '</div>' +
+          '<div class="item-info">' +
+            '<h3>' + (cat.parent_id ? '<i class="bi bi-folder2-open me-1 text-muted"></i>' : '') + cat.name + '</h3>' +
+            '<span class="item-meta">' +
+              (cat.parent && cat.parent.name ? '<span class="parent-badge" style="color: ' + cat.parent.color + '"><i class="bi bi-folder me-1"></i>' + cat.parent.name + '</span> | ' : '') +
+              '<code>/' + cat.slug + '</code> | ' + cat.postCount + ' posts | Ordem: ' + cat.order +
+            '</span>' +
+          '</div>' +
+          '<div class="item-status">' +
+            (cat.parent_id ? '<span class="badge info me-1">Subcategoria</span>' : '') +
+            (cat.active ? '<span class="badge success">Ativa</span>' : '<span class="badge muted">Inativa</span>') +
+          '</div>' +
+          '<div class="item-actions">' +
+            '<a href="/admin/categories/' + cat.id + '/edit" class="btn-icon" title="Editar"><i class="bi bi-pencil"></i></a>' +
+            '<a href="/categoria/' + cat.slug + '" target="_blank" class="btn-icon" title="Ver"><i class="bi bi-eye"></i></a>' +
+            '<button type="button" class="btn-icon danger" onclick="deleteItem(' + cat.id + ', ' + cat.postCount + ')" title="Excluir"><i class="bi bi-trash"></i></button>' +
+          '</div>' +
+        '</div>'
+      ).join('') +
       '</div>'
     : '<div class="empty-state">' +
         '<i class="bi bi-folder"></i>' +
@@ -50,190 +49,237 @@
 <form id="deleteForm" method="POST" style="display: none;"></form>
 
 <style>
-.page-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 24px;
-}
-.page-header h1 {
-  font-size: 22px;
-  font-weight: 700;
-  color: #0f172a;
-  margin: 0 0 4px;
-}
-.page-header p {
-  font-size: 13px;
-  color: #64748b;
-  margin: 0;
-}
-.btn-action {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 18px;
-  background: #3b82f6;
-  color: #fff;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  text-decoration: none;
-  transition: background 0.2s;
-}
-.btn-action:hover {
-  background: #2563eb;
-  color: #fff;
-}
-.btn-action i {
-  font-size: 16px;
-}
-
-.data-card {
-  background: #fff;
-  border-radius: 12px;
-}
-.data-list {
-  display: flex;
-  flex-direction: column;
-}
-.data-item {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 16px 20px;
-  border-bottom: 1px solid #f1f5f9;
-  transition: background 0.2s;
-}
-.data-item:last-child {
-  border-bottom: none;
-}
-.data-item:hover {
-  background: #f8fafc;
-}
-.item-color {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  flex-shrink: 0;
-}
-.item-info {
-  flex: 1;
-  min-width: 0;
-}
-.item-info h3 {
-  font-size: 14px;
-  font-weight: 600;
-  color: #0f172a;
-  margin: 0 0 4px;
-}
-.item-meta {
-  font-size: 12px;
-  color: #64748b;
-}
-.item-meta code {
-  background: #f1f5f9;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 11px;
-}
-.item-status {
-  flex-shrink: 0;
-}
-.badge {
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 600;
-}
-.badge.success {
-  background: #dcfce7;
-  color: #16a34a;
-}
-.badge.muted {
-  background: #f1f5f9;
-  color: #64748b;
-}
-.item-actions {
-  display: flex;
-  gap: 4px;
-}
-.btn-icon {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  border: 1px solid #e2e8f0;
-  background: #fff;
-  color: #64748b;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-decoration: none;
-}
-.btn-icon:hover {
-  background: #f8fafc;
-  color: #0f172a;
-  border-color: #cbd5e1;
-}
-.btn-icon.danger:hover {
-  background: #fef2f2;
-  color: #dc2626;
-  border-color: #fecaca;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: #64748b;
-}
-.empty-state i {
-  font-size: 48px;
-  color: #cbd5e1;
-  margin-bottom: 16px;
-}
-.empty-state h3 {
-  font-size: 16px;
-  font-weight: 600;
-  color: #475569;
-  margin: 0 0 8px;
-}
-.empty-state p {
-  font-size: 13px;
-  margin: 0 0 20px;
-}
-
-@media (max-width: 640px) {
   .page-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
   }
-  .btn-action {
-    width: 100%;
-    justify-content: center;
-  }
-  .data-item {
-    flex-wrap: wrap;
-  }
-  .item-status {
-    order: 3;
-    width: 100%;
-    margin-top: 8px;
-  }
-}
-</style>
 
-<script>
-function deleteItem(id, postCount) {
-  if (postCount > 0) {
-    alert('Não é possível excluir: existem ' + postCount + ' posts vinculados.');
-    return;
+  .page-header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 4px;
   }
-  if (confirm('Excluir esta categoria?')) {
-    document.getElementById('deleteForm').action = '/admin/categories/' + id + '/delete';
-    document.getElementById('deleteForm').submit();
-  }
-}
-</script>
-`}) %>
+
+    .page-header p {
+      font-size: 13px;
+      color: #64748b;
+      margin: 0;
+    }
+
+    .btn-action {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      background: #3b82f6;
+      color: #fff;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+
+    .btn-action:hover {
+      background: #2563eb;
+      color: #fff;
+    }
+
+    .btn-action i {
+      font-size: 16px;
+    }
+
+    .data-card {
+      background: #fff;
+      border-radius: 12px;
+    }
+
+    .data-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .data-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      border-bottom: 1px solid #f1f5f9;
+      transition: background 0.2s;
+    }
+
+    .data-item:last-child {
+      border-bottom: none;
+    }
+
+    .data-item:hover {
+      background: #f8fafc;
+    }
+
+    .item-color {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+
+    .item-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .item-info h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #0f172a;
+      margin: 0 0 4px;
+    }
+
+    .item-meta {
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .item-meta code {
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+
+    .parent-badge {
+      font-weight: 600;
+    }
+
+    .item-status {
+      flex-shrink: 0;
+    }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .badge.success {
+      background: #dcfce7;
+      color: #16a34a;
+    }
+
+    .badge.muted {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+
+    .badge.info {
+      background: #dbeafe;
+      color: #2563eb;
+    }
+
+    .subcategory-item {
+      background: #fafbfc;
+      padding-left: 40px;
+    }
+
+    .item-actions {
+      display: flex;
+      gap: 4px;
+    }
+
+    .btn-icon {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+      background: #fff;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-icon:hover {
+      background: #f8fafc;
+      color: #0f172a;
+      border-color: #cbd5e1;
+    }
+
+    .btn-icon.danger:hover {
+      background: #fef2f2;
+      color: #dc2626;
+      border-color: #fecaca;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #64748b;
+    }
+
+    .empty-state i {
+      font-size: 48px;
+      color: #cbd5e1;
+      margin-bottom: 16px;
+    }
+
+    .empty-state h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #475569;
+      margin: 0 0 8px;
+    }
+
+    .empty-state p {
+      font-size: 13px;
+      margin: 0 0 20px;
+    }
+
+    @media (max-width: 640px) {
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+
+      .btn-action {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .data-item {
+        flex-wrap: wrap;
+      }
+
+      .item-status {
+        order: 3;
+        width: 100%;
+        margin-top: 8px;
+      }
+    }
+  </style>
+
+  <script>
+    function deleteItem(id, postCount) {
+      if (postCount > 0) {
+        alert('Nao e possivel excluir: existem ' + postCount + ' posts vinculados.');
+        return;
+      }
+      if (confirm('Excluir esta categoria?')) {
+        document.getElementById('deleteForm').action = '/admin/categories/' + id + '/delete';
+        document.getElementById('deleteForm').submit();
+      }
+    }
+  </script>
+  `}) %>

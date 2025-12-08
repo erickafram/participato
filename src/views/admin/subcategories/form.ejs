@@ -1,0 +1,103 @@
+<%- include('../layouts/main', { body: ` <div class="page-header">
+    <h1><i class="bi bi-folder2 me-2"></i>${isEdit ? 'Editar Subcategoria' : 'Nova Subcategoria'}</h1>
+    <a href="/admin/subcategories" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Voltar
+    </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <form action="${isEdit ? '/admin/subcategories/' + subcategory.id : '/admin/subcategories'}"
+                        method="POST">
+
+                        <div class="mb-3">
+                            <label class="form-label">Categoria Pai <span class="text-danger">*</span></label>
+                            <select name="category_id" class="form-select" required>
+                                <option value="">Selecione uma categoria...</option>
+                                ${categories.map(cat =>
+                                '<option value="' + cat.id + '"' + 
+                (subcategory && subcategory.category_id == cat.id ? ' selected' : '' ) + ' style="color: ' + (cat.color
+                                    || '#000' ) + '">' + cat.name + '</option>' ).join('')} </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Nome <span class="text-danger">*</span></label>
+                            <input type="text" name="name" class="form-control"
+                                value="${subcategory ? subcategory.name : ''}" required
+                                placeholder="Nome da subcategoria">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Slug</label>
+                            <div class="input-group">
+                                <span class="input-group-text">/subcategoria/</span>
+                                <input type="text" name="slug" class="form-control"
+                                    value="${subcategory ? subcategory.slug : ''}" placeholder="url-amigavel">
+                            </div>
+                            <small class="text-muted">Deixe em branco para gerar automaticamente</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Descrição</label>
+                            <textarea name="description" class="form-control" rows="3"
+                                placeholder="Descrição da subcategoria">${subcategory ? subcategory.description || '' : ''}</textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Cor</label>
+                                <input type="color" name="color" class="form-control form-control-color w-100"
+                                    value="${subcategory ? subcategory.color || '#3ba4ff' : '#3ba4ff'}">
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Ícone (Bootstrap Icons)</label>
+                                <input type="text" name="icon" class="form-control"
+                                    value="${subcategory ? subcategory.icon || '' : ''}" placeholder="bi-folder">
+                                <small class="text-muted"><a href="https://icons.getbootstrap.com/" target="_blank">Ver
+                                        ícones</a></small>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Ordem</label>
+                                <input type="number" name="order" class="form-control"
+                                    value="${subcategory ? subcategory.order : 0}" min="0">
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input type="checkbox" name="active" class="form-check-input" id="active" ${!subcategory ||
+                                subcategory.active ? ' checked' : '' }>
+                            <label class="form-check-label" for="active">Subcategoria ativa</label>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg me-1"></i>${isEdit ? 'Atualizar' : 'Criar Subcategoria'}
+                            </button>
+                            <a href="/admin/subcategories" class="btn btn-outline-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-info-circle me-2"></i>Dicas
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><strong>Categoria Pai:</strong> Selecione a categoria principal.</p>
+                    <p class="mb-2"><strong>Nome:</strong> Será exibido no dropdown do menu.</p>
+                    <p class="mb-2"><strong>Slug:</strong> URL amigável da subcategoria.</p>
+                    <p class="mb-2"><strong>Cor:</strong> Usada para destacar a subcategoria.</p>
+                    <p class="mb-2"><strong>Ícone:</strong> Use classes do Bootstrap Icons.</p>
+                    <p class="mb-0"><strong>Ordem:</strong> Define a posição no dropdown (menor = primeiro).</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    `}) %>

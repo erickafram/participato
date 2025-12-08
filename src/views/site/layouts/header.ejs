@@ -1,34 +1,40 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="<%= typeof metaDescription !== 'undefined' ? metaDescription : (settings.site_description || '') %>">
+  <meta name="description"
+    content="<%= typeof metaDescription !== 'undefined' ? metaDescription : (settings.site_description || '') %>">
   <meta name="keywords" content="<%= settings.site_keywords || '' %>">
   <meta name="author" content="<%= settings.site_name || 'Portal Convictos' %>">
-  
+
   <!-- Open Graph -->
   <meta property="og:title" content="<%= title %>">
-  <meta property="og:description" content="<%= typeof metaDescription !== 'undefined' ? metaDescription : (settings.site_description || '') %>">
+  <meta property="og:description"
+    content="<%= typeof metaDescription !== 'undefined' ? metaDescription : (settings.site_description || '') %>">
   <meta property="og:type" content="website">
   <meta property="og:url" content="<%= siteUrl %><%= currentUrl %>">
   <meta property="og:site_name" content="<%= settings.site_name || 'Portal Convictos' %>">
-  
-  <title><%= title %> | <%= settings.site_name || 'Portal Convictos' %></title>
-  
+
+  <title>
+    <%= title %> | <%= settings.site_name || 'Portal Convictos' %>
+  </title>
+
   <!-- Favicon -->
   <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
-  
+
   <!-- Bootstrap 5.3 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
   <!-- Custom CSS -->
   <link href="/css/style.css" rel="stylesheet">
-  
+
   <style>
     :root {
       --primary-color: #3ba4ff;
@@ -39,40 +45,330 @@
       --bg-light: #f8fafc;
       --border-color: #e2e8f0;
     }
-    
-    * { font-family: 'Inter', sans-serif; }
-    body { background-color: var(--bg-light); color: var(--text-dark); display: flex; flex-direction: column; min-height: 100vh; }
-    main { flex: 1; }
-    a { color: var(--primary-color); text-decoration: none; transition: all 0.2s ease; }
-    a:hover { color: var(--primary-dark); }
-    .site-header { background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
-    .header-top { background: linear-gradient(90deg, #1e3a5f 0%, #0d1f33 100%); padding: 10px 0; color: #fff; font-size: 13px; font-weight: 500; }
-    .header-main { padding: 20px 0; border-bottom: 1px solid var(--border-color); }
-    .site-logo { font-size: 32px; font-weight: 800; letter-spacing: -1px; color: var(--text-dark); display: flex; align-items: center; gap: 10px; }
-    .site-logo i { color: var(--primary-color); }
-    .site-logo span { color: var(--primary-color); }
-    .header-search { position: relative; max-width: 500px; width: 100%; }
-    .header-search input { padding: 12px 20px 12px 50px; border: 2px solid #f1f5f9; background: #f8fafc; border-radius: 50px; width: 100%; transition: all 0.3s ease; font-size: 15px; }
-    .header-search input:focus { outline: none; border-color: var(--primary-color); background: #fff; box-shadow: 0 0 0 4px rgba(59, 164, 255, 0.1); }
-    .header-search i { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 18px; }
-    .navbar { padding: 0; }
-    .nav-link { color: var(--text-dark) !important; font-weight: 600; padding: 18px 20px !important; font-size: 15px; position: relative; }
-    .nav-link:hover, .nav-link.active { color: var(--primary-color) !important; }
-    .nav-link.active::after { content: ''; position: absolute; bottom: 0; left: 20px; right: 20px; height: 3px; background: var(--primary-color); border-radius: 3px 3px 0 0; }
-    .navbar-toggler { border: none; padding: 0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--primary-light); color: var(--primary-color); border-radius: 10px; }
-    .navbar-toggler:focus { box-shadow: none; }
-    .card { border: none; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden; background: #fff; }
-    .card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
-    .site-footer { background: #0f172a; color: #94a3b8; padding: 80px 0 30px; margin-top: 80px; }
-    .footer-widget h5 { color: #fff; font-weight: 800; margin-bottom: 25px; font-size: 20px; }
-    .footer-link { display: block; padding: 8px 0; color: #94a3b8; transition: all 0.2s; }
-    .footer-link:hover { color: #fff; padding-left: 5px; }
-    .social-btn { width: 45px; height: 45px; display: inline-flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); color: #fff; border-radius: 12px; margin-right: 10px; transition: all 0.3s; }
-    .social-btn:hover { background: var(--primary-color); transform: translateY(-5px); color: #fff; }
-    @media (max-width: 991px) { .nav-link.active::after { display: none; } .header-search { margin: 15px 0; max-width: 100%; } .navbar-collapse { background: #fff; padding: 20px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-top: 15px; } }
-    @media (max-width: 767px) { .site-logo { font-size: 24px; } }
+
+    * {
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-light);
+      color: var(--text-dark);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    main {
+      flex: 1;
+    }
+
+    a {
+      color: var(--primary-color);
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    a:hover {
+      color: var(--primary-dark);
+    }
+
+    .site-header {
+      background: #fff;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .header-top {
+      background: linear-gradient(90deg, #1e3a5f 0%, #0d1f33 100%);
+      padding: 10px 0;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .header-main {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .site-logo {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .site-logo i {
+      color: var(--primary-color);
+    }
+
+    .site-logo span {
+      color: var(--primary-color);
+    }
+
+    .header-search {
+      position: relative;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .header-search input {
+      padding: 12px 20px 12px 50px;
+      border: 2px solid #f1f5f9;
+      background: #f8fafc;
+      border-radius: 50px;
+      width: 100%;
+      transition: all 0.3s ease;
+      font-size: 15px;
+    }
+
+    .header-search input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(59, 164, 255, 0.1);
+    }
+
+    .header-search i {
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 18px;
+    }
+
+    .navbar {
+      padding: 0;
+    }
+
+    .nav-link {
+      color: var(--text-dark) !important;
+      font-weight: 600;
+      padding: 18px 20px !important;
+      font-size: 15px;
+      position: relative;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      color: var(--primary-color) !important;
+    }
+
+    .nav-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 20px;
+      right: 20px;
+      height: 3px;
+      background: var(--primary-color);
+      border-radius: 3px 3px 0 0;
+    }
+
+    /* Dropdown Menu Styles */
+    .nav-item.dropdown {
+      position: relative;
+    }
+
+    .nav-item.dropdown .dropdown-toggle::after {
+      margin-left: 6px;
+      vertical-align: middle;
+      border-top: 5px solid;
+      border-right: 5px solid transparent;
+      border-left: 5px solid transparent;
+      transition: transform 0.2s ease;
+    }
+
+    .nav-item.dropdown:hover .dropdown-toggle::after {
+      transform: rotate(180deg);
+    }
+
+    .dropdown-menu {
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+      padding: 8px;
+      min-width: 220px;
+      margin-top: 0;
+      animation: dropdownFade 0.2s ease;
+    }
+
+    @keyframes dropdownFade {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .dropdown-item {
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-dark);
+      transition: all 0.2s ease;
+    }
+
+    .dropdown-item:hover {
+      background: var(--primary-light);
+      color: var(--primary-color);
+    }
+
+    .dropdown-item i {
+      color: var(--primary-color);
+    }
+
+    .dropdown-divider {
+      margin: 6px 8px;
+      border-color: var(--border-color);
+    }
+
+    .navbar-toggler {
+      border: none;
+      padding: 0;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--primary-light);
+      color: var(--primary-color);
+      border-radius: 10px;
+    }
+
+    .navbar-toggler:focus {
+      box-shadow: none;
+    }
+
+    .card {
+      border: none;
+      border-radius: 16px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .site-footer {
+      background: #0f172a;
+      color: #94a3b8;
+      padding: 80px 0 30px;
+      margin-top: 80px;
+    }
+
+    .footer-widget h5 {
+      color: #fff;
+      font-weight: 800;
+      margin-bottom: 25px;
+      font-size: 20px;
+    }
+
+    .footer-link {
+      display: block;
+      padding: 8px 0;
+      color: #94a3b8;
+      transition: all 0.2s;
+    }
+
+    .footer-link:hover {
+      color: #fff;
+      padding-left: 5px;
+    }
+
+    .social-btn {
+      width: 45px;
+      height: 45px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border-radius: 12px;
+      margin-right: 10px;
+      transition: all 0.3s;
+    }
+
+    .social-btn:hover {
+      background: var(--primary-color);
+      transform: translateY(-5px);
+      color: #fff;
+    }
+
+    @media (max-width: 991px) {
+      .nav-link.active::after {
+        display: none;
+      }
+
+      .header-search {
+        margin: 15px 0;
+        max-width: 100%;
+      }
+
+      .navbar-collapse {
+        background: #fff;
+        padding: 20px;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        margin-top: 15px;
+      }
+
+      /* Mobile Dropdown Styles */
+      .nav-item.dropdown {
+        position: relative;
+      }
+
+      .nav-item.dropdown .dropdown-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+      }
+
+      .nav-item.dropdown .dropdown-menu {
+        position: static !important;
+        transform: none !important;
+        box-shadow: none;
+        border: none;
+        background: var(--bg-light);
+        border-radius: 8px;
+        margin: 8px 0;
+        padding: 8px;
+      }
+
+      .nav-item.dropdown .dropdown-item {
+        padding: 10px 16px;
+        font-size: 14px;
+      }
+
+      .nav-item.dropdown .dropdown-item i {
+        font-size: 14px;
+      }
+    }
+
+    @media (max-width: 767px) {
+      .site-logo {
+        font-size: 24px;
+      }
+    }
   </style>
 </head>
+
 <body>
   <!-- Header -->
   <header class="site-header">
@@ -82,18 +378,27 @@
         <div class="d-flex justify-content-between align-items-center">
           <div>
             <i class="bi bi-calendar3 me-2 opacity-75"></i>
-            <%= new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>
+            <%= new Date().toLocaleDateString('pt-BR', { weekday: 'long' , year: 'numeric' , month: 'long' ,
+              day: 'numeric' }) %>
           </div>
           <div class="d-flex gap-3">
-            <% if (settings && settings.social_facebook) { %><a href="<%= settings.social_facebook %>" target="_blank"><i class="bi bi-facebook"></i></a><% } %>
-            <% if (settings && settings.social_instagram) { %><a href="<%= settings.social_instagram %>" target="_blank"><i class="bi bi-instagram"></i></a><% } %>
-            <% if (settings && settings.social_twitter) { %><a href="<%= settings.social_twitter %>" target="_blank"><i class="bi bi-twitter-x"></i></a><% } %>
-            <% if (settings && settings.social_youtube) { %><a href="<%= settings.social_youtube %>" target="_blank"><i class="bi bi-youtube"></i></a><% } %>
+            <% if (settings && settings.social_facebook) { %><a href="<%= settings.social_facebook %>"
+                target="_blank"><i class="bi bi-facebook"></i></a>
+              <% } %>
+                <% if (settings && settings.social_instagram) { %><a href="<%= settings.social_instagram %>"
+                    target="_blank"><i class="bi bi-instagram"></i></a>
+                  <% } %>
+                    <% if (settings && settings.social_twitter) { %><a href="<%= settings.social_twitter %>"
+                        target="_blank"><i class="bi bi-twitter-x"></i></a>
+                      <% } %>
+                        <% if (settings && settings.social_youtube) { %><a href="<%= settings.social_youtube %>"
+                            target="_blank"><i class="bi bi-youtube"></i></a>
+                          <% } %>
           </div>
         </div>
       </div>
     </div>
-    
+
     <!-- Main Header -->
     <div class="header-main">
       <div class="container">
@@ -104,28 +409,30 @@
               <div><span>Portal</span>Convictos</div>
             </a>
           </div>
-          
+
           <div class="col-lg-6 d-none d-lg-block">
             <form action="/busca" method="GET" class="header-search mx-auto">
               <i class="bi bi-search"></i>
-              <input type="text" name="q" placeholder="O que você procura hoje?" value="<%= typeof query !== 'undefined' ? query : '' %>">
+              <input type="text" name="q" placeholder="O que você procura hoje?"
+                value="<%= typeof query !== 'undefined' ? query : '' %>">
             </form>
           </div>
-          
+
           <div class="col-lg-3 col-6 text-end">
-            <button class="navbar-toggler ms-auto d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+            <button class="navbar-toggler ms-auto d-lg-none" type="button" data-bs-toggle="collapse"
+              data-bs-target="#mainNav">
               <i class="bi bi-list fs-2"></i>
             </button>
             <div class="d-none d-lg-block">
-               <a href="/noticias" class="btn btn-primary rounded-pill px-4">
-                 <i class="bi bi-newspaper me-2"></i>Últimas Notícias
-               </a>
+              <a href="/noticias" class="btn btn-primary rounded-pill px-4">
+                <i class="bi bi-newspaper me-2"></i>Últimas Notícias
+              </a>
             </div>
           </div>
         </div>
       </div>
     </div>
-    
+
     <!-- Navigation -->
     <div class="container">
       <nav class="navbar navbar-expand-lg">
@@ -133,28 +440,66 @@
           <div class="d-lg-none mb-3">
             <form action="/busca" method="GET" class="header-search">
               <i class="bi bi-search"></i>
-              <input type="text" name="q" placeholder="Buscar notícias..." value="<%= typeof query !== 'undefined' ? query : '' %>">
+              <input type="text" name="q" placeholder="Buscar notícias..."
+                value="<%= typeof query !== 'undefined' ? query : '' %>">
             </form>
           </div>
           <ul class="navbar-nav mx-auto">
             <li class="nav-item">
-              <a href="/" class="nav-link<%= typeof currentPath !== 'undefined' && currentPath === '/' ? ' active' : '' %>">Início</a>
+              <a href="/"
+                class="nav-link<%= typeof currentPath !== 'undefined' && currentPath === '/' ? ' active' : '' %>">Início</a>
             </li>
-            <% if (typeof categories !== 'undefined' && categories) { categories.forEach(cat => { %>
-              <li class="nav-item">
-                <a href="/categoria/<%= cat.slug %>" class="nav-link<%= typeof currentPath !== 'undefined' && currentPath === '/categoria/' + cat.slug ? ' active' : '' %>"><%= cat.name %></a>
-              </li>
-            <% }) } %>
-            <% if (typeof menuPages !== 'undefined' && menuPages) { menuPages.forEach(page => { %>
-              <li class="nav-item">
-                <a href="/pagina/<%= page.slug %>" class="nav-link<%= typeof currentPath !== 'undefined' && currentPath === '/pagina/' + page.slug ? ' active' : '' %>"><%= page.title %></a>
-              </li>
-            <% }) } %>
+            <% if (typeof categories !=='undefined' && categories) { categories.forEach(cat=> { %>
+              <% const hasSubcats=(cat.subcategories && cat.subcategories.length> 0) || (cat.children &&
+                cat.children.length > 0); %>
+                <% if (hasSubcats) { %>
+                  <li class="nav-item dropdown">
+                    <a href="/categoria/<%= cat.slug %>"
+                      class="nav-link dropdown-toggle<%= typeof currentPath !== 'undefined' && currentPath.startsWith('/categoria/' + cat.slug) ? ' active' : '' %>"
+                      data-bs-toggle="dropdown" aria-expanded="false">
+                      <%= cat.name %>
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li><a class="dropdown-item" href="/categoria/<%= cat.slug %>"><i
+                            class="bi bi-folder me-2"></i>Ver
+                          tudo em <%= cat.name %></a></li>
+                      <li>
+                        <hr class="dropdown-divider">
+                      </li>
+                      <% if (cat.subcategories && cat.subcategories.length> 0) { cat.subcategories.forEach(sub=> { %>
+                        <li><a class="dropdown-item" href="/subcategoria/<%= sub.slug %>">
+                            <%= sub.name %>
+                          </a></li>
+                        <% }); } %>
+                          <% if (cat.children && cat.children.length> 0) { cat.children.forEach(child=> { %>
+                            <li><a class="dropdown-item" href="/categoria/<%= child.slug %>">
+                                <%= child.name %>
+                              </a></li>
+                            <% }); } %>
+                    </ul>
+                  </li>
+                  <% } else { %>
+                    <li class="nav-item">
+                      <a href="/categoria/<%= cat.slug %>"
+                        class="nav-link<%= typeof currentPath !== 'undefined' && currentPath === '/categoria/' + cat.slug ? ' active' : '' %>">
+                        <%= cat.name %>
+                      </a>
+                    </li>
+                    <% } %>
+                      <% }) } %>
+                        <% if (typeof menuPages !=='undefined' && menuPages) { menuPages.forEach(page=> { %>
+                          <li class="nav-item">
+                            <a href="/pagina/<%= page.slug %>"
+                              class="nav-link<%= typeof currentPath !== 'undefined' && currentPath === '/pagina/' + page.slug ? ' active' : '' %>">
+                              <%= page.title %>
+                            </a>
+                          </li>
+                          <% }) } %>
           </ul>
         </div>
       </nav>
     </div>
   </header>
-  
+
   <!-- Main Content -->
   <main>

@@ -11,12 +11,19 @@ class CategoryController {
   async index(req, res) {
     try {
       const categories = await Category.findAll({
-        order: [['order', 'ASC'], ['name', 'ASC']],
-        include: [{
-          model: Post,
-          as: 'posts',
-          attributes: ['id']
-        }]
+        order: [['parent_id', 'ASC'], ['order', 'ASC'], ['name', 'ASC']],
+        include: [
+          {
+            model: Post,
+            as: 'posts',
+            attributes: ['id']
+          },
+          {
+            model: Category,
+            as: 'parent',
+            attributes: ['id', 'name', 'color']
+          }
+        ]
       });
 
       // Adicionar contagem de posts
@@ -38,21 +45,34 @@ class CategoryController {
 
   // Exibir formulário de criação
   async create(req, res) {
-    res.render('admin/categories/form', {
-      title: 'Nova Categoria',
-      category: null,
-      isEdit: false
-    });
+    try {
+      // Buscar apenas categorias principais (sem parent_id) para serem opções de pai
+      const parentCategories = await Category.findAll({
+        where: { parent_id: null, active: true },
+        order: [['order', 'ASC'], ['name', 'ASC']]
+      });
+
+      res.render('admin/categories/form', {
+        title: 'Nova Categoria',
+        category: null,
+        parentCategories,
+        isEdit: false
+      });
+    } catch (error) {
+      console.error('Erro ao carregar formulário:', error);
+      req.flash('error', 'Erro ao carregar formulário.');
+      res.redirect('/admin/categories');
+    }
   }
 
   // Salvar nova categoria
   async store(req, res) {
     try {
-      const { name, slug, description, color, icon, order, active } = req.body;
+      const { name, slug, description, color, icon, order, active, parent_id } = req.body;
 
       // Gerar slug se não fornecido
       let categorySlug = slug || slugify(name, { lower: true, strict: true });
-      
+
       // Verificar se slug já existe
       const existingCategory = await Category.findOne({ where: { slug: categorySlug } });
       if (existingCategory) {
@@ -67,7 +87,8 @@ class CategoryController {
         color: color || '#3ba4ff',
         icon,
         order: order || 0,
-        active: active === 'on' || active === true
+        active: active === 'on' || active === true,
+        parent_id: parent_id || null
       });
 
       req.flash('success', 'Categoria criada com sucesso!');
@@ -89,9 +110,21 @@ class CategoryController {
         return res.redirect('/admin/categories');
       }
 
+      // Buscar categorias principais que não sejam a própria categoria
+      // (para evitar que uma categoria seja pai dela mesma)
+      const parentCategories = await Category.findAll({
+        where: {
+          parent_id: null,
+          active: true,
+          id: { [Op.ne]: category.id }
+        },
+        order: [['order', 'ASC'], ['name', 'ASC']]
+      });
+
       res.render('admin/categories/form', {
         title: 'Editar Categoria',
         category,
+        parentCategories,
         isEdit: true
       });
     } catch (error) {
@@ -111,12 +144,12 @@ class CategoryController {
         return res.redirect('/admin/categories');
       }
 
-      const { name, slug, description, color, icon, order, active } = req.body;
+      const { name, slug, description, color, icon, order, active, parent_id } = req.body;
 
       // Verificar slug único (se alterado)
       if (slug && slug !== category.slug) {
-        const existingCategory = await Category.findOne({ 
-          where: { slug, id: { [Op.ne]: category.id } } 
+        const existingCategory = await Category.findOne({
+          where: { slug, id: { [Op.ne]: category.id } }
         });
         if (existingCategory) {
           req.flash('error', 'Este slug já está em uso.');
@@ -132,6 +165,7 @@ class CategoryController {
       category.icon = icon;
       category.order = order || 0;
       category.active = active === 'on' || active === true;
+      category.parent_id = parent_id || null;
 
       await category.save();
 
@@ -185,8 +219,8 @@ class CategoryController {
       category.active = !category.active;
       await category.save();
 
-      return res.json({ 
-        success: true, 
+      return res.json({
+        success: true,
         active: category.active,
         message: category.active ? 'Categoria ativada!' : 'Categoria desativada!'
       });

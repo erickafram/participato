@@ -2,7 +2,7 @@
  * Controller do Site Público
  * Gerencia todas as páginas do frontend
  */
-const { Post, Category, Page, User, Setting, sequelize } = require('../models');
+const { Post, Category, Subcategory, Page, User, Setting, sequelize } = require('../models');
 const { Op } = require('sequelize');
 const { getBanners } = require('../helpers/bannerHelper');
 
@@ -87,7 +87,7 @@ class SiteController {
 
       // Filtros
       const where = { status: 'published' };
-      
+
       if (req.query.category) {
         const category = await Category.findOne({ where: { slug: req.query.category } });
         if (category) {
@@ -251,6 +251,69 @@ class SiteController {
       res.render('site/error', {
         title: 'Erro',
         message: 'Ocorreu um erro ao carregar a categoria.'
+      });
+    }
+  }
+
+  // Página de subcategoria
+  async subcategory(req, res) {
+    try {
+      const subcategory = await Subcategory.findOne({
+        where: { slug: req.params.slug, active: true },
+        include: [{
+          model: Category,
+          as: 'category',
+          attributes: ['id', 'name', 'slug', 'color']
+        }]
+      });
+
+      if (!subcategory) {
+        return res.status(404).render('site/404', {
+          title: 'Subcategoria não encontrada'
+        });
+      }
+
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(res.locals.settings.posts_per_page) || 12;
+      const offset = (page - 1) * limit;
+
+      // Por enquanto, busca posts da categoria pai
+      // TODO: Adicionar subcategory_id no Post model futuramente
+      const { count, rows: posts } = await Post.findAndCountAll({
+        where: { status: 'published', category_id: subcategory.category_id },
+        include: [
+          { model: User, as: 'author', attributes: ['id', 'name', 'avatar'] },
+          { model: Category, as: 'category', attributes: ['id', 'name', 'slug', 'color'] }
+        ],
+        order: [['published_at', 'DESC']],
+        limit,
+        offset
+      });
+
+      const totalPages = Math.ceil(count / limit);
+
+      // Buscar banners da subcategoria (usa os mesmos da categoria)
+      const banners = await getBanners(['category_top', 'category_bottom', 'category_sidebar']);
+
+      res.render('site/subcategory', {
+        title: subcategory.name,
+        metaDescription: subcategory.description || `Notícias sobre ${subcategory.name}`,
+        subcategory,
+        posts,
+        pagination: {
+          page,
+          totalPages,
+          total: count,
+          hasNext: page < totalPages,
+          hasPrev: page > 1
+        },
+        banners
+      });
+    } catch (error) {
+      console.error('Erro ao carregar subcategoria:', error);
+      res.render('site/error', {
+        title: 'Erro',
+        message: 'Ocorreu um erro ao carregar a subcategoria.'
       });
     }
   }
