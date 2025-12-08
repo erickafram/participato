@@ -8,13 +8,20 @@ class HomeEditorController {
   // Exibir editor visual
   async index(req, res) {
     try {
-      const blocks = await HomeBlock.findAll({
-        order: [['order', 'ASC']],
-        include: [
-          { model: Category, as: 'category', attributes: ['id', 'name', 'color'] },
-          { model: Banner, as: 'banner', attributes: ['id', 'title', 'image'] }
-        ]
-      });
+      // Tentar buscar blocos (pode falhar se tabela não existir)
+      let blocks = [];
+      try {
+        blocks = await HomeBlock.findAll({
+          order: [['order', 'ASC']],
+          include: [
+            { model: Category, as: 'category', attributes: ['id', 'name', 'color'] },
+            { model: Banner, as: 'banner', attributes: ['id', 'title', 'image'] }
+          ]
+        });
+      } catch (blockError) {
+        console.error('Tabela home_blocks pode não existir. Execute a migration:', blockError.message);
+        // Continua com array vazio
+      }
 
       const categories = await Category.findAll({
         where: { active: true, parent_id: null },
@@ -44,7 +51,7 @@ class HomeEditorController {
       });
     } catch (error) {
       console.error('Erro ao carregar editor:', error);
-      req.flash('error', 'Erro ao carregar editor da home.');
+      req.flash('error', 'Erro ao carregar editor da home. Verifique se a migration foi executada.');
       res.redirect('/admin');
     }
   }

@@ -60,42 +60,48 @@ class SiteController {
       // Buscar banners da home
       const banners = await getBanners(['home_top', 'home_middle', 'home_bottom', 'home_sidebar']);
 
-      // Buscar blocos configurados da home
-      const homeBlocks = await HomeBlock.findAll({
-        where: { active: true },
-        order: [['order', 'ASC']],
-        include: [
-          { model: Category, as: 'category', attributes: ['id', 'name', 'slug', 'color'] },
-          { model: Banner, as: 'banner' }
-        ]
-      });
-
-      // Carregar posts para cada bloco
-      const blocksWithPosts = await Promise.all(homeBlocks.map(async (block) => {
-        const blockData = block.toJSON();
-        
-        if (block.type === 'banner') {
-          return blockData;
-        }
-
-        const whereClause = { status: 'published' };
-        if (block.category_id) {
-          whereClause.category_id = block.category_id;
-        }
-
-        const posts = await Post.findAll({
-          where: whereClause,
+      // Buscar blocos configurados da home (com tratamento de erro caso tabela não exista)
+      let blocksWithPosts = [];
+      try {
+        const homeBlocks = await HomeBlock.findAll({
+          where: { active: true },
+          order: [['order', 'ASC']],
           include: [
-            { model: User, as: 'author', attributes: ['id', 'name'] },
-            { model: Category, as: 'category', attributes: ['id', 'name', 'slug', 'color'] }
-          ],
-          order: [['published_at', 'DESC']],
-          limit: block.posts_count || 4
+            { model: Category, as: 'category', attributes: ['id', 'name', 'slug', 'color'] },
+            { model: Banner, as: 'banner' }
+          ]
         });
 
-        blockData.posts = posts;
-        return blockData;
-      }));
+        // Carregar posts para cada bloco
+        blocksWithPosts = await Promise.all(homeBlocks.map(async (block) => {
+          const blockData = block.toJSON();
+          
+          if (block.type === 'banner') {
+            return blockData;
+          }
+
+          const whereClause = { status: 'published' };
+          if (block.category_id) {
+            whereClause.category_id = block.category_id;
+          }
+
+          const posts = await Post.findAll({
+            where: whereClause,
+            include: [
+              { model: User, as: 'author', attributes: ['id', 'name'] },
+              { model: Category, as: 'category', attributes: ['id', 'name', 'slug', 'color'] }
+            ],
+            order: [['published_at', 'DESC']],
+            limit: block.posts_count || 4
+          });
+
+          blockData.posts = posts;
+          return blockData;
+        }));
+      } catch (blockError) {
+        console.error('Erro ao carregar blocos da home (tabela pode não existir):', blockError.message);
+        // Continua sem blocos - vai usar o fallback na view
+      }
 
       res.render('site/home', {
         title: res.locals.settings.site_name || 'Portal Convictos',
