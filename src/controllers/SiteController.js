@@ -246,7 +246,9 @@ class SiteController {
 
       res.render('site/posts/show', {
         title: post.meta_title || post.title,
-        metaDescription: post.meta_description || post.excerpt,
+        metaDescription: post.meta_description || post.excerpt || post.subtitle,
+        ogImage: post.featured_image,
+        ogType: 'article',
         post,
         relatedPosts,
         popularPosts,
