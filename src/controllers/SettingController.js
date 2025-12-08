@@ -30,7 +30,8 @@ class SettingController {
           contact: 'Contato',
           social: 'Redes Sociais',
           posts: 'Posts',
-          footer: 'Rodapé'
+          footer: 'Rodapé',
+          ai: 'Assistente de IA'
         },
         nodeVersion: process.version,
         nodeEnv: process.env.NODE_ENV || 'development'

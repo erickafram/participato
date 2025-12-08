@@ -8,4 +8,5 @@ Servidor de Produção
 cd /home/portalconvictos/htdocs/portalconvictos.com.br/portalconvictos
 git pull origin main
 npx sequelize-cli db:migrate
+npx sequelize-cli db:seed:all
 pm2 restart portalconvictos

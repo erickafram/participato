@@ -16,6 +16,7 @@ const MediaController = require('../controllers/MediaController');
 const SettingController = require('../controllers/SettingController');
 const BannerController = require('../controllers/BannerController');
 const HomeEditorController = require('../controllers/HomeEditorController');
+const AIController = require('../controllers/AIController');
 
 // Middlewares
 const { isAuthenticated, isNotAuthenticated, isAdmin } = require('../middlewares/auth');
@@ -150,5 +151,14 @@ router.post('/home-editor/blocks/:id/delete', HomeEditorController.deleteBlock);
 router.post('/home-editor/blocks/:id/toggle', HomeEditorController.toggleActive);
 router.post('/home-editor/reorder', HomeEditorController.reorderBlocks);
 router.get('/home-editor/blocks/:id/preview', HomeEditorController.previewBlock);
+
+// ==========================================
+// ASSISTENTE DE IA
+// ==========================================
+router.get('/ai/status', AIController.status.bind(AIController));
+router.post('/ai/generate', AIController.generateArticle.bind(AIController));
+router.post('/ai/improve-title', AIController.improveTitle.bind(AIController));
+router.post('/ai/improve-subtitle', AIController.improveSubtitle.bind(AIController));
+router.post('/ai/improve-content', AIController.improveContent.bind(AIController));
 
 module.exports = router;

@@ -8,161 +8,420 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root { --primary: #3ba4ff; }
-    * { font-family: 'Inter', sans-serif; }
-    body { background: #f1f5f9; font-size: 13px; }
-    .navbar { background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 0.5rem 0; }
-    .navbar-brand { font-weight: 700; color: var(--primary) !important; font-size: 1rem; }
-    .card { border: none; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-    .card-header { background: #fff; border-bottom: 1px solid #e2e8f0; font-weight: 600; padding: 0.75rem 1rem; font-size: 0.85rem; }
-    .form-label { font-weight: 500; color: #374151; margin-bottom: 4px; font-size: 0.8rem; }
-    .form-control, .form-select { border-radius: 6px; border: 1px solid #d1d5db; padding: 8px 12px; font-size: 0.85rem; }
-    .form-control-lg { padding: 10px 14px; font-size: 1rem; }
-    .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(59,164,255,0.15); }
-    .btn { font-size: 0.85rem; padding: 6px 14px; }
-    .btn-primary { background: var(--primary); border: none; border-radius: 6px; font-weight: 500; }
-    .btn-primary:hover { background: #2b8ce6; }
-    .btn-lg { padding: 10px 18px; font-size: 0.9rem; }
-    .btn-outline-secondary { border-radius: 6px; }
-    .btn-sm { font-size: 0.75rem; padding: 4px 10px; }
-    .ck-editor__editable { min-height: 350px !important; font-size: 0.9rem; }
-    .img-preview { max-height: 120px; object-fit: cover; border-radius: 6px; }
-    .text-muted { font-size: 0.75rem; }
-    .form-check-label { font-size: 0.85rem; }
-    .input-group-text { font-size: 0.8rem; padding: 8px 10px; }
-    small { font-size: 0.7rem; }
-    .mb-3 { margin-bottom: 0.75rem !important; }
-    .mb-4 { margin-bottom: 1rem !important; }
-    .g-4 { gap: 1rem !important; }
-    .card-body { padding: 1rem; }
+    :root { 
+      --primary: #6366f1; 
+      --primary-hover: #4f46e5;
+      --bg-main: #f8fafc;
+      --bg-card: #ffffff;
+      --border-color: #e2e8f0;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --success: #10b981;
+      --warning: #f59e0b;
+    }
+    * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
+    body { background: var(--bg-main); font-size: 14px; color: var(--text-primary); }
     
-    /* Forçar layout lado a lado */
-    .row.g-4 { flex-wrap: nowrap; }
-    @media (max-width: 991px) {
-      .row.g-4 { flex-wrap: wrap; }
+    /* Header fixo */
+    .page-header {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .page-header h1 { font-size: 1.1rem; font-weight: 600; margin: 0; display: flex; align-items: center; gap: 10px; }
+    .header-actions { display: flex; gap: 10px; align-items: center; }
+    
+    /* Cards modernos */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      overflow: hidden;
+    }
+    .card-header {
+      background: transparent;
+      border-bottom: 1px solid var(--border-color);
+      padding: 14px 18px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+</style>
+</head>
+<body>
+<style>
+    .card-header i { color: var(--primary); }
+    .card-body { padding: 18px; }
+    
+    /* Formulário */
+    .form-label { font-weight: 500; color: var(--text-primary); margin-bottom: 6px; font-size: 0.85rem; }
+    .form-control, .form-select {
+      border: 1.5px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+      outline: none;
+    }
+    .form-control-lg { padding: 12px 16px; font-size: 1.1rem; }
+    .input-title { font-weight: 600; }
+    
+    /* Botões */
+    .btn { 
+      font-size: 0.875rem; 
+      padding: 10px 18px; 
+      border-radius: 8px; 
+      font-weight: 500;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-primary { 
+      background: var(--primary); 
+      border: none; 
+      color: white;
+    }
+    .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+    .btn-success { background: var(--success); border: none; }
+    .btn-outline-secondary { 
+      border: 1.5px solid var(--border-color); 
+      color: var(--text-secondary);
+      background: transparent;
+    }
+    .btn-outline-secondary:hover { background: var(--bg-main); border-color: var(--text-secondary); }
+    .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+    .btn-lg { padding: 12px 24px; font-size: 0.95rem; }
+    
+    /* Editor CKEditor menor */
+    .ck-editor__editable { min-height: 180px !important; max-height: 250px !important; font-size: 0.95rem; }
+    
+    /* Toolbar de imagem no editor */
+    .image-toolbar {
+      position: absolute;
+      background: #1e293b;
+      border-radius: 8px;
+      padding: 6px;
+      display: flex;
+      gap: 4px;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      animation: fadeIn 0.2s ease;
+    }
+    .image-toolbar button {
+      background: transparent;
+      border: none;
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .image-toolbar button:hover { background: rgba(255,255,255,0.15); }
+    .image-toolbar button.delete-btn:hover { background: #ef4444; }
+    .image-toolbar::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 6px solid #1e293b;
+    }
+    .ck-editor__editable img.selected-image {
+      outline: 3px solid var(--primary);
+      outline-offset: 2px;
     }
     
-    /* Estilos para o modal de galeria */
-    .media-gallery { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; max-height: 400px; overflow-y: auto; }
+    /* Upload de imagem moderno */
+    .image-upload-area {
+      border: 2px dashed var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: var(--bg-main);
+    }
+    .image-upload-area:hover { border-color: var(--primary); background: rgba(99, 102, 241, 0.03); }
+    .image-upload-area.has-image { padding: 12px; }
+    .image-upload-area .upload-icon { font-size: 2.5rem; color: var(--text-secondary); margin-bottom: 8px; }
+    .image-upload-area img { max-height: 150px; border-radius: 8px; object-fit: cover; }
+    .image-upload-area .upload-text { color: var(--text-secondary); font-size: 0.85rem; }
+    .image-upload-area .upload-hint { color: var(--text-secondary); font-size: 0.75rem; margin-top: 4px; }
+</style>
+<style>
+    /* Preview de imagem */
+    .img-preview-container { position: relative; display: inline-block; }
+    .img-preview-container .remove-btn {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #ef4444;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Status badges */
+    .status-option { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 8px; cursor: pointer; transition: all 0.2s; border: 2px solid transparent; }
+    .status-option:hover { background: var(--bg-main); }
+    .status-option.active { border-color: var(--primary); background: rgba(99, 102, 241, 0.05); }
+    .status-option input { display: none; }
+    .status-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+    .status-draft .status-icon { background: #fef3c7; color: #d97706; }
+    .status-published .status-icon { background: #d1fae5; color: #059669; }
+    .status-scheduled .status-icon { background: #dbeafe; color: #2563eb; }
+    
+    /* Seções colapsáveis */
+    .collapsible-header { cursor: pointer; user-select: none; }
+    .collapsible-header .chevron { transition: transform 0.2s; }
+    .collapsible-header.collapsed .chevron { transform: rotate(-90deg); }
+    
+    /* Tags input */
+    .tags-container { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px; border: 1.5px solid var(--border-color); border-radius: 8px; min-height: 44px; cursor: text; }
+    .tags-container:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+    .tag-item { background: var(--primary); color: white; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; }
+    .tag-item .remove-tag { cursor: pointer; opacity: 0.8; }
+    .tag-item .remove-tag:hover { opacity: 1; }
+    .tags-input { border: none; outline: none; flex: 1; min-width: 100px; font-size: 0.85rem; }
+    
+    /* Layout responsivo */
+    .main-content { padding: 24px; }
+    .content-grid { display: grid; grid-template-columns: 1fr 340px; gap: 24px; }
+    @media (max-width: 1024px) { .content-grid { grid-template-columns: 1fr; } }
+    
+    /* Animações */
+    .fade-in { animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    /* Tooltip de conversão WebP */
+    .webp-badge { 
+      background: linear-gradient(135deg, #10b981, #059669); 
+      color: white; 
+      font-size: 0.7rem; 
+      padding: 3px 8px; 
+      border-radius: 4px; 
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    /* Estilos do Assistente de IA */
+    .ai-assistant-card { border: 1px solid #c7d2fe; background: linear-gradient(135deg, #fefeff 0%, #f5f3ff 100%); }
+    .ai-header { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white !important; }
+    .ai-header i { color: white !important; }
+    .ai-badge-small { background: rgba(255,255,255,0.25); padding: 2px 6px; border-radius: 8px; font-size: 0.65rem; font-weight: 600; margin-left: auto; }
+    .btn-ai { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; border: none; font-weight: 500; }
+    .btn-ai:hover { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; transform: translateY(-1px); }
+    .btn-ai:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .btn-outline-ai { border: 1.5px solid #c7d2fe; color: #6366f1; background: white; }
+    .btn-outline-ai:hover { background: #f5f3ff; border-color: #6366f1; color: #4f46e5; }
+    
+    /* Input com botão de IA */
+    .input-with-ai { position: relative; display: flex; align-items: center; }
+    .input-with-ai input { padding-right: 40px; }
+    .ai-field-btn {
+      position: absolute;
+      right: 8px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border: none;
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+      opacity: 0.8;
+    }
+    .ai-field-btn:hover { opacity: 1; transform: scale(1.05); }
+    .ai-field-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .ai-field-btn.loading { animation: pulse 1s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+    
+    /* Loading overlay */
+    .ai-loading { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+    .ai-loading-content { background: white; padding: 30px 40px; border-radius: 12px; text-align: center; }
+    .ai-loading-content i { font-size: 2.5rem; color: #6366f1; animation: pulse 1s infinite; }
+    .ai-loading-content p { margin: 15px 0 0; font-weight: 500; color: #374151; }
+</style>
+<style>
+    /* Modal de mídia */
+    .media-gallery { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; max-height: 350px; overflow-y: auto; }
     .media-item { cursor: pointer; border: 2px solid transparent; border-radius: 8px; overflow: hidden; transition: all 0.2s; }
     .media-item:hover { border-color: var(--primary); transform: scale(1.02); }
-    .media-item.selected { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59,164,255,0.3); }
-    .media-item img { width: 100%; height: 100px; object-fit: cover; }
-    .upload-zone { border: 2px dashed #d1d5db; border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s; }
-    .upload-zone:hover { border-color: var(--primary); background: rgba(59,164,255,0.05); }
-    .upload-zone.dragover { border-color: var(--primary); background: rgba(59,164,255,0.1); }
+    .media-item.selected { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3); }
+    .media-item img { width: 100%; height: 80px; object-fit: cover; }
+    .upload-zone { border: 2px dashed var(--border-color); border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s; }
+    .upload-zone:hover { border-color: var(--primary); background: rgba(99, 102, 241, 0.03); }
+    .upload-zone.dragover { border-color: var(--primary); background: rgba(99, 102, 241, 0.08); }
+    
+    /* Quick actions */
+    .quick-action { 
+      display: flex; 
+      align-items: center; 
+      gap: 10px; 
+      padding: 12px 14px; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      transition: all 0.2s;
+      border: 1.5px solid var(--border-color);
+    }
+    .quick-action:hover { background: var(--bg-main); border-color: var(--primary); }
+    .quick-action i { font-size: 1.2rem; color: var(--primary); }
+    .quick-action-text { font-size: 0.85rem; }
+    .quick-action-text small { display: block; color: var(--text-secondary); font-size: 0.75rem; }
   </style>
 </head>
 <body>
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg mb-3">
-    <div class="container-fluid px-3">
-      <a class="navbar-brand" href="/admin"><i class="bi bi-lightning-charge"></i> Portal Admin</a>
-      <div class="d-flex align-items-center gap-2">
-        <a href="/admin/posts" class="btn btn-outline-secondary btn-sm">
-          <i class="bi bi-arrow-left me-1"></i>Voltar
+  <!-- Header fixo -->
+  <header class="page-header">
+    <h1>
+      <a href="/admin/posts" class="text-decoration-none text-secondary">
+        <i class="bi bi-arrow-left"></i>
+      </a>
+      <i class="bi bi-pencil-square text-primary"></i>
+      <%= isEdit ? 'Editar Post' : 'Nova Notícia' %>
+    </h1>
+    <div class="header-actions">
+      <% if (isEdit && post) { %>
+        <a href="/noticia/<%= post.slug %>" target="_blank" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-eye"></i> Visualizar
         </a>
-        <a href="/" target="_blank" class="btn btn-outline-secondary btn-sm">
-          <i class="bi bi-box-arrow-up-right me-1"></i>Ver Site
-        </a>
-      </div>
+      <% } %>
+      <button type="submit" form="postForm" class="btn btn-primary">
+        <i class="bi bi-check-lg"></i> <%= isEdit ? 'Salvar' : 'Publicar' %>
+      </button>
     </div>
-  </nav>
+  </header>
 
-  <div class="container-fluid px-3 pb-4">
+  <main class="main-content">
     <form id="postForm" action="<%= isEdit ? '/admin/posts/' + post.id : '/admin/posts' %>" method="POST" enctype="multipart/form-data">
-      <div class="row g-4">
-        <!-- Conteúdo Principal -->
-        <div class="col-md-8">
-          <!-- Título -->
-          <div class="card mb-3">
-            <div class="card-body py-3">
-              <div class="mb-2">
-                <label class="form-label">Título <span class="text-danger">*</span></label>
-                <input type="text" name="title" class="form-control form-control-lg" 
-                       value="<%= post ? post.title : '' %>" required 
-                       placeholder="Digite o título do post" style="font-weight: 600;">
+      <div class="content-grid">
+        <!-- Coluna Principal -->
+        <div class="main-column">
+          <!-- Título e Subtítulo -->
+          <div class="card mb-3 fade-in">
+            <div class="card-body">
+              <div class="mb-3">
+                <div class="input-with-ai">
+                  <input type="text" name="title" id="titleInput" class="form-control form-control-lg input-title" 
+                         value="<%= post ? post.title : '' %>" required 
+                         placeholder="Título da notícia" autofocus>
+                  <button type="button" class="ai-field-btn" onclick="improveField('title')" title="Melhorar com IA">
+                    <i class="bi bi-magic"></i>
+                  </button>
+                </div>
               </div>
               <div>
-                <label class="form-label">Subtítulo</label>
-                <input type="text" name="subtitle" class="form-control" 
-                       value="<%= post ? (post.subtitle || '') : '' %>" 
-                       placeholder="Subtítulo ou resumo curto (opcional)">
+                <div class="input-with-ai">
+                  <input type="text" name="subtitle" id="subtitleInput" class="form-control" 
+                         value="<%= post ? (post.subtitle || '') : '' %>" 
+                         placeholder="Subtítulo ou resumo curto (opcional)">
+                  <button type="button" class="ai-field-btn" onclick="improveField('subtitle')" title="Melhorar com IA">
+                    <i class="bi bi-magic"></i>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
 
           <!-- Editor de Conteúdo -->
-          <div class="card mb-3">
-            <div class="card-header d-flex justify-content-between align-items-center">
-              <span><i class="bi bi-pencil-square me-2"></i>Conteúdo</span>
-              <button type="button" class="btn btn-outline-primary btn-sm" onclick="openMediaModal()">
-                <i class="bi bi-image me-1"></i>Inserir Imagem
-              </button>
+          <div class="card mb-3 fade-in" style="animation-delay: 0.1s;">
+            <div class="card-header">
+              <i class="bi bi-text-paragraph"></i> Conteúdo
+              <div class="ms-auto d-flex gap-2">
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="improveField('content')" title="Melhorar conteúdo com IA">
+                  <i class="bi bi-magic"></i> Melhorar
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="openMediaModal()">
+                  <i class="bi bi-image"></i> Imagem
+                </button>
+              </div>
             </div>
-            <div class="card-body">
+            <div class="card-body" style="padding: 12px;">
               <textarea name="content" id="editor"><%= post ? post.content : '' %></textarea>
               <input type="hidden" name="content_backup" id="contentBackup">
             </div>
           </div>
 
-          <!-- Embed de Redes Sociais -->
-          <div class="card mb-3">
-            <div class="card-header" data-bs-toggle="collapse" data-bs-target="#embedSection" style="cursor: pointer;">
-              <i class="bi bi-play-circle me-2"></i>Embed de Mídia <small class="text-muted ms-2">(YouTube, Instagram, Facebook)</small>
-              <i class="bi bi-chevron-down float-end"></i>
+          <!-- Embed de Mídia (Colapsável) -->
+          <div class="card mb-3 fade-in" style="animation-delay: 0.2s;">
+            <div class="card-header collapsible-header" data-bs-toggle="collapse" data-bs-target="#embedSection">
+              <i class="bi bi-play-circle"></i> Embed de Mídia
+              <small class="text-muted ms-2">YouTube, Instagram, TikTok</small>
+              <i class="bi bi-chevron-down chevron ms-auto"></i>
             </div>
             <div class="collapse" id="embedSection">
               <div class="card-body">
-                <div class="mb-2">
-                  <label class="form-label">Código Embed</label>
-                  <textarea name="embed_code" class="form-control" rows="4" 
-                            placeholder="Cole aqui o código embed do YouTube, Instagram, Facebook ou TikTok..."><%= post ? (post.embed_code || '') : '' %></textarea>
-                  <small class="text-muted">
-                    <i class="bi bi-info-circle me-1"></i>
-                    Cole o código de incorporação (embed) da publicação. O embed será exibido após o conteúdo do post.
-                  </small>
-                </div>
-                <div class="embed-help mt-3 p-2 bg-light rounded" style="font-size: 0.75rem;">
-                  <strong>Como obter o código embed:</strong>
-                  <ul class="mb-0 mt-1 ps-3">
-                    <li><strong>YouTube:</strong> Clique em "Compartilhar" → "Incorporar" → Copie o código</li>
-                    <li><strong>Instagram:</strong> Clique nos 3 pontos → "Incorporar" → Copie o código</li>
-                    <li><strong>Facebook:</strong> Clique nos 3 pontos → "Incorporar" → Copie o código</li>
-                    <li><strong>TikTok:</strong> Clique em "Compartilhar" → "Incorporar" → Copie o código</li>
-                  </ul>
-                </div>
+                <textarea name="embed_code" class="form-control" rows="3" 
+                          placeholder="Cole o código embed aqui..."><%= post ? (post.embed_code || '') : '' %></textarea>
+                <small class="text-muted mt-2 d-block">
+                  <i class="bi bi-info-circle"></i> Cole o código de incorporação do YouTube, Instagram, Facebook ou TikTok.
+                </small>
               </div>
             </div>
           </div>
 
           <!-- SEO (Colapsável) -->
-          <div class="card">
-            <div class="card-header" data-bs-toggle="collapse" data-bs-target="#seoSection" style="cursor: pointer;">
-              <i class="bi bi-search me-2"></i>SEO <small class="text-muted ms-2">(opcional)</small>
-              <i class="bi bi-chevron-down float-end"></i>
+          <div class="card fade-in" style="animation-delay: 0.3s;">
+            <div class="card-header collapsible-header" data-bs-toggle="collapse" data-bs-target="#seoSection">
+              <i class="bi bi-search"></i> SEO
+              <small class="text-muted ms-2">Opcional</small>
+              <i class="bi bi-chevron-down chevron ms-auto"></i>
             </div>
             <div class="collapse" id="seoSection">
               <div class="card-body">
-                <div class="mb-2">
-                  <label class="form-label">Slug (URL)</label>
+                <div class="mb-3">
+                  <label class="form-label">URL amigável</label>
                   <div class="input-group">
-                    <span class="input-group-text">/noticia/</span>
+                    <span class="input-group-text" style="font-size: 0.85rem;">/noticia/</span>
                     <input type="text" name="slug" class="form-control" 
-                           value="<%= post ? post.slug : '' %>" placeholder="url-amigavel">
+                           value="<%= post ? post.slug : '' %>" placeholder="url-da-noticia">
                   </div>
-                  <small class="text-muted">Deixe em branco para gerar automaticamente</small>
                 </div>
-                <div class="mb-2">
-                  <label class="form-label">Meta Título</label>
-                  <input type="text" name="meta_title" class="form-control" 
-                         value="<%= post ? (post.meta_title || '') : '' %>" 
-                         maxlength="70" placeholder="Título para SEO (máx. 70 caracteres)">
-                </div>
-                <div>
-                  <label class="form-label">Meta Descrição</label>
-                  <textarea name="meta_description" class="form-control" rows="2" 
-                            maxlength="160" placeholder="Descrição para SEO (máx. 160 caracteres)"><%= post ? (post.meta_description || '') : '' %></textarea>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Meta Título</label>
+                    <input type="text" name="meta_title" class="form-control" 
+                           value="<%= post ? (post.meta_title || '') : '' %>" maxlength="70">
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Meta Descrição</label>
+                    <textarea name="meta_description" class="form-control" rows="1" 
+                              maxlength="160"><%= post ? (post.meta_description || '') : '' %></textarea>
+                  </div>
                 </div>
               </div>
             </div>
@@ -170,56 +429,92 @@
         </div>
 
         <!-- Sidebar -->
-        <div class="col-md-4">
-          <!-- Publicar -->
-          <div class="card mb-3">
-            <div class="card-header">
-              <i class="bi bi-send me-2"></i>Publicar
+        <div class="sidebar-column">
+          <!-- Assistente de IA -->
+          <div class="card mb-3 fade-in ai-assistant-card" id="aiCard" style="display: none;">
+            <div class="card-header ai-header">
+              <i class="bi bi-robot"></i> Assistente IA
+              <span class="ai-badge-small">Beta</span>
             </div>
             <div class="card-body">
-              <div class="mb-2">
-                <label class="form-label">Status</label>
-                <select name="status" class="form-select">
-                  <option value="draft" <%= post && post.status === 'draft' ? 'selected' : '' %>>📝 Rascunho</option>
-                  <option value="published" <%= post && post.status === 'published' ? 'selected' : '' %>>✅ Publicado</option>
-                  <option value="scheduled" <%= post && post.status === 'scheduled' ? 'selected' : '' %>>📅 Agendado</option>
-                </select>
+              <div class="ai-generate-section">
+                <label class="form-label">Criar matéria por IA</label>
+                <input type="text" id="aiKeyword" class="form-control mb-2" placeholder="Digite a palavra-chave ou tema">
+                <div class="form-check mb-2">
+                  <input type="checkbox" class="form-check-input" id="aiSearchWeb">
+                  <label class="form-check-label" for="aiSearchWeb">
+                    <i class="bi bi-globe"></i> Pesquisar na internet
+                  </label>
+                </div>
+                <button type="button" class="btn btn-ai w-100" onclick="generateArticle()">
+                  <i class="bi bi-stars"></i> Gerar Matéria
+                </button>
+              </div>
+              <hr class="my-3">
+              <div class="ai-actions">
+                <small class="text-muted d-block mb-2">Ou corrija campos individuais:</small>
+                <div class="d-flex flex-wrap gap-2">
+                  <button type="button" class="btn btn-outline-ai btn-sm" onclick="improveField('title')">
+                    <i class="bi bi-type-h1"></i> Título
+                  </button>
+                  <button type="button" class="btn btn-outline-ai btn-sm" onclick="improveField('subtitle')">
+                    <i class="bi bi-type-h2"></i> Subtítulo
+                  </button>
+                  <button type="button" class="btn btn-outline-ai btn-sm" onclick="improveField('content')">
+                    <i class="bi bi-text-paragraph"></i> Conteúdo
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Status de Publicação -->
+          <div class="card mb-3 fade-in">
+            <div class="card-header">
+              <i class="bi bi-send"></i> Publicação
+            </div>
+            <div class="card-body">
+              <div class="d-flex flex-column gap-2 mb-3">
+                <label class="status-option status-draft <%= (!post || post.status === 'draft') ? 'active' : '' %>">
+                  <input type="radio" name="status" value="draft" <%= (!post || post.status === 'draft') ? 'checked' : '' %>>
+                  <span class="status-icon"><i class="bi bi-pencil"></i></span>
+                  <span>Rascunho</span>
+                </label>
+                <label class="status-option status-published <%= (post && post.status === 'published') ? 'active' : '' %>">
+                  <input type="radio" name="status" value="published" <%= (post && post.status === 'published') ? 'checked' : '' %>>
+                  <span class="status-icon"><i class="bi bi-check-lg"></i></span>
+                  <span>Publicado</span>
+                </label>
+                <label class="status-option status-scheduled <%= (post && post.status === 'scheduled') ? 'active' : '' %>">
+                  <input type="radio" name="status" value="scheduled" <%= (post && post.status === 'scheduled') ? 'checked' : '' %>>
+                  <span class="status-icon"><i class="bi bi-calendar"></i></span>
+                  <span>Agendado</span>
+                </label>
               </div>
               
-              <div class="mb-2">
+              <div id="scheduleField" class="mb-3" style="display: none;">
                 <label class="form-label">Agendar para</label>
                 <input type="datetime-local" name="scheduled_at" class="form-control" 
                        value="<%= post && post.scheduled_at ? new Date(post.scheduled_at).toISOString().slice(0,16) : '' %>">
               </div>
               
-              <div class="form-check mb-3">
+              <div class="form-check">
                 <input type="checkbox" name="featured" class="form-check-input" id="featured" <%= post && post.featured ? 'checked' : '' %>>
                 <label class="form-check-label" for="featured">
-                  <i class="bi bi-star-fill text-warning me-1"></i>Destaque na Home
+                  <i class="bi bi-star-fill text-warning"></i> Destaque na Home
                 </label>
-              </div>
-              
-              <div class="d-grid gap-2">
-                <button type="submit" class="btn btn-primary btn-lg">
-                  <i class="bi bi-check-lg me-1"></i><%= isEdit ? 'Atualizar Post' : 'Publicar Post' %>
-                </button>
-                <% if (isEdit) { %>
-                  <a href="/noticia/<%= post.slug %>" target="_blank" class="btn btn-outline-secondary">
-                    <i class="bi bi-eye me-1"></i>Visualizar
-                  </a>
-                <% } %>
               </div>
             </div>
           </div>
 
           <!-- Categoria -->
-          <div class="card mb-3">
+          <div class="card mb-3 fade-in" style="animation-delay: 0.1s;">
             <div class="card-header">
-              <i class="bi bi-folder me-2"></i>Categoria
+              <i class="bi bi-folder"></i> Categoria
             </div>
-            <div class="card-body py-2">
+            <div class="card-body py-3">
               <select name="category_id" class="form-select">
-                <option value="">Sem categoria</option>
+                <option value="">Selecione uma categoria</option>
                 <% categories.forEach(cat => { %>
                   <option value="<%= cat.id %>" <%= post && post.category_id == cat.id ? 'selected' : '' %>><%= cat.name %></option>
                 <% }) %>
@@ -228,90 +523,98 @@
           </div>
 
           <!-- Tags -->
-          <div class="card mb-3">
+          <div class="card mb-3 fade-in" style="animation-delay: 0.2s;">
             <div class="card-header">
-              <i class="bi bi-tags me-2"></i>Tags
+              <i class="bi bi-tags"></i> Tags
             </div>
-            <div class="card-body py-2">
+            <div class="card-body py-3">
               <input type="text" name="tags" class="form-control" 
                      value="<%= post && post.tags ? (Array.isArray(post.tags) ? post.tags.join(', ') : post.tags) : '' %>" 
-                     placeholder="tag1, tag2, tag3">
-              <small class="text-muted">Separe por vírgula</small>
+                     placeholder="Ex: política, economia, esportes">
+              <small class="text-muted">Separe as tags por vírgula</small>
             </div>
           </div>
-
-          <!-- Imagem Destacada -->
-          <div class="card">
+ 
+         <!-- Imagem Destacada -->
+          <div class="card fade-in" style="animation-delay: 0.3s;">
             <div class="card-header">
-              <i class="bi bi-image me-2"></i>Imagem Destacada
+              <i class="bi bi-image"></i> Imagem Destacada
+              <span class="webp-badge ms-auto"><i class="bi bi-lightning-charge"></i> Auto WebP</span>
             </div>
-            <div class="card-body py-2">
-              <% if (post && post.featured_image) { %>
-                <div class="mb-2">
-                  <img src="<%= post.featured_image %>" alt="" class="img-fluid img-preview w-100">
-                </div>
-              <% } %>
-              <input type="file" name="featured_image" class="form-control" accept="image/*" id="imageInput">
-              <div id="imagePreview" class="mt-2"></div>
-              <small class="text-muted">JPG, PNG, GIF, WebP (máx. 10MB)</small>
+            <div class="card-body">
+              <div class="image-upload-area <%= post && post.featured_image ? 'has-image' : '' %>" 
+                   onclick="document.getElementById('imageInput').click()" id="uploadArea">
+                <% if (post && post.featured_image) { %>
+                  <div class="img-preview-container">
+                    <img src="<%= post.featured_image %>" alt="Preview" id="currentImage">
+                    <button type="button" class="remove-btn" onclick="event.stopPropagation(); removeImage();">
+                      <i class="bi bi-x"></i>
+                    </button>
+                  </div>
+                <% } else { %>
+                  <div id="uploadPlaceholder">
+                    <i class="bi bi-cloud-arrow-up upload-icon"></i>
+                    <div class="upload-text">Clique ou arraste uma imagem</div>
+                    <div class="upload-hint">JPG, PNG, GIF • Convertido para WebP automaticamente</div>
+                  </div>
+                <% } %>
+              </div>
+              <input type="file" name="featured_image" class="d-none" accept="image/*" id="imageInput">
+              <div id="imagePreview" class="mt-2 text-center"></div>
             </div>
           </div>
         </div>
       </div>
     </form>
-  </div>
+  </main>
 
-  <!-- Modal de Mídia para inserir imagem no conteúdo -->
+  <!-- Modal de Mídia -->
   <div class="modal fade" id="mediaModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" style="font-size: 1rem;"><i class="bi bi-images me-2"></i>Inserir Imagem no Conteúdo</h5>
+          <h5 class="modal-title" style="font-size: 1rem;"><i class="bi bi-images me-2"></i>Inserir Imagem</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
-          <!-- Tabs -->
           <ul class="nav nav-tabs mb-3" role="tablist">
             <li class="nav-item">
-              <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#uploadTab" style="font-size: 0.85rem;">
+              <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#uploadTab">
                 <i class="bi bi-cloud-upload me-1"></i>Upload
               </button>
             </li>
             <li class="nav-item">
-              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#galleryTab" style="font-size: 0.85rem;">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#galleryTab">
                 <i class="bi bi-grid me-1"></i>Galeria
               </button>
             </li>
             <li class="nav-item">
-              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#urlTab" style="font-size: 0.85rem;">
-                <i class="bi bi-link-45deg me-1"></i>URL Externa
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#urlTab">
+                <i class="bi bi-link-45deg me-1"></i>URL
               </button>
             </li>
           </ul>
           
           <div class="tab-content">
-            <!-- Upload Tab -->
             <div class="tab-pane fade show active" id="uploadTab">
               <div class="upload-zone" id="uploadZone" onclick="document.getElementById('mediaUploadInput').click()">
-                <i class="bi bi-cloud-arrow-up" style="font-size: 2rem; color: #6b7280;"></i>
-                <p class="mb-1 mt-2" style="font-size: 0.9rem;">Clique ou arraste uma imagem aqui</p>
-                <small class="text-muted">JPG, PNG, GIF, WebP (máx. 10MB)</small>
+                <i class="bi bi-cloud-arrow-up" style="font-size: 2rem; color: var(--text-secondary);"></i>
+                <p class="mb-1 mt-2">Clique ou arraste uma imagem</p>
+                <small class="text-muted">Convertido automaticamente para WebP</small>
               </div>
               <input type="file" id="mediaUploadInput" accept="image/*" style="display: none;">
               <div id="uploadPreview" class="mt-3 text-center"></div>
             </div>
             
-            <!-- Gallery Tab -->
             <div class="tab-pane fade" id="galleryTab">
               <div id="mediaGallery" class="media-gallery">
                 <div class="text-center py-4 w-100">
-                  <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
-                  <p class="mt-2 mb-0" style="font-size: 0.85rem;">Carregando imagens...</p>
+                  <div class="spinner-border spinner-border-sm text-primary"></div>
+                  <p class="mt-2 mb-0">Carregando...</p>
                 </div>
               </div>
             </div>
             
-            <!-- URL Tab -->
             <div class="tab-pane fade" id="urlTab">
               <div class="mb-3">
                 <label class="form-label">URL da Imagem</label>
@@ -321,11 +624,10 @@
             </div>
           </div>
           
-          <!-- Opções da imagem -->
           <div id="imageOptions" class="mt-3 p-3 bg-light rounded" style="display: none;">
             <div class="row g-2">
               <div class="col-md-6">
-                <label class="form-label">Texto alternativo (alt)</label>
+                <label class="form-label">Texto alternativo</label>
                 <input type="text" id="imageAlt" class="form-control" placeholder="Descrição da imagem">
               </div>
               <div class="col-md-6">
@@ -343,7 +645,7 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
           <button type="button" class="btn btn-primary" id="insertImageBtn" disabled onclick="insertImageToEditor()">
-            <i class="bi bi-plus-lg me-1"></i>Inserir Imagem
+            <i class="bi bi-plus-lg"></i> Inserir
           </button>
         </div>
       </div>
@@ -357,23 +659,223 @@
     let selectedImageUrl = '';
     let mediaModal;
     
-    // Inicializar CKEditor com suporte a imagens
+    // Inicializar CKEditor
     ClassicEditor
       .create(document.querySelector('#editor'), {
-        toolbar: ['heading', '|', 'bold', 'italic', 'link', '|', 'bulletedList', 'numberedList', '|', 'blockQuote', 'insertTable', '|', 'undo', 'redo'],
-        placeholder: 'Escreva o conteúdo do seu post aqui...'
+        toolbar: ['heading', '|', 'bold', 'italic', 'link', '|', 'bulletedList', 'numberedList', '|', 'blockQuote', '|', 'undo', 'redo'],
+        placeholder: 'Escreva o conteúdo da notícia...'
       })
-      .then(editor => {
+      .then(editor => { 
         editorInstance = editor;
+        
+        // Adicionar listener para cliques em imagens
+        const editorElement = editor.ui.view.editable.element;
+        
+        editorElement.addEventListener('click', function(e) {
+          // Remover toolbar anterior
+          removeImageToolbar();
+          
+          // Verificar se clicou em uma imagem
+          if (e.target.tagName === 'IMG') {
+            e.target.classList.add('selected-image');
+            showImageToolbar(e.target);
+          }
+        });
+        
+        // Remover toolbar ao clicar fora
+        document.addEventListener('click', function(e) {
+          if (!e.target.closest('.image-toolbar') && e.target.tagName !== 'IMG') {
+            removeImageToolbar();
+          }
+        });
       })
       .catch(error => console.error(error));
+    
+    // Mostrar toolbar de imagem
+    function showImageToolbar(img) {
+      const toolbar = document.createElement('div');
+      toolbar.className = 'image-toolbar';
+      toolbar.id = 'imageToolbar';
+      toolbar.innerHTML = `
+        <button type="button" onclick="alignEditorImage('left')" title="Alinhar à esquerda">
+          <i class="bi bi-text-left"></i>
+        </button>
+        <button type="button" onclick="alignEditorImage('center')" title="Centralizar">
+          <i class="bi bi-text-center"></i>
+        </button>
+        <button type="button" onclick="alignEditorImage('right')" title="Alinhar à direita">
+          <i class="bi bi-text-right"></i>
+        </button>
+        <button type="button" class="delete-btn" onclick="deleteEditorImage()" title="Excluir imagem">
+          <i class="bi bi-trash"></i>
+        </button>
+      `;
+      
+      document.body.appendChild(toolbar);
+      
+      // Posicionar toolbar acima da imagem
+      const rect = img.getBoundingClientRect();
+      toolbar.style.left = (rect.left + rect.width / 2 - toolbar.offsetWidth / 2) + 'px';
+      toolbar.style.top = (rect.top - toolbar.offsetHeight - 10 + window.scrollY) + 'px';
+      
+      // Guardar referência da imagem selecionada
+      window.selectedEditorImage = img;
+    }
+    
+    // Remover toolbar
+    function removeImageToolbar() {
+      const toolbar = document.getElementById('imageToolbar');
+      if (toolbar) toolbar.remove();
+      document.querySelectorAll('.selected-image').forEach(img => img.classList.remove('selected-image'));
+      window.selectedEditorImage = null;
+    }
+    
+    // Alinhar imagem no editor
+    function alignEditorImage(align) {
+      if (!window.selectedEditorImage || !editorInstance) return;
+      const img = window.selectedEditorImage;
+      const imgSrc = img.getAttribute('src');
+      
+      // Pegar o conteúdo atual do editor
+      let content = editorInstance.getData();
+      
+      // Criar um elemento temporário para manipular o HTML
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = content;
+      
+      // Encontrar a imagem pelo src e aplicar estilo
+      const images = tempDiv.querySelectorAll('img');
+      images.forEach(image => {
+        if (image.getAttribute('src') === imgSrc) {
+          // Resetar estilos
+          image.style.float = '';
+          image.style.display = '';
+          image.style.marginLeft = '';
+          image.style.marginRight = '';
+          
+          if (align === 'left') {
+            image.style.cssText = 'float: left; margin-right: 15px; margin-bottom: 15px; max-width: 100%;';
+          } else if (align === 'right') {
+            image.style.cssText = 'float: right; margin-left: 15px; margin-bottom: 15px; max-width: 100%;';
+          } else if (align === 'center') {
+            image.style.cssText = 'display: block; margin: 0 auto 15px auto; max-width: 100%;';
+          }
+        }
+      });
+      
+      // Atualizar o conteúdo do editor
+      editorInstance.setData(tempDiv.innerHTML);
+      
+      removeImageToolbar();
+    }
+    
+    // Excluir imagem do editor
+    function deleteEditorImage() {
+      if (!window.selectedEditorImage || !editorInstance) return;
+      
+      if (confirm('Deseja excluir esta imagem?')) {
+        const img = window.selectedEditorImage;
+        
+        // Pegar o conteúdo atual do editor
+        let content = editorInstance.getData();
+        
+        // Criar um elemento temporário para manipular o HTML
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = content;
+        
+        // Encontrar e remover a imagem pelo src
+        const imgSrc = img.getAttribute('src');
+        const images = tempDiv.querySelectorAll('img');
+        images.forEach(image => {
+          if (image.getAttribute('src') === imgSrc) {
+            image.remove();
+          }
+        });
+        
+        // Atualizar o conteúdo do editor
+        editorInstance.setData(tempDiv.innerHTML);
+        
+        removeImageToolbar();
+      }
+    }
 
-    // Inicializar modal
     document.addEventListener('DOMContentLoaded', function() {
       mediaModal = new bootstrap.Modal(document.getElementById('mediaModal'));
+      
+      // Status radio buttons
+      document.querySelectorAll('.status-option').forEach(option => {
+        option.addEventListener('click', function() {
+          document.querySelectorAll('.status-option').forEach(o => o.classList.remove('active'));
+          this.classList.add('active');
+          const isScheduled = this.querySelector('input').value === 'scheduled';
+          document.getElementById('scheduleField').style.display = isScheduled ? 'block' : 'none';
+        });
+      });
+      
+      // Mostrar campo de agendamento se já estiver selecionado
+      if (document.querySelector('input[name="status"][value="scheduled"]:checked')) {
+        document.getElementById('scheduleField').style.display = 'block';
+      }
+      
+      // Collapsible headers
+      document.querySelectorAll('.collapsible-header').forEach(header => {
+        header.addEventListener('click', function() {
+          this.classList.toggle('collapsed');
+        });
+      });
     });
 
-    // Abrir modal de mídia
+    // Upload de imagem destacada com drag and drop
+    const uploadArea = document.getElementById('uploadArea');
+    const imageInput = document.getElementById('imageInput');
+    
+    uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.style.borderColor = 'var(--primary)'; });
+    uploadArea.addEventListener('dragleave', () => { uploadArea.style.borderColor = ''; });
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.style.borderColor = '';
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        imageInput.files = dt.files;
+        previewImage(file);
+      }
+    });
+    
+    imageInput.addEventListener('change', function(e) {
+      if (e.target.files[0]) previewImage(e.target.files[0]);
+    });
+    
+    function previewImage(file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        uploadArea.innerHTML = `
+          <div class="img-preview-container">
+            <img src="${e.target.result}" alt="Preview" style="max-height: 150px; border-radius: 8px;">
+            <button type="button" class="remove-btn" onclick="event.stopPropagation(); removeImage();">
+              <i class="bi bi-x"></i>
+            </button>
+          </div>
+        `;
+        uploadArea.classList.add('has-image');
+      };
+      reader.readAsDataURL(file);
+    }
+    
+    function removeImage() {
+      imageInput.value = '';
+      uploadArea.innerHTML = `
+        <div id="uploadPlaceholder">
+          <i class="bi bi-cloud-arrow-up upload-icon"></i>
+          <div class="upload-text">Clique ou arraste uma imagem</div>
+          <div class="upload-hint">JPG, PNG, GIF • Convertido para WebP automaticamente</div>
+        </div>
+      `;
+      uploadArea.classList.remove('has-image');
+    }
+
+    // Modal de mídia
     function openMediaModal() {
       selectedImageUrl = '';
       document.getElementById('insertImageBtn').disabled = true;
@@ -381,22 +883,15 @@
       document.getElementById('uploadPreview').innerHTML = '';
       document.getElementById('urlPreview').innerHTML = '';
       document.getElementById('externalImageUrl').value = '';
-      document.getElementById('imageAlt').value = '';
-      document.getElementById('imageAlign').value = '';
-      
-      // Carregar galeria
       loadMediaGallery();
-      
       mediaModal.show();
     }
 
-    // Carregar galeria de mídia
     async function loadMediaGallery() {
       const gallery = document.getElementById('mediaGallery');
       try {
         const response = await fetch('/admin/media/browse');
         const data = await response.json();
-        
         if (data.medias && data.medias.length > 0) {
           gallery.innerHTML = data.medias.map(item => `
             <div class="media-item" onclick="selectGalleryImage('${item.url}', this)">
@@ -404,14 +899,13 @@
             </div>
           `).join('');
         } else {
-          gallery.innerHTML = '<div class="text-center py-4 w-100"><p class="text-muted mb-0" style="font-size: 0.85rem;">Nenhuma imagem na galeria</p></div>';
+          gallery.innerHTML = '<div class="text-center py-4 w-100"><p class="text-muted mb-0">Nenhuma imagem</p></div>';
         }
       } catch (error) {
-        gallery.innerHTML = '<div class="text-center py-4 w-100"><p class="text-muted mb-0" style="font-size: 0.85rem;">Erro ao carregar galeria</p></div>';
+        gallery.innerHTML = '<div class="text-center py-4 w-100"><p class="text-muted mb-0">Erro ao carregar</p></div>';
       }
     }
 
-    // Selecionar imagem da galeria
     function selectGalleryImage(url, element) {
       document.querySelectorAll('.media-item').forEach(el => el.classList.remove('selected'));
       element.classList.add('selected');
@@ -420,7 +914,7 @@
       document.getElementById('imageOptions').style.display = 'block';
     }
 
-    // Upload de imagem
+    // Upload no modal
     document.getElementById('mediaUploadInput').addEventListener('change', async function(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -432,26 +926,23 @@
       preview.innerHTML = '<div class="spinner-border spinner-border-sm text-primary"></div> Enviando...';
       
       try {
-        const response = await fetch('/admin/media/upload', {
-          method: 'POST',
-          body: formData
-        });
+        const response = await fetch('/admin/media/upload', { method: 'POST', body: formData });
         const data = await response.json();
         
         if (data.success && data.media) {
           selectedImageUrl = data.media.url;
-          preview.innerHTML = `<img src="${data.media.url}" style="max-height: 150px; border-radius: 8px;">`;
+          preview.innerHTML = `<img src="${data.media.url}" style="max-height: 120px; border-radius: 8px;">`;
           document.getElementById('insertImageBtn').disabled = false;
           document.getElementById('imageOptions').style.display = 'block';
         } else {
-          preview.innerHTML = '<p class="text-danger">Erro no upload: ' + (data.message || 'Erro desconhecido') + '</p>';
+          preview.innerHTML = '<p class="text-danger">Erro: ' + (data.message || 'Erro desconhecido') + '</p>';
         }
       } catch (error) {
         preview.innerHTML = '<p class="text-danger">Erro no upload</p>';
       }
     });
 
-    // Drag and drop
+    // Drag and drop no modal
     const uploadZone = document.getElementById('uploadZone');
     uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
     uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
@@ -473,8 +964,8 @@
       const url = this.value.trim();
       const preview = document.getElementById('urlPreview');
       
-      if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
-        preview.innerHTML = `<img src="${url}" style="max-height: 150px; border-radius: 8px;" onerror="this.parentElement.innerHTML='<p class=\\'text-danger\\'>Imagem não encontrada</p>'">`;
+      if (url && url.startsWith('http')) {
+        preview.innerHTML = `<img src="${url}" style="max-height: 120px; border-radius: 8px;" onerror="this.parentElement.innerHTML='<p class=\\'text-danger\\'>Imagem não encontrada</p>'">`;
         selectedImageUrl = url;
         document.getElementById('insertImageBtn').disabled = false;
         document.getElementById('imageOptions').style.display = 'block';
@@ -486,20 +977,18 @@
       }
     });
 
-    // Inserir imagem no editor
     function insertImageToEditor() {
       if (!selectedImageUrl || !editorInstance) return;
       
       const alt = document.getElementById('imageAlt').value || '';
       const align = document.getElementById('imageAlign').value;
       
-      let style = '';
-      if (align === 'center') style = 'display: block; margin: 0 auto;';
-      else if (align === 'left') style = 'float: left; margin-right: 15px;';
-      else if (align === 'right') style = 'float: right; margin-left: 15px;';
+      let style = 'max-width: 100%; height: auto; margin-bottom: 15px;';
+      if (align === 'center') style += ' display: block; margin-left: auto; margin-right: auto;';
+      else if (align === 'left') style += ' float: left; margin-right: 15px;';
+      else if (align === 'right') style += ' float: right; margin-left: 15px;';
       
-      const imgHtml = `<img src="${selectedImageUrl}" alt="${alt}" style="${style} max-width: 100%; height: auto; margin-bottom: 15px;">`;
-      
+      const imgHtml = `<img src="${selectedImageUrl}" alt="${alt}" style="${style}">`;
       const viewFragment = editorInstance.data.processor.toView(imgHtml);
       const modelFragment = editorInstance.data.toModel(viewFragment);
       editorInstance.model.insertContent(modelFragment);
@@ -507,39 +996,138 @@
       mediaModal.hide();
     }
 
-    // Validar formulário antes de enviar
+    // Validação do formulário
     document.getElementById('postForm').addEventListener('submit', function(e) {
       const title = document.querySelector('input[name="title"]').value.trim();
       const content = editorInstance ? editorInstance.getData().trim() : '';
       
-      if (!title) {
-        e.preventDefault();
-        alert('Por favor, preencha o título do post.');
-        return false;
-      }
-      
-      if (!content) {
-        e.preventDefault();
-        alert('Por favor, preencha o conteúdo do post.');
-        return false;
-      }
+      if (!title) { e.preventDefault(); alert('Preencha o título.'); return false; }
+      if (!content) { e.preventDefault(); alert('Preencha o conteúdo.'); return false; }
       
       document.getElementById('contentBackup').value = content;
       return true;
     });
 
-    // Preview de imagem destacada
-    document.getElementById('imageInput').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          document.getElementById('imagePreview').innerHTML = 
-            '<img src="' + e.target.result + '" class="img-fluid img-preview w-100 mt-2">';
-        };
-        reader.readAsDataURL(file);
+    // ==========================================
+    // ASSISTENTE DE IA
+    // ==========================================
+    
+    // Verificar se IA está ativada
+    async function checkAIStatus() {
+      try {
+        const response = await fetch('/admin/ai/status');
+        const data = await response.json();
+        if (data.enabled && data.configured) {
+          document.getElementById('aiCard').style.display = 'block';
+          document.querySelectorAll('.ai-field-btn').forEach(btn => btn.style.display = 'flex');
+        }
+      } catch (e) {
+        console.log('IA não disponível');
       }
-    });
+    }
+    checkAIStatus();
+
+    // Mostrar loading
+    function showAILoading(message = 'Processando com IA...') {
+      const overlay = document.createElement('div');
+      overlay.className = 'ai-loading';
+      overlay.id = 'aiLoadingOverlay';
+      overlay.innerHTML = `<div class="ai-loading-content"><i class="bi bi-robot"></i><p>${message}</p></div>`;
+      document.body.appendChild(overlay);
+    }
+
+    function hideAILoading() {
+      const overlay = document.getElementById('aiLoadingOverlay');
+      if (overlay) overlay.remove();
+    }
+
+    // Gerar matéria completa
+    async function generateArticle() {
+      const keyword = document.getElementById('aiKeyword').value.trim();
+      if (!keyword) {
+        alert('Digite uma palavra-chave ou tema.');
+        return;
+      }
+
+      const searchWeb = document.getElementById('aiSearchWeb').checked;
+      showAILoading('Gerando matéria com IA...');
+
+      try {
+        const response = await fetch('/admin/ai/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ keyword, searchWeb })
+        });
+        const data = await response.json();
+
+        if (data.success && data.data) {
+          document.getElementById('titleInput').value = data.data.title || '';
+          document.getElementById('subtitleInput').value = data.data.subtitle || '';
+          if (editorInstance && data.data.content) {
+            editorInstance.setData(data.data.content);
+          }
+          alert('Matéria gerada com sucesso! Revise o conteúdo antes de publicar.');
+        } else {
+          alert('Erro: ' + (data.message || 'Não foi possível gerar a matéria.'));
+        }
+      } catch (error) {
+        alert('Erro ao conectar com a IA: ' + error.message);
+      } finally {
+        hideAILoading();
+      }
+    }
+
+    // Melhorar campo individual
+    async function improveField(field) {
+      let value, endpoint, title;
+      
+      if (field === 'title') {
+        value = document.getElementById('titleInput').value.trim();
+        if (!value) { alert('Digite um título primeiro.'); return; }
+        endpoint = '/admin/ai/improve-title';
+      } else if (field === 'subtitle') {
+        value = document.getElementById('subtitleInput').value.trim();
+        if (!value) { alert('Digite um subtítulo primeiro.'); return; }
+        endpoint = '/admin/ai/improve-subtitle';
+        title = document.getElementById('titleInput').value.trim();
+      } else if (field === 'content') {
+        value = editorInstance ? editorInstance.getData().trim() : '';
+        if (!value) { alert('Escreva algum conteúdo primeiro.'); return; }
+        endpoint = '/admin/ai/improve-content';
+        title = document.getElementById('titleInput').value.trim();
+      }
+
+      showAILoading('Melhorando ' + (field === 'title' ? 'título' : field === 'subtitle' ? 'subtítulo' : 'conteúdo') + '...');
+
+      try {
+        const body = field === 'title' ? { title: value } : 
+                     field === 'subtitle' ? { subtitle: value, title } : 
+                     { content: value, title };
+
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        const data = await response.json();
+
+        if (data.success && data.data) {
+          if (field === 'title') {
+            document.getElementById('titleInput').value = data.data;
+          } else if (field === 'subtitle') {
+            document.getElementById('subtitleInput').value = data.data;
+          } else if (field === 'content') {
+            editorInstance.setData(data.data);
+          }
+        } else {
+          alert('Erro: ' + (data.message || 'Não foi possível melhorar.'));
+        }
+      } catch (error) {
+        alert('Erro: ' + error.message);
+      } finally {
+        hideAILoading();
+      }
+    }
   </script>
 </body>
 </html>
