@@ -59,6 +59,12 @@ class SiteController {
 
       // Buscar banners da home
       const banners = await getBanners(['home_top', 'home_middle', 'home_bottom', 'home_sidebar']);
+      
+      // Buscar todos os banners para o editor
+      const { Banner } = require('../models');
+      const allBanners = await Banner.findAll({
+        order: [['title', 'ASC']]
+      });
 
       // Buscar blocos configurados da home (com tratamento de erro caso tabela não exista)
       let blocksWithPosts = [];
@@ -122,6 +128,7 @@ class SiteController {
         popularPosts,
         categoriesWithPosts,
         banners,
+        allBanners, // Para o editor de blocos
         homeBlocks: blocksWithPosts
       });
     } catch (error) {

@@ -191,7 +191,7 @@ ${featuredPosts && featuredPosts.length > 0 ? `
         <div class="categories-list">
           ${categories.map(cat => `
             <a href="/categoria/${cat.slug}" class="category-item">
-              <span class="category-dot" style="background-color: ${cat.color}"></span>
+              <span class="category-dot" style="background-color: '${cat.color}'"></span>
               <span class="category-name">${cat.name}</span>
               <span class="category-count">${cat.postCount || 0}</span>
             </a>
@@ -1415,6 +1415,7 @@ ${user && (user.role === 'admin' || user.role === 'editor') ? `
         <label>Banner</label>
         <select id="liveBlockBanner">
           <option value="">Selecione um banner</option>
+          ${allBanners.map(function(b) { return '<option value="' + b.id + '">' + b.title + '</option>'; }).join('')}
         </select>
       </div>
       
