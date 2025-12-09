@@ -1,22 +1,105 @@
 /**
  * Controller de Assistente de IA
- * Integração com Together AI para criação de conteúdo
+ * Integração com Together AI para criação de conteúdo jornalístico
+ * Estilos: Globo/G1, Metrópoles Política, Metrópoles Policial
  */
 const { Setting } = require('../models');
 const https = require('https');
 const http = require('http');
 
 class AIController {
+  // Prompts de sistema por estilo
+  getSystemPrompt(style) {
+    const baseRules = `
+REGRAS ABSOLUTAS - NUNCA QUEBRE:
+1. NÃO INVENTE fatos, nomes, datas, números ou citações
+2. Use APENAS informações fornecidas na pesquisa
+3. Se faltar informação, indique com [a confirmar] ou omita
+4. Reescreva SEMPRE com suas próprias palavras - NUNCA copie
+5. Texto deve ser 100% original e humanizado
+6. Português brasileiro padrão, sem erros gramaticais`;
+
+    const styles = {
+      globo: `Você é um redator sênior do G1/Globo, especialista em hard news.
+
+${baseRules}
+
+ESTILO G1/GLOBO - Hard News:
+- Linguagem IMPESSOAL, objetiva e neutra
+- Sem ironia, sem gíria, sem adjetivo opinativo
+- SEMPRE atribuir informações a fontes: "segundo a polícia", "a PGR afirma"
+- Verbos de atribuição: "afirma", "aponta", "disse", "informou"
+
+ESTRUTURA OBRIGATÓRIA:
+1. TÍTULO: Responde "quem + o quê + onde/por quê" de forma direta, sem trocadilhos
+2. SUBTÍTULO: Complementa com 1-2 informações importantes (valor, data, afetados)
+3. LIDE (1º parágrafo): O fato principal - o que aconteceu, onde, quando, quem
+4. CORPO: Detalhes, contexto, dados concretos, fontes institucionais
+5. SERVIÇO (se aplicável): "O que muda", "Quem tem direito", listas claras
+
+TOM: Sério, informativo, de serviço público. Como se estivesse no Jornal Nacional.`,
+
+      metropoles_politica: `Você é um redator do Metrópoles especializado em política e bastidores.
+
+${baseRules}
+
+ESTILO METRÓPOLES POLÍTICA - Bastidores:
+- Jornalístico com INTERPRETAÇÃO de cenário
+- Pode usar: "impasse", "isolamento", "queda de braço", "perdeu fôlego"
+- Bastidores: "a interlocutores, disse...", "líderes ouvidos pela reportagem"
+- Foco em jogo de poder, crise, articulação, estratégia
+
+ESTRUTURA OBRIGATÓRIA:
+1. TÍTULO: Destacar conflito, urgência ou derrota (ex: "Com prazo curto, X tenta salvar Y")
+2. LIDE: O dilema central - o que está travado, quem pressiona, qual prazo
+3. BASTIDORES: Estado das negociações, reações de partidos, quem recuou/apoia
+4. BLOCOS com subtítulos: "Impasse na Câmara", "Sem espaço no Senado"
+5. ANÁLISE: Conectar com estratégia eleitoral ou de poder
+
+TOM: Analítico, revelador, como quem conhece os bastidores de Brasília.`,
+
+      metropoles_policial: `Você é um redator do Metrópoles especializado em cobertura policial narrativa.
+
+${baseRules}
+
+ESTILO METRÓPOLES POLICIAL - Narrativo:
+- Narrativa em tom de CRÔNICA, com liberdade literária
+- Baseado em BO, falas e fatos documentados
+- Pode usar expressões populares e títulos chamativos
+- Foco em cenário, personagens, falas de efeito, viradas
+
+ESTRUTURA OBRIGATÓRIA:
+1. TÍTULO: Chamativo, pode ter expressão popular (ex: "Festa termina em delegacia")
+2. ABERTURA: Como uma história - situar lugar, clima, expectativa
+3. DESENVOLVIMENTO: Sequência como enredo - convite, encontro, conflito, desfecho
+4. SUBTÍTULOS CRIATIVOS: Cada um abre um novo "ato" da história
+5. FECHAMENTO: Frase de efeito ou observação sobre o caso
+
+TOM: Envolvente, narrativo, como quem conta um caso real de forma cinematográfica.
+LIMITE: Não inventar falas graves, proteger vítimas em temas sensíveis.`
+    };
+
+    return styles[style] || styles.globo;
+  }
+
   // Buscar notícias reais via Google News RSS
   async searchWeb(query) {
-    return new Promise((resolve, reject) => {
-      const googleNewsUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=pt-BR&gl=BR&ceid=BR:pt-419`;
+    return new Promise((resolve) => {
+      // Limitar query a 150 caracteres para evitar URLs muito longas
+      const safeQuery = query.substring(0, 150).trim();
+      const googleNewsUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(safeQuery)}&hl=pt-BR&gl=BR&ceid=BR:pt-419`;
       
       https.get(googleNewsUrl, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-        }
+        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
+        timeout: 15000
       }, (res) => {
+        // Se não for status 200, retornar vazio
+        if (res.statusCode !== 200) {
+          console.log('Google News retornou status:', res.statusCode);
+          resolve('');
+          return;
+        }
+        
         let data = '';
         res.on('data', chunk => data += chunk);
         res.on('end', () => {
@@ -25,61 +108,44 @@ class AIController {
             const itemRegex = /<item>([\s\S]*?)<\/item>/gi;
             let match;
             
-            while ((match = itemRegex.exec(data)) !== null && results.length < 6) {
+            while ((match = itemRegex.exec(data)) !== null && results.length < 8) {
               const item = match[1];
-              
               const titleMatch = item.match(/<title>([^<]+)/i);
               const pubDateMatch = item.match(/<pubDate>([^<]+)/i);
               const sourceMatch = item.match(/<source[^>]*>([^<]+)/i);
-              const descMatch = item.match(/<description>([^<]+)/i);
               
               if (titleMatch) {
                 const title = titleMatch[1].replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
-                const source = sourceMatch ? sourceMatch[1] : 'Fonte desconhecida';
+                const source = sourceMatch ? sourceMatch[1] : 'Fonte';
                 const date = pubDateMatch ? this.formatDate(pubDateMatch[1]) : '';
-                const desc = descMatch ? descMatch[1].replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>') : '';
-                
-                results.push(`FONTE: ${source}\nTÍTULO: ${title}\nDATA: ${date}${desc ? '\nRESUMO: ' + desc : ''}`);
+                results.push(`[${source}] ${title} (${date})`);
               }
             }
             
             if (results.length === 0) {
-              console.log('Nenhuma notícia encontrada no Google News');
               resolve('');
             } else {
-              const hoje = new Date().toLocaleDateString('pt-BR');
-              resolve(`NOTÍCIAS REAIS ENCONTRADAS (pesquisa em ${hoje}):\n\n${results.join('\n\n---\n\n')}\n\n⚠️ IMPORTANTE: Baseie a matéria APENAS nestas notícias reais. NÃO invente informações adicionais.`);
+              resolve(`NOTÍCIAS ENCONTRADAS NA PESQUISA:\n${results.join('\n')}`);
             }
           } catch (e) {
-            console.error('Erro ao processar Google News:', e);
             resolve('');
           }
         });
-      }).on('error', (e) => {
-        console.error('Erro Google News:', e);
-        resolve('');
-      });
+      }).on('error', () => resolve(''));
     });
   }
 
-  // Formatar data do RSS para português
   formatDate(dateStr) {
     try {
       const date = new Date(dateStr);
-      return date.toLocaleDateString('pt-BR', { 
-        day: 'numeric', 
-        month: 'long', 
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
+      return date.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', year: 'numeric' });
     } catch (e) {
       return dateStr;
     }
   }
 
   // Chamar API Together AI
-  async callTogetherAI(prompt, settings) {
+  async callTogetherAI(prompt, settings, style = 'globo') {
     return new Promise((resolve, reject) => {
       const apiKey = settings.ai_api_key;
       const apiUrl = settings.ai_api_url || 'https://api.together.xyz/v1/chat/completions';
@@ -89,28 +155,7 @@ class AIController {
       const isHttps = urlParts.protocol === 'https:';
       const httpModule = isHttps ? https : http;
 
-      const systemPrompt = `Você é um jornalista investigativo do portal Metrópoles, um dos maiores veículos de notícias do Brasil.
-
-REGRA MAIS IMPORTANTE - NUNCA QUEBRE:
-⚠️ JAMAIS INVENTE informações, nomes, datas, números ou fatos
-⚠️ Use APENAS dados fornecidos na pesquisa ou informados pelo usuário
-⚠️ Se não tiver dados suficientes, use marcadores [PREENCHER] ou informe a limitação
-⚠️ Datas devem ser coerentes com a data atual informada
-
-ESTILO METRÓPOLES:
-- Linguagem direta, objetiva e factual
-- Primeiro parágrafo (lide) resume o fato principal
-- Parágrafos curtos (3-4 linhas máximo)
-- Citações entre aspas quando houver falas
-- Tom investigativo, nunca opinativo
-- Estrutura: Lide > Desenvolvimento > Contexto
-- Português brasileiro formal
-
-PROIBIDO:
-- Inventar nomes de pessoas, empresas ou órgãos
-- Criar datas ou números fictícios
-- Fabricar citações ou declarações
-- Usar linguagem sensacionalista`;
+      const systemPrompt = this.getSystemPrompt(style);
 
       const requestData = JSON.stringify({
         model: model,
@@ -119,7 +164,7 @@ PROIBIDO:
           { role: 'user', content: prompt }
         ],
         max_tokens: 4000,
-        temperature: 0.7
+        temperature: 0.75
       });
 
       const options = {
@@ -139,64 +184,42 @@ PROIBIDO:
         res.on('data', chunk => data += chunk);
         res.on('end', () => {
           try {
-            // Verificar se a resposta é HTML (erro)
             if (data.trim().startsWith('<!DOCTYPE') || data.trim().startsWith('<html')) {
-              console.error('API retornou HTML em vez de JSON. Status:', res.statusCode);
-              console.error('URL:', apiUrl);
-              reject(new Error(`Erro na API (Status ${res.statusCode}). Verifique a URL e a chave da API nas configurações.`));
+              reject(new Error(`Erro na API (Status ${res.statusCode}). Verifique configurações.`));
               return;
             }
-            
-            // Verificar status HTTP
             if (res.statusCode !== 200) {
-              console.error('API retornou status:', res.statusCode);
-              console.error('Resposta:', data.substring(0, 500));
               reject(new Error(`Erro na API: Status ${res.statusCode}`));
               return;
             }
-            
             const json = JSON.parse(data);
             if (json.choices && json.choices[0]) {
               resolve(json.choices[0].message.content);
             } else if (json.error) {
               reject(new Error(json.error.message || 'Erro na API'));
             } else {
-              console.error('Resposta inesperada:', JSON.stringify(json).substring(0, 500));
               reject(new Error('Resposta inválida da API'));
             }
           } catch (e) {
-            console.error('Erro ao processar resposta:', e.message);
-            console.error('Dados recebidos:', data.substring(0, 300));
-            reject(new Error('Erro ao processar resposta da API. Verifique as configurações.'));
+            reject(new Error('Erro ao processar resposta da API.'));
           }
         });
       });
 
-      req.on('error', (e) => {
-        console.error('Erro de conexão:', e.message);
-        reject(new Error('Erro de conexão com a API: ' + e.message));
-      });
-      
-      req.setTimeout(60000, () => {
-        req.destroy();
-        reject(new Error('Timeout: A API demorou muito para responder'));
-      });
-      
+      req.on('error', (e) => reject(new Error('Erro de conexão: ' + e.message)));
+      req.setTimeout(90000, () => { req.destroy(); reject(new Error('Timeout na requisição')); });
       req.write(requestData);
       req.end();
     });
   }
 
-  // Obter configurações de IA
   async getAISettings() {
     const settings = {};
     const keys = ['ai_enabled', 'ai_api_key', 'ai_api_url', 'ai_model'];
-    
     for (const key of keys) {
       const setting = await Setting.findOne({ where: { key } });
       settings[key] = setting ? setting.value : null;
     }
-    
     return settings;
   }
 
@@ -208,118 +231,99 @@ PROIBIDO:
       if (settings.ai_enabled !== 'true' && settings.ai_enabled !== '1') {
         return res.status(400).json({ success: false, message: 'Assistente de IA está desativado.' });
       }
-      
       if (!settings.ai_api_key) {
         return res.status(400).json({ success: false, message: 'Chave da API não configurada.' });
       }
 
-      const { keyword, searchWeb } = req.body;
+      const { keyword, searchWeb, style = 'globo' } = req.body;
       
       if (!keyword) {
-        return res.status(400).json({ success: false, message: 'Palavra-chave é obrigatória.' });
+        return res.status(400).json({ success: false, message: 'Tema é obrigatório.' });
       }
 
       let context = '';
-      let hasRealData = false;
-      
       if (searchWeb) {
         context = await this.searchWeb(keyword);
-        hasRealData = context && context.length > 100;
       }
 
-      // Data atual para referência
       const hoje = new Date();
       const dataAtual = hoje.toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
 
+      const styleInstructions = {
+        globo: `
+INSTRUÇÕES ESTILO G1/GLOBO:
+- Título direto respondendo "quem fez o quê"
+- Subtítulo com dado complementar importante
+- Lide objetivo no 1º parágrafo
+- Atribuir TUDO a fontes: "segundo...", "de acordo com..."
+- Parágrafos curtos, linguagem neutra
+- Se for serviço: incluir "O que muda", "Como funciona"`,
+
+        metropoles_politica: `
+INSTRUÇÕES ESTILO METRÓPOLES POLÍTICA:
+- Título destacando conflito ou urgência
+- Subtítulo revelando bastidor
+- Lide apresentando o dilema/impasse
+- Usar linguagem de bastidor: "a interlocutores disse", "nos bastidores"
+- Subtítulos como: "Impasse", "Reação do Centrão", "Próximos passos"
+- Análise de cenário político conectada aos fatos`,
+
+        metropoles_policial: `
+INSTRUÇÕES ESTILO METRÓPOLES POLICIAL:
+- Título chamativo, pode ter expressão popular
+- Abertura narrativa situando o cenário
+- Contar como história: início, meio, clímax, desfecho
+- Subtítulos criativos marcando "atos" da história
+- Diálogos e cenas quando houver nos fatos
+- Fechamento com frase de efeito`
+      };
+
       let prompt;
       
-      if (hasRealData) {
-        prompt = `DATA DE HOJE: ${dataAtual}
+      if (context) {
+        prompt = `DATA: ${dataAtual}
 
-NOTÍCIAS REAIS ENCONTRADAS NA PESQUISA:
 ${context}
 
-TAREFA: Crie uma matéria jornalística COMPLETA e DETALHADA no estilo Metrópoles sobre: "${keyword}"
+TAREFA: Escreva uma matéria jornalística COMPLETA e ORIGINAL sobre "${keyword}".
 
-INSTRUÇÕES PARA CONTEÚDO EXTENSO:
-- Desenvolva uma matéria com NO MÍNIMO 8-10 parágrafos
-- Cada parágrafo deve ter 3-4 linhas
-- Use TODAS as informações disponíveis nas notícias acima
-- Combine informações de diferentes fontes quando possível
-- Adicione contexto explicativo para o leitor entender o assunto
-- Inclua possíveis desdobramentos ou consequências do fato
-- Se houver múltiplas notícias, faça uma matéria abrangente
+${styleInstructions[style] || styleInstructions.globo}
 
-ESTRUTURA OBRIGATÓRIA:
-1. LIDE (1º parágrafo): Resuma o fato principal de forma impactante
-2. DETALHAMENTO (2-3 parágrafos): Desenvolva os detalhes do acontecimento
-3. CONTEXTO (2-3 parágrafos): Explique o contexto, histórico ou background
-4. REPERCUSSÃO (1-2 parágrafos): Reações, declarações ou posicionamentos
-5. DESDOBRAMENTOS (1-2 parágrafos): O que pode acontecer, investigações, etc.
+REGRAS DE OURO:
+1. REESCREVA tudo com suas palavras - texto 100% original
+2. NÃO copie frases das notícias - apenas use as INFORMAÇÕES
+3. NÃO invente dados que não estão nas notícias
+4. Mínimo 8 parágrafos bem desenvolvidos
+5. Humanize o texto - deve parecer escrito por jornalista experiente
 
-REGRAS:
-- Use APENAS fatos das notícias encontradas
-- NÃO invente nomes, datas ou números
-- Reescreva com suas palavras (não copie)
-- Use citações entre aspas quando apropriado
-- Hoje é ${dataAtual}
-
-Retorne EXATAMENTE neste formato JSON:
-{
-  "title": "título impactante baseado nos fatos",
-  "subtitle": "subtítulo explicativo com detalhes importantes",
-  "content": "conteúdo EXTENSO em HTML com múltiplos <p>, mínimo 8 parágrafos bem desenvolvidos"
-}`;
+Retorne em JSON:
+{"title": "título", "subtitle": "subtítulo", "content": "HTML com <p> para parágrafos"}`;
       } else {
-        prompt = `DATA DE HOJE: ${dataAtual}
+        prompt = `DATA: ${dataAtual}
 
-TAREFA: Crie uma matéria jornalística COMPLETA sobre "${keyword}" no estilo Metrópoles.
+TAREFA: Escreva uma matéria jornalística sobre "${keyword}".
 
-Como não há dados específicos da pesquisa, crie uma matéria informativa e educativa sobre o tema, usando conhecimento geral. Seja abrangente e detalhado.
+${styleInstructions[style] || styleInstructions.globo}
 
-INSTRUÇÕES:
-- Escreva NO MÍNIMO 8-10 parágrafos completos
-- Aborde o tema de forma ampla e informativa
-- Inclua contexto, explicações e informações relevantes
-- Use linguagem jornalística profissional
-- Se for um tema de notícia, use estrutura de matéria factual
-- Se for um tema geral, faça uma matéria explicativa/informativa
+IMPORTANTE: Como não há dados de pesquisa, crie uma matéria INFORMATIVA sobre o tema.
+- Use conhecimento geral, sem inventar fatos específicos
+- Se precisar de dados específicos, use [a confirmar] ou termos genéricos
+- Mínimo 6 parágrafos informativos
 
-ESTRUTURA:
-1. LIDE: Introdução impactante ao tema
-2. DESENVOLVIMENTO: Explicação detalhada (3-4 parágrafos)
-3. CONTEXTO: Background e informações complementares (2-3 parágrafos)
-4. ANÁLISE: Importância, impactos ou relevância do tema (2 parágrafos)
-5. CONCLUSÃO: Fechamento ou perspectivas
-
-IMPORTANTE:
-- NÃO invente nomes de pessoas específicas, datas exatas ou números fictícios
-- Use termos genéricos quando necessário: "autoridades", "especialistas afirmam", "segundo fontes"
-- Seja informativo e útil ao leitor
-
-Retorne EXATAMENTE neste formato JSON:
-{
-  "title": "título informativo e chamativo sobre ${keyword}",
-  "subtitle": "subtítulo que complementa e explica o tema",
-  "content": "conteúdo EXTENSO em HTML com múltiplos <p>, mínimo 8 parágrafos bem desenvolvidos"
-}`; 
+Retorne em JSON:
+{"title": "título", "subtitle": "subtítulo", "content": "HTML com <p> para parágrafos"}`;
       }
 
-
-      const response = await this.callTogetherAI(prompt, settings);
+      const response = await this.callTogetherAI(prompt, settings, style);
       
-      // Tentar extrair JSON da resposta
       let result;
       try {
-        // Remover possíveis marcadores de código
         const cleanResponse = response.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
         result = JSON.parse(cleanResponse);
       } catch (e) {
-        // Se não for JSON válido, tentar extrair manualmente
         const titleMatch = response.match(/"title":\s*"([^"]+)"/);
         const subtitleMatch = response.match(/"subtitle":\s*"([^"]+)"/);
         const contentMatch = response.match(/"content":\s*"([\s\S]+?)"\s*}/);
-        
         result = {
           title: titleMatch ? titleMatch[1] : keyword,
           subtitle: subtitleMatch ? subtitleMatch[1] : '',
@@ -334,131 +338,112 @@ Retorne EXATAMENTE neste formato JSON:
     }
   }
 
-  // Melhorar/corrigir título
+  // Melhorar título
   async improveTitle(req, res) {
     try {
       const settings = await this.getAISettings();
-      
       if (settings.ai_enabled !== 'true' && settings.ai_enabled !== '1') {
-        return res.status(400).json({ success: false, message: 'Assistente de IA está desativado.' });
+        return res.status(400).json({ success: false, message: 'IA desativada.' });
       }
 
-      const { title } = req.body;
+      const { title, style = 'globo' } = req.body;
       if (!title) {
         return res.status(400).json({ success: false, message: 'Título é obrigatório.' });
       }
 
-      const prompt = `Reescreva este título no estilo do portal Metrópoles.
+      const styleGuides = {
+        globo: 'Estilo G1: direto, informativo, responde "quem fez o quê", sem trocadilhos, máximo 12 palavras',
+        metropoles_politica: 'Estilo Metrópoles: destaca conflito/urgência, pode usar vírgula para contexto, tom de bastidor',
+        metropoles_policial: 'Estilo Policial: chamativo, pode ter expressão popular, gancho narrativo'
+      };
 
-CARACTERÍSTICAS DO TÍTULO METRÓPOLES:
-- Direto e informativo, vai direto ao ponto
-- Usa verbos de ação no presente ou passado
-- Pode usar vírgula para adicionar contexto (ex: "Ministro nega acusações, mas provas contradizem versão")
-- Evita clickbait exagerado, mas é chamativo
-- Menciona os envolvidos principais
-- Máximo 15 palavras
+      const prompt = `Reescreva este título de notícia.
+${styleGuides[style] || styleGuides.globo}
 
 Título original: "${title}"
 
-Responda APENAS com o novo título, sem aspas, sem explicações.`;
+Responda APENAS com o novo título, sem aspas, sem explicação.`;
 
-      const response = await this.callTogetherAI(prompt, settings);
+      const response = await this.callTogetherAI(prompt, settings, style);
       return res.json({ success: true, data: response.trim().replace(/^["']|["']$/g, '') });
     } catch (error) {
-      console.error('Erro ao melhorar título:', error);
       return res.status(500).json({ success: false, message: error.message });
     }
   }
 
-  // Melhorar/corrigir subtítulo
+  // Melhorar subtítulo
   async improveSubtitle(req, res) {
     try {
       const settings = await this.getAISettings();
-      
       if (settings.ai_enabled !== 'true' && settings.ai_enabled !== '1') {
-        return res.status(400).json({ success: false, message: 'Assistente de IA está desativado.' });
+        return res.status(400).json({ success: false, message: 'IA desativada.' });
       }
 
-      const { subtitle, title } = req.body;
+      const { subtitle, title, style = 'globo' } = req.body;
       if (!subtitle) {
         return res.status(400).json({ success: false, message: 'Subtítulo é obrigatório.' });
       }
 
-      const prompt = `Reescreva este subtítulo no estilo do portal Metrópoles.
-
-CARACTERÍSTICAS DO SUBTÍTULO METRÓPOLES:
-- Complementa o título com informações adicionais
-- Explica o "como" ou "por quê" da notícia
-- Uma ou duas frases curtas e diretas
-- Pode mencionar fontes ou órgãos envolvidos
-- Adiciona contexto que não coube no título
-
-${title ? `Título da matéria: "${title}"` : ''}
+      const prompt = `Reescreva este subtítulo de notícia para complementar o título.
+${title ? `Título: "${title}"` : ''}
 Subtítulo original: "${subtitle}"
 
-Responda APENAS com o novo subtítulo, sem aspas, sem explicações.`;
+Regras:
+- Adicione informação que não está no título
+- Uma ou duas frases curtas
+- Pode mencionar fonte, número ou contexto importante
 
-      const response = await this.callTogetherAI(prompt, settings);
+Responda APENAS com o novo subtítulo, sem aspas.`;
+
+      const response = await this.callTogetherAI(prompt, settings, style);
       return res.json({ success: true, data: response.trim().replace(/^["']|["']$/g, '') });
     } catch (error) {
-      console.error('Erro ao melhorar subtítulo:', error);
       return res.status(500).json({ success: false, message: error.message });
     }
   }
 
-  // Melhorar/corrigir conteúdo
+  // Melhorar conteúdo
   async improveContent(req, res) {
     try {
       const settings = await this.getAISettings();
-      
       if (settings.ai_enabled !== 'true' && settings.ai_enabled !== '1') {
-        return res.status(400).json({ success: false, message: 'Assistente de IA está desativado.' });
+        return res.status(400).json({ success: false, message: 'IA desativada.' });
       }
 
-      const { content, title } = req.body;
+      const { content, title, style = 'globo' } = req.body;
       if (!content) {
         return res.status(400).json({ success: false, message: 'Conteúdo é obrigatório.' });
       }
 
-      const prompt = `Reescreva este conteúdo no estilo jornalístico do portal Metrópoles.
+      const prompt = `Melhore este texto jornalístico.
+${title ? `Título: "${title}"` : ''}
 
-⚠️ REGRAS ABSOLUTAS - NÃO QUEBRE:
-1. USE APENAS as informações que estão no texto original
-2. NÃO INVENTE nomes, datas, números, citações ou fatos novos
-3. NÃO ADICIONE informações que não existem no original
-4. MANTENHA o mesmo tamanho aproximado do texto original
-5. Se faltar informação, NÃO preencha com invenções
+REGRAS ABSOLUTAS:
+1. Use APENAS as informações do texto original
+2. NÃO INVENTE nomes, datas, números ou fatos novos
+3. NÃO ADICIONE informações que não existem
+4. Mantenha tamanho similar ao original
 
-O QUE VOCÊ DEVE FAZER:
-- Corrigir erros de português (gramática, ortografia, concordância)
-- Melhorar a estrutura das frases para ficarem mais claras
-- Reorganizar parágrafos para melhor fluidez
-- Aplicar estilo jornalístico profissional
-- Usar linguagem direta e objetiva
-- Formatar citações corretamente entre aspas
+O QUE FAZER:
+- Corrigir português (gramática, ortografia)
+- Melhorar clareza e fluidez das frases
+- Aplicar estrutura jornalística (lide forte, parágrafos curtos)
+- Formatar citações entre aspas
+- Humanizar o texto
 
-ESTILO METRÓPOLES:
-- Lide forte no primeiro parágrafo (quem, o quê, quando, onde)
-- Parágrafos curtos e diretos (3-4 linhas)
-- Linguagem factual, sem opinião
-- Tom profissional e investigativo
-
-${title ? `Título da matéria: "${title}"` : ''}
-
-Conteúdo original para melhorar:
+Texto original:
 ${content}
 
-Responda APENAS com o conteúdo reescrito em HTML (usando <p> para parágrafos, <strong> para destaques importantes), sem explicações ou comentários.`;
+Responda APENAS com o texto melhorado em HTML (<p> para parágrafos), sem comentários.`;
 
-      const response = await this.callTogetherAI(prompt, settings);
+      const response = await this.callTogetherAI(prompt, settings, style);
       return res.json({ success: true, data: response.trim() });
     } catch (error) {
-      console.error('Erro ao melhorar conteúdo:', error);
       return res.status(500).json({ success: false, message: error.message });
     }
   }
 
-  // Verificar status da IA
+  // Status da IA
   async status(req, res) {
     try {
       const settings = await this.getAISettings();

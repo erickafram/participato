@@ -662,25 +662,39 @@
           <div class="card mb-3 fade-in ai-assistant-card" id="aiCard" style="display: none;">
             <div class="card-header ai-header">
               <i class="bi bi-robot"></i> Assistente IA
-              <span class="ai-badge-small">Beta</span>
+              <span class="ai-badge-small">Pro</span>
             </div>
             <div class="card-body">
               <div class="ai-generate-section">
-                <label class="form-label">Criar matéria por IA</label>
-                <input type="text" id="aiKeyword" class="form-control mb-2" placeholder="Digite a palavra-chave ou tema">
+                <label class="form-label">Tema da matéria</label>
+                <input type="text" id="aiKeyword" class="form-control mb-2" placeholder="Ex: Acidente na BR-153 em Gurupi" maxlength="150">
+                <small class="text-muted d-block mb-2" style="font-size: 0.7rem;">Máximo 150 caracteres</small>
+                
+                <label class="form-label">Estilo de escrita</label>
+                <select id="aiStyle" class="form-select mb-2">
+                  <option value="globo">Hard News (neutro, factual)</option>
+                  <option value="metropoles_politica">Política (bastidores, análise)</option>
+                  <option value="metropoles_policial">Policial (narrativo, crônica)</option>
+                </select>
+                
                 <div class="form-check mb-2">
-                  <input type="checkbox" class="form-check-input" id="aiSearchWeb">
+                  <input type="checkbox" class="form-check-input" id="aiSearchWeb" checked>
                   <label class="form-check-label" for="aiSearchWeb">
-                    <i class="bi bi-globe"></i> Pesquisar na internet
+                    <i class="bi bi-globe"></i> Pesquisar notícias na internet
                   </label>
                 </div>
+                
                 <button type="button" class="btn btn-ai w-100" onclick="generateArticle()">
                   <i class="bi bi-stars"></i> Gerar Matéria
                 </button>
+                
+                <small class="text-muted d-block mt-2 text-center">
+                  <i class="bi bi-shield-check"></i> Texto humanizado, sem plágio
+                </small>
               </div>
               <hr class="my-3">
               <div class="ai-actions">
-                <small class="text-muted d-block mb-2">Ou corrija campos individuais:</small>
+                <small class="text-muted d-block mb-2">Melhorar campos individuais:</small>
                 <div class="d-flex flex-wrap gap-2">
                   <button type="button" class="btn btn-outline-ai btn-sm" onclick="improveField('title')">
                     <i class="bi bi-type-h1"></i> Título
@@ -1516,13 +1530,21 @@
       }
 
       const searchWeb = document.getElementById('aiSearchWeb').checked;
-      showAILoading('Gerando matéria com IA...');
+      const style = document.getElementById('aiStyle').value;
+      
+      const styleNames = {
+        'globo': 'Globo/G1',
+        'metropoles_politica': 'Metrópoles Política',
+        'metropoles_policial': 'Metrópoles Policial'
+      };
+      
+      showAILoading(`Gerando matéria estilo ${styleNames[style]}...`);
 
       try {
         const response = await fetch('/admin/ai/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ keyword, searchWeb })
+          body: JSON.stringify({ keyword, searchWeb, style })
         });
         const data = await response.json();
 
