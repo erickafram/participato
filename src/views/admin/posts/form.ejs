@@ -1532,13 +1532,7 @@
       const searchWeb = document.getElementById('aiSearchWeb').checked;
       const style = document.getElementById('aiStyle').value;
       
-      const styleNames = {
-        'globo': 'Globo/G1',
-        'metropoles_politica': 'Metrópoles Política',
-        'metropoles_policial': 'Metrópoles Policial'
-      };
-      
-      showAILoading(`Gerando matéria estilo ${styleNames[style]}...`);
+showAILoading('Gerando matéria, aguarde...');
 
       try {
         const response = await fetch('/admin/ai/generate', {
@@ -1616,6 +1610,206 @@
         hideAILoading();
       }
     }
+
+    // ========================================
+    // AUTO-SAVE LOCAL (Proteção contra queda)
+    // ========================================
+    const AUTO_SAVE_KEY = 'post_autosave_<%= isEdit && post ? post.id : "new" %>';
+    const AUTO_SAVE_INTERVAL = 5000; // Salva a cada 5 segundos
+    let autoSaveTimer = null;
+    let lastSavedData = '';
+
+    // Coletar dados do formulário
+    function collectFormData() {
+      return {
+        title: document.getElementById('titleInput')?.value || '',
+        subtitle: document.getElementById('subtitleInput')?.value || '',
+        content: editorInstance ? editorInstance.getData() : '',
+        category_id: document.querySelector('select[name="category_id"]')?.value || '',
+        status: document.querySelector('input[name="status"]:checked')?.value || 'draft',
+        slug: document.querySelector('input[name="slug"]')?.value || '',
+        meta_title: document.querySelector('input[name="meta_title"]')?.value || '',
+        meta_description: document.querySelector('textarea[name="meta_description"]')?.value || '',
+        embed_code: document.querySelector('textarea[name="embed_code"]')?.value || '',
+        savedAt: new Date().toISOString()
+      };
+    }
+
+    // Salvar no localStorage
+    function autoSaveToLocal() {
+      try {
+        const data = collectFormData();
+        const dataStr = JSON.stringify(data);
+        
+        // Só salva se houver mudanças
+        if (dataStr !== lastSavedData && (data.title || data.content)) {
+          localStorage.setItem(AUTO_SAVE_KEY, dataStr);
+          lastSavedData = dataStr;
+          showAutoSaveIndicator('Rascunho salvo localmente');
+        }
+      } catch (e) {
+        console.warn('Erro ao salvar rascunho local:', e);
+      }
+    }
+
+    // Restaurar do localStorage
+    function restoreFromLocal() {
+      try {
+        const saved = localStorage.getItem(AUTO_SAVE_KEY);
+        if (!saved) return false;
+        
+        const data = JSON.parse(saved);
+        const savedDate = new Date(data.savedAt);
+        const timeAgo = getTimeAgo(savedDate);
+        
+        // Verifica se há conteúdo salvo
+        if (!data.title && !data.content) {
+          localStorage.removeItem(AUTO_SAVE_KEY);
+          return false;
+        }
+
+        // Pergunta se quer restaurar
+        const restore = confirm(
+          `📝 Rascunho encontrado!\n\n` +
+          `Título: "${data.title || '(sem título)'}"\n` +
+          `Salvo: ${timeAgo}\n\n` +
+          `Deseja restaurar este rascunho?`
+        );
+
+        if (restore) {
+          if (data.title) document.getElementById('titleInput').value = data.title;
+          if (data.subtitle) document.getElementById('subtitleInput').value = data.subtitle;
+          if (data.content && editorInstance) {
+            setTimeout(() => editorInstance.setData(data.content), 500);
+          }
+          if (data.category_id) {
+            const catSelect = document.querySelector('select[name="category_id"]');
+            if (catSelect) catSelect.value = data.category_id;
+          }
+          if (data.slug) {
+            const slugInput = document.querySelector('input[name="slug"]');
+            if (slugInput) slugInput.value = data.slug;
+          }
+          if (data.meta_title) {
+            const metaTitle = document.querySelector('input[name="meta_title"]');
+            if (metaTitle) metaTitle.value = data.meta_title;
+          }
+          if (data.meta_description) {
+            const metaDesc = document.querySelector('textarea[name="meta_description"]');
+            if (metaDesc) metaDesc.value = data.meta_description;
+          }
+          if (data.embed_code) {
+            const embed = document.querySelector('textarea[name="embed_code"]');
+            if (embed) embed.value = data.embed_code;
+          }
+          
+          showAutoSaveIndicator('Rascunho restaurado!', 'success');
+          return true;
+        } else {
+          // Se não restaurar, limpa o rascunho antigo
+          localStorage.removeItem(AUTO_SAVE_KEY);
+        }
+      } catch (e) {
+        console.warn('Erro ao restaurar rascunho:', e);
+      }
+      return false;
+    }
+
+    // Formatar tempo relativo
+    function getTimeAgo(date) {
+      const seconds = Math.floor((new Date() - date) / 1000);
+      if (seconds < 60) return 'agora mesmo';
+      if (seconds < 3600) return `há ${Math.floor(seconds / 60)} minutos`;
+      if (seconds < 86400) return `há ${Math.floor(seconds / 3600)} horas`;
+      return `há ${Math.floor(seconds / 86400)} dias`;
+    }
+
+    // Indicador visual de auto-save
+    function showAutoSaveIndicator(message, type = 'info') {
+      let indicator = document.getElementById('autoSaveIndicator');
+      if (!indicator) {
+        indicator = document.createElement('div');
+        indicator.id = 'autoSaveIndicator';
+        indicator.style.cssText = `
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          padding: 10px 16px;
+          border-radius: 8px;
+          font-size: 0.85rem;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          z-index: 9999;
+          transition: all 0.3s ease;
+          opacity: 0;
+          transform: translateY(10px);
+        `;
+        document.body.appendChild(indicator);
+      }
+      
+      indicator.style.background = type === 'success' ? '#10b981' : '#6366f1';
+      indicator.style.color = 'white';
+      indicator.innerHTML = `<i class="bi bi-${type === 'success' ? 'check-circle' : 'cloud-check'}"></i> ${message}`;
+      
+      // Animar entrada
+      setTimeout(() => {
+        indicator.style.opacity = '1';
+        indicator.style.transform = 'translateY(0)';
+      }, 10);
+      
+      // Esconder após 2 segundos
+      setTimeout(() => {
+        indicator.style.opacity = '0';
+        indicator.style.transform = 'translateY(10px)';
+      }, 2000);
+    }
+
+    // Limpar rascunho após salvar com sucesso
+    function clearAutoSave() {
+      localStorage.removeItem(AUTO_SAVE_KEY);
+    }
+
+    // Iniciar auto-save
+    function startAutoSave() {
+      // Salvar periodicamente
+      autoSaveTimer = setInterval(autoSaveToLocal, AUTO_SAVE_INTERVAL);
+      
+      // Salvar ao sair da página
+      window.addEventListener('beforeunload', (e) => {
+        autoSaveToLocal();
+      });
+      
+      // Salvar quando perder conexão
+      window.addEventListener('offline', () => {
+        autoSaveToLocal();
+        showAutoSaveIndicator('Sem internet - rascunho salvo!', 'info');
+      });
+      
+      // Notificar quando voltar online
+      window.addEventListener('online', () => {
+        showAutoSaveIndicator('Conexão restaurada!', 'success');
+      });
+    }
+
+    // Limpar ao submeter formulário com sucesso
+    document.getElementById('postForm').addEventListener('submit', function() {
+      clearAutoSave();
+    });
+
+    // Inicializar auto-save após carregar
+    <% if (!isEdit) { %>
+    // Só restaura em posts novos (não em edição)
+    setTimeout(() => {
+      if (!restoreFromLocal()) {
+        startAutoSave();
+      } else {
+        startAutoSave();
+      }
+    }, 1000);
+    <% } else { %>
+    startAutoSave();
+    <% } %>
   </script>
 </body>
 </html>
