@@ -4,7 +4,7 @@ git commit -m "Fix: Corrigir middleware legacyRedirect para não bloquear URLs A
 git push -u origin main
 
 
-Servidor de Produção Portal convictos
+#Servidor de Produção Portal convictos
 cd /home/portalconvictos/htdocs/portalconvictos.com.br/portalconvictos
 git pull origin main
 npx sequelize-cli db:migrate
@@ -12,9 +12,9 @@ npx sequelize-cli db:seed:all
 pm2 restart portalconvictos
 
 
-Servidor de Produção Participa TO
-cd home/participato/htdocs/participato.com.br/participato
+#Servidor de Produção Participa TO
+cd /home/participato/htdocs/participato.com.br/participato
 git pull origin main
 npx sequelize-cli db:migrate
 npx sequelize-cli db:seed:all
-pm2 restart portalconvictos
+pm2 restart participato
