@@ -52,8 +52,18 @@ class SettingController {
       for (const [key, value] of Object.entries(settings)) {
         if (key.startsWith('_')) continue; // Ignorar campos especiais
 
+        // Converter array/objeto para string se necessário
+        let finalValue = value;
+        if (Array.isArray(value)) {
+          finalValue = value.join(',');
+        } else if (typeof value === 'object' && value !== null) {
+          finalValue = JSON.stringify(value);
+        } else {
+          finalValue = value || '';
+        }
+
         await Setting.update(
-          { value: value || '' },
+          { value: finalValue },
           { where: { key } }
         );
       }
