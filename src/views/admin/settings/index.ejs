@@ -97,6 +97,320 @@
         </div>
       </div>
       
+      <!-- Paleta de Cores -->
+      <div class="settings-card colors-card">
+        <div class="card-header">
+          <i class="bi bi-palette"></i>
+          <span>Paleta de Cores</span>
+          <button type="button" class="btn-reset-colors" onclick="resetColors()">
+            <i class="bi bi-arrow-counterclockwise"></i> Resetar
+          </button>
+        </div>
+        <div class="card-body">
+          <p class="colors-description">Personalize as cores do seu portal. As alterações serão aplicadas em todo o site.</p>
+          
+          <!-- Cores Principais -->
+          <div class="color-section">
+            <h4><i class="bi bi-star"></i> Cores Principais</h4>
+            <div class="color-grid">
+              <div class="color-item">
+                <label>Cor Principal</label>
+                <div class="color-input-wrapper">
+                  <input type="color" name="color_primary" value="${groupedSettings.colors?.find(s => s.key === 'color_primary')?.value || '#3b82f6'}" class="color-picker">
+                  <input type="text" value="${groupedSettings.colors?.find(s => s.key === 'color_primary')?.value || '#3b82f6'}" class="color-text" data-for="color_primary">
+                </div>
+              </div>
+              <div class="color-item">
+                <label>Cor Principal (Hover)</label>
+                <div class="color-input-wrapper">
+                  <input type="color" name="color_primary_dark" value="${groupedSettings.colors?.find(s => s.key === 'color_primary_dark')?.value || '#2563eb'}" class="color-picker">
+                  <input type="text" value="${groupedSettings.colors?.find(s => s.key === 'color_primary_dark')?.value || '#2563eb'}" class="color-text" data-for="color_primary_dark">
+                </div>
+              </div>
+              <div class="color-item">
+                <label>Cor Secundária</label>
+                <div class="color-input-wrapper">
+                  <input type="color" name="color_secondary" value="${groupedSettings.colors?.find(s => s.key === 'color_secondary')?.value || '#0f172a'}" class="color-picker">
+                  <input type="text" value="${groupedSettings.colors?.find(s => s.key === 'color_secondary')?.value || '#0f172a'}" class="color-text" data-for="color_secondary">
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Header -->
+          <div class="color-section">
+            <h4><i class="bi bi-layout-text-window-reverse"></i> Cabeçalho</h4>
+            <div class="color-grid">
+              <div class="color-item">
+                <label>Fundo Barra Superior</label>
+                <div class="color-input-wrapper">
+                  <input type="color" name="color_topbar_bg" value="${groupedSettings.colors?.find(s => s.key === 'color_topbar_bg')?.value || '#0f172a'}" class="color-picker">
+                  <input type="text" value="${groupedSettings.colors?.find(s => s.key === 'color_topbar_bg')?.value || '#0f172a'}" class="color-text" data-for="color_topbar_bg">
+                </div>
+              </div>
+              <div class="color-item">
+                <label>Texto Barra Superior</label>
+                <div class="color-input-wrapper">
+                  <input type="color" name="color_topbar_text" value="${groupedSettings.colors?.find(s => s.key === 'color_topbar_text')?.value || '#ffffff'}" class="color-picker">
+                  <input type="text" value="${groupedSettings.colors?.find(s => s.key === 'color_topbar_text')?.value || '#ffffff'}" class="color-text" data-for="color_topbar_text">
+                </div>
+              </div>
+              <div class="color-item">
+                <label>Fundo do Header</label>
+                <div class="color-input-wrapper">
+                  <input type="color" name="color_header_bg" value="${groupedSettings.colors?.find(s => s.key === 'color_header_bg')?.value || '#ffffff'}" class="color-picker">
+                  <input type="text" value="${groupedSettings.colors?.find(s => s.key === 'color_header_bg')?.value || '#ffffff'}" class="color-text" data-for="color_header_bg">
+                </div>
+              </div>
+              <div class="color-item">
+                <label>Texto do Header</label>
+                <div class="color-input-wrapper">
+                  <input type="color" name="color_header_text" value="${groupedSettings.colors?.find(s => s.key === 'color_header_text')?.value || '#0f172a'}" class="color-picker">
+                  <input type="text" value="${groupedSettings.colors?.find(s => s.key === 'color_header_text')?.value || '#0f172a'}" class="color-text" data-for="color_header_text">
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Menu -->
+          <div class="color-section">
+            <h4><i class="bi bi-list"></i> Menu de Navegação</h4>
+            <div class="color-grid">
+              <div class="color-item">
+                <label>Fundo do Menu</label>
+                <div class="color-input-wrapper">
+                  <input type="color" name="color_menu_bg" value="${groupedSettings.colors?.find(s => s.key === 'color_menu_bg')?.value || '#ffffff'}" class="color-picker">
+                  <input type="text" value="${groupedSettings.colors?.find(s => s.key === 'color_menu_bg')?.value || '#ffffff'}" class="color-text" data-for="color_menu_bg">
+                </div>
+              </div>
+              <div class="color-item">
+                <label>Texto do Menu</label>
+                <div class="color-input-wrapper">
+                  <input type="color" name="color_menu_text" value="${groupedSettings.colors?.find(s => s.key === 'color_menu_text')?.value || '#0f172a'}" class="color-picker">
+                  <input type="text" value="${groupedSettings.colors?.find(s => s.key === 'color_menu_text')?.value || '#0f172a'}" class="color-text" data-for="color_menu_text">
+                </div>
+              </div>
+              <div class="color-item">
+                <label>Menu Hover/Ativo</label>
+                <div class="color-input-wrapper">
+                  <input type="color" name="color_menu_hover" value="${groupedSettings.colors?.find(s => s.key === 'color_menu_hover')?.value || '#3b82f6'}" class="color-picker">
+                  <input type="text" value="${groupedSettings.colors?.find(s => s.key === 'color_menu_hover')?.value || '#3b82f6'}" class="color-text" data-for="color_menu_hover">
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Corpo -->
+          <div class="color-section">
+            <h4><i class="bi bi-file-earmark"></i> Corpo do Site</h4>
+            <div class="color-grid">
+              <div class="color-item">
+                <label>Fundo do Site</label>
+                <div class="color-input-wrapper">
+                  <input type="color" name="color_body_bg" value="${groupedSettings.colors?.find(s => s.key === 'color_body_bg')?.value || '#f8fafc'}" class="color-picker">
+                  <input type="text" value="${groupedSettings.colors?.find(s => s.key === 'color_body_bg')?.value || '#f8fafc'}" class="color-text" data-for="color_body_bg">
+                </div>
+              </div>
+              <div class="color-item">
+                <label>Fundo dos Cards</label>
+                <div class="color-input-wrapper">
+                  <input type="color" name="color_card_bg" value="${groupedSettings.colors?.find(s => s.key === 'color_card_bg')?.value || '#ffffff'}" class="color-picker">
+                  <input type="text" value="${groupedSettings.colors?.find(s => s.key === 'color_card_bg')?.value || '#ffffff'}" class="color-text" data-for="color_card_bg">
+                </div>
+              </div>
+              <div class="color-item">
+                <label>Texto Principal</label>
+                <div class="color-input-wrapper">
+                  <input type="color" name="color_text" value="${groupedSettings.colors?.find(s => s.key === 'color_text')?.value || '#0f172a'}" class="color-picker">
+                  <input type="text" value="${groupedSettings.colors?.find(s => s.key === 'color_text')?.value || '#0f172a'}" class="color-text" data-for="color_text">
+                </div>
+              </div>
+              <div class="color-item">
+                <label>Texto Secundário</label>
+                <div class="color-input-wrapper">
+                  <input type="color" name="color_text_muted" value="${groupedSettings.colors?.find(s => s.key === 'color_text_muted')?.value || '#64748b'}" class="color-picker">
+                  <input type="text" value="${groupedSettings.colors?.find(s => s.key === 'color_text_muted')?.value || '#64748b'}" class="color-text" data-for="color_text_muted">
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Rodapé -->
+          <div class="color-section">
+            <h4><i class="bi bi-layout-text-sidebar-reverse"></i> Rodapé</h4>
+            <div class="color-grid">
+              <div class="color-item">
+                <label>Fundo do Rodapé</label>
+                <div class="color-input-wrapper">
+                  <input type="color" name="color_footer_bg" value="${groupedSettings.colors?.find(s => s.key === 'color_footer_bg')?.value || '#0f172a'}" class="color-picker">
+                  <input type="text" value="${groupedSettings.colors?.find(s => s.key === 'color_footer_bg')?.value || '#0f172a'}" class="color-text" data-for="color_footer_bg">
+                </div>
+              </div>
+              <div class="color-item">
+                <label>Texto do Rodapé</label>
+                <div class="color-input-wrapper">
+                  <input type="color" name="color_footer_text" value="${groupedSettings.colors?.find(s => s.key === 'color_footer_text')?.value || '#94a3b8'}" class="color-picker">
+                  <input type="text" value="${groupedSettings.colors?.find(s => s.key === 'color_footer_text')?.value || '#94a3b8'}" class="color-text" data-for="color_footer_text">
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Paletas Prontas -->
+          <div class="color-section">
+            <h4><i class="bi bi-collection"></i> Paletas Prontas</h4>
+            <p class="palette-hint">Clique em uma paleta para aplicar as cores automaticamente</p>
+            <div class="preset-palettes">
+              <!-- Fundo Branco -->
+              <div class="palette-card" onclick="applyPalette('blue_white')">
+                <div class="palette-colors">
+                  <span style="background: #3b82f6" title="#3b82f6"></span>
+                  <span style="background: #1e40af" title="#1e40af"></span>
+                  <span style="background: #ffffff" title="#ffffff"></span>
+                </div>
+                <div class="palette-info">
+                  <strong>Azul Clássico</strong>
+                  <small>#3b82f6 • Fundo Branco</small>
+                </div>
+              </div>
+              
+              <div class="palette-card" onclick="applyPalette('green_white')">
+                <div class="palette-colors">
+                  <span style="background: #10b981" title="#10b981"></span>
+                  <span style="background: #047857" title="#047857"></span>
+                  <span style="background: #ffffff" title="#ffffff"></span>
+                </div>
+                <div class="palette-info">
+                  <strong>Verde Natureza</strong>
+                  <small>#10b981 • Fundo Branco</small>
+                </div>
+              </div>
+              
+              <div class="palette-card" onclick="applyPalette('orange_white')">
+                <div class="palette-colors">
+                  <span style="background: #f97316" title="#f97316"></span>
+                  <span style="background: #c2410c" title="#c2410c"></span>
+                  <span style="background: #ffffff" title="#ffffff"></span>
+                </div>
+                <div class="palette-info">
+                  <strong>Laranja Vibrante</strong>
+                  <small>#f97316 • Fundo Branco</small>
+                </div>
+              </div>
+              
+              <div class="palette-card" onclick="applyPalette('red_white')">
+                <div class="palette-colors">
+                  <span style="background: #ef4444" title="#ef4444"></span>
+                  <span style="background: #b91c1c" title="#b91c1c"></span>
+                  <span style="background: #ffffff" title="#ffffff"></span>
+                </div>
+                <div class="palette-info">
+                  <strong>Vermelho Intenso</strong>
+                  <small>#ef4444 • Fundo Branco</small>
+                </div>
+              </div>
+              
+              <div class="palette-card" onclick="applyPalette('purple_white')">
+                <div class="palette-colors">
+                  <span style="background: #8b5cf6" title="#8b5cf6"></span>
+                  <span style="background: #6d28d9" title="#6d28d9"></span>
+                  <span style="background: #ffffff" title="#ffffff"></span>
+                </div>
+                <div class="palette-info">
+                  <strong>Roxo Elegante</strong>
+                  <small>#8b5cf6 • Fundo Branco</small>
+                </div>
+              </div>
+              
+              <div class="palette-card" onclick="applyPalette('pink_white')">
+                <div class="palette-colors">
+                  <span style="background: #ec4899" title="#ec4899"></span>
+                  <span style="background: #be185d" title="#be185d"></span>
+                  <span style="background: #ffffff" title="#ffffff"></span>
+                </div>
+                <div class="palette-info">
+                  <strong>Rosa Moderno</strong>
+                  <small>#ec4899 • Fundo Branco</small>
+                </div>
+              </div>
+              
+              <div class="palette-card" onclick="applyPalette('cyan_white')">
+                <div class="palette-colors">
+                  <span style="background: #06b6d4" title="#06b6d4"></span>
+                  <span style="background: #0891b2" title="#0891b2"></span>
+                  <span style="background: #ffffff" title="#ffffff"></span>
+                </div>
+                <div class="palette-info">
+                  <strong>Ciano Fresh</strong>
+                  <small>#06b6d4 • Fundo Branco</small>
+                </div>
+              </div>
+              
+              <div class="palette-card" onclick="applyPalette('indigo_white')">
+                <div class="palette-colors">
+                  <span style="background: #6366f1" title="#6366f1"></span>
+                  <span style="background: #4338ca" title="#4338ca"></span>
+                  <span style="background: #ffffff" title="#ffffff"></span>
+                </div>
+                <div class="palette-info">
+                  <strong>Índigo Tech</strong>
+                  <small>#6366f1 • Fundo Branco</small>
+                </div>
+              </div>
+              
+              <!-- Fundo Escuro -->
+              <div class="palette-card dark" onclick="applyPalette('dark_blue')">
+                <div class="palette-colors">
+                  <span style="background: #60a5fa" title="#60a5fa"></span>
+                  <span style="background: #3b82f6" title="#3b82f6"></span>
+                  <span style="background: #0f172a" title="#0f172a"></span>
+                </div>
+                <div class="palette-info">
+                  <strong>Azul Noturno</strong>
+                  <small>#60a5fa • Fundo Escuro</small>
+                </div>
+              </div>
+              
+              <div class="palette-card dark" onclick="applyPalette('dark_green')">
+                <div class="palette-colors">
+                  <span style="background: #34d399" title="#34d399"></span>
+                  <span style="background: #10b981" title="#10b981"></span>
+                  <span style="background: #0f172a" title="#0f172a"></span>
+                </div>
+                <div class="palette-info">
+                  <strong>Verde Neon</strong>
+                  <small>#34d399 • Fundo Escuro</small>
+                </div>
+              </div>
+              
+              <div class="palette-card dark" onclick="applyPalette('dark_purple')">
+                <div class="palette-colors">
+                  <span style="background: #a78bfa" title="#a78bfa"></span>
+                  <span style="background: #8b5cf6" title="#8b5cf6"></span>
+                  <span style="background: #0f172a" title="#0f172a"></span>
+                </div>
+                <div class="palette-info">
+                  <strong>Roxo Cyber</strong>
+                  <small>#a78bfa • Fundo Escuro</small>
+                </div>
+              </div>
+              
+              <div class="palette-card dark" onclick="applyPalette('dark_red')">
+                <div class="palette-colors">
+                  <span style="background: #f87171" title="#f87171"></span>
+                  <span style="background: #ef4444" title="#ef4444"></span>
+                  <span style="background: #0f172a" title="#0f172a"></span>
+                </div>
+                <div class="palette-info">
+                  <strong>Vermelho Dark</strong>
+                  <small>#f87171 • Fundo Escuro</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
       <!-- Assistente de IA -->
       <div class="settings-card ai-card">
         <div class="card-header">
@@ -424,5 +738,346 @@
   outline: none;
   border-color: #6366f1;
 }
+
+/* Estilos da Paleta de Cores */
+.colors-card {
+  border: 1px solid #e0f2fe;
+  background: linear-gradient(135deg, #fafeff 0%, #f0f9ff 100%);
+}
+.colors-card .card-header {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  color: #fff;
+  border-bottom: none;
+}
+.colors-card .card-header i {
+  color: #fff;
+}
+.btn-reset-colors {
+  margin-left: auto;
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.btn-reset-colors:hover {
+  background: rgba(255,255,255,0.3);
+}
+.colors-description {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 20px;
+  padding: 12px;
+  background: #fff;
+  border-radius: 8px;
+  border-left: 3px solid #0ea5e9;
+}
+.color-section {
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+.color-section:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+.color-section h4 {
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.color-section h4 i {
+  color: #0ea5e9;
+}
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 14px;
+}
+.color-item {
+  background: #fff;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+}
+.color-item label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+.color-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.color-picker {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  overflow: hidden;
+}
+.color-picker::-webkit-color-swatch-wrapper {
+  padding: 2px;
+}
+.color-picker::-webkit-color-swatch {
+  border: none;
+  border-radius: 4px;
+}
+.color-text {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: monospace;
+  text-transform: uppercase;
+}
+.color-text:focus {
+  outline: none;
+  border-color: #0ea5e9;
+}
+
+/* Paletas Prontas */
+.palette-hint {
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 14px;
+}
+.preset-palettes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+.palette-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #fff;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.palette-card:hover {
+  border-color: #0ea5e9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.palette-card.dark {
+  background: #1e293b;
+  border-color: #334155;
+}
+.palette-card.dark:hover {
+  border-color: #60a5fa;
+}
+.palette-card.dark .palette-info strong {
+  color: #f1f5f9;
+}
+.palette-card.dark .palette-info small {
+  color: #94a3b8;
+}
+.palette-colors {
+  display: flex;
+  gap: 3px;
+}
+.palette-colors span {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+.palette-info {
+  flex: 1;
+  min-width: 0;
+}
+.palette-info strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 2px;
+}
+.palette-info small {
+  font-size: 10px;
+  color: #64748b;
+  font-family: monospace;
+}
 </style>
+
+<script>
+// Sincronizar color picker com input de texto
+document.querySelectorAll('.color-picker').forEach(picker => {
+  picker.addEventListener('input', function() {
+    const textInput = this.parentElement.querySelector('.color-text');
+    if (textInput) textInput.value = this.value.toUpperCase();
+  });
+});
+
+document.querySelectorAll('.color-text').forEach(input => {
+  input.addEventListener('input', function() {
+    const picker = this.parentElement.querySelector('.color-picker');
+    if (picker && /^#[0-9A-Fa-f]{6}$/.test(this.value)) {
+      picker.value = this.value;
+    }
+  });
+});
+
+// Paletas prontas
+const palettes = {
+  // Fundo Branco
+  blue_white: {
+    color_primary: '#3b82f6', color_primary_dark: '#1e40af', color_secondary: '#0f172a',
+    color_topbar_bg: '#1e40af', color_topbar_text: '#ffffff',
+    color_header_bg: '#ffffff', color_header_text: '#0f172a',
+    color_menu_bg: '#ffffff', color_menu_text: '#0f172a', color_menu_hover: '#3b82f6',
+    color_body_bg: '#ffffff', color_card_bg: '#ffffff',
+    color_text: '#0f172a', color_text_muted: '#64748b',
+    color_footer_bg: '#0f172a', color_footer_text: '#94a3b8'
+  },
+  green_white: {
+    color_primary: '#10b981', color_primary_dark: '#047857', color_secondary: '#064e3b',
+    color_topbar_bg: '#047857', color_topbar_text: '#ffffff',
+    color_header_bg: '#ffffff', color_header_text: '#064e3b',
+    color_menu_bg: '#ffffff', color_menu_text: '#064e3b', color_menu_hover: '#10b981',
+    color_body_bg: '#ffffff', color_card_bg: '#ffffff',
+    color_text: '#064e3b', color_text_muted: '#6b7280',
+    color_footer_bg: '#064e3b', color_footer_text: '#a7f3d0'
+  },
+  orange_white: {
+    color_primary: '#f97316', color_primary_dark: '#c2410c', color_secondary: '#1c1917',
+    color_topbar_bg: '#c2410c', color_topbar_text: '#ffffff',
+    color_header_bg: '#ffffff', color_header_text: '#1c1917',
+    color_menu_bg: '#ffffff', color_menu_text: '#1c1917', color_menu_hover: '#f97316',
+    color_body_bg: '#ffffff', color_card_bg: '#ffffff',
+    color_text: '#1c1917', color_text_muted: '#78716c',
+    color_footer_bg: '#1c1917', color_footer_text: '#a8a29e'
+  },
+  red_white: {
+    color_primary: '#ef4444', color_primary_dark: '#b91c1c', color_secondary: '#1f2937',
+    color_topbar_bg: '#b91c1c', color_topbar_text: '#ffffff',
+    color_header_bg: '#ffffff', color_header_text: '#1f2937',
+    color_menu_bg: '#ffffff', color_menu_text: '#1f2937', color_menu_hover: '#ef4444',
+    color_body_bg: '#ffffff', color_card_bg: '#ffffff',
+    color_text: '#1f2937', color_text_muted: '#6b7280',
+    color_footer_bg: '#1f2937', color_footer_text: '#9ca3af'
+  },
+  purple_white: {
+    color_primary: '#8b5cf6', color_primary_dark: '#6d28d9', color_secondary: '#1e1b4b',
+    color_topbar_bg: '#6d28d9', color_topbar_text: '#ffffff',
+    color_header_bg: '#ffffff', color_header_text: '#1e1b4b',
+    color_menu_bg: '#ffffff', color_menu_text: '#1e1b4b', color_menu_hover: '#8b5cf6',
+    color_body_bg: '#ffffff', color_card_bg: '#ffffff',
+    color_text: '#1e1b4b', color_text_muted: '#6b7280',
+    color_footer_bg: '#1e1b4b', color_footer_text: '#c4b5fd'
+  },
+  pink_white: {
+    color_primary: '#ec4899', color_primary_dark: '#be185d', color_secondary: '#1f2937',
+    color_topbar_bg: '#be185d', color_topbar_text: '#ffffff',
+    color_header_bg: '#ffffff', color_header_text: '#1f2937',
+    color_menu_bg: '#ffffff', color_menu_text: '#1f2937', color_menu_hover: '#ec4899',
+    color_body_bg: '#ffffff', color_card_bg: '#ffffff',
+    color_text: '#1f2937', color_text_muted: '#6b7280',
+    color_footer_bg: '#1f2937', color_footer_text: '#f9a8d4'
+  },
+  cyan_white: {
+    color_primary: '#06b6d4', color_primary_dark: '#0891b2', color_secondary: '#164e63',
+    color_topbar_bg: '#0891b2', color_topbar_text: '#ffffff',
+    color_header_bg: '#ffffff', color_header_text: '#164e63',
+    color_menu_bg: '#ffffff', color_menu_text: '#164e63', color_menu_hover: '#06b6d4',
+    color_body_bg: '#ffffff', color_card_bg: '#ffffff',
+    color_text: '#164e63', color_text_muted: '#6b7280',
+    color_footer_bg: '#164e63', color_footer_text: '#67e8f9'
+  },
+  indigo_white: {
+    color_primary: '#6366f1', color_primary_dark: '#4338ca', color_secondary: '#1e1b4b',
+    color_topbar_bg: '#4338ca', color_topbar_text: '#ffffff',
+    color_header_bg: '#ffffff', color_header_text: '#1e1b4b',
+    color_menu_bg: '#ffffff', color_menu_text: '#1e1b4b', color_menu_hover: '#6366f1',
+    color_body_bg: '#ffffff', color_card_bg: '#ffffff',
+    color_text: '#1e1b4b', color_text_muted: '#6b7280',
+    color_footer_bg: '#1e1b4b', color_footer_text: '#a5b4fc'
+  },
+  // Fundo Escuro
+  dark_blue: {
+    color_primary: '#60a5fa', color_primary_dark: '#3b82f6', color_secondary: '#f8fafc',
+    color_topbar_bg: '#030712', color_topbar_text: '#e5e7eb',
+    color_header_bg: '#111827', color_header_text: '#f9fafb',
+    color_menu_bg: '#111827', color_menu_text: '#e5e7eb', color_menu_hover: '#60a5fa',
+    color_body_bg: '#0f172a', color_card_bg: '#1e293b',
+    color_text: '#f9fafb', color_text_muted: '#9ca3af',
+    color_footer_bg: '#030712', color_footer_text: '#6b7280'
+  },
+  dark_green: {
+    color_primary: '#34d399', color_primary_dark: '#10b981', color_secondary: '#f8fafc',
+    color_topbar_bg: '#030712', color_topbar_text: '#e5e7eb',
+    color_header_bg: '#111827', color_header_text: '#f9fafb',
+    color_menu_bg: '#111827', color_menu_text: '#e5e7eb', color_menu_hover: '#34d399',
+    color_body_bg: '#0f172a', color_card_bg: '#1e293b',
+    color_text: '#f9fafb', color_text_muted: '#9ca3af',
+    color_footer_bg: '#030712', color_footer_text: '#6b7280'
+  },
+  dark_purple: {
+    color_primary: '#a78bfa', color_primary_dark: '#8b5cf6', color_secondary: '#f8fafc',
+    color_topbar_bg: '#030712', color_topbar_text: '#e5e7eb',
+    color_header_bg: '#111827', color_header_text: '#f9fafb',
+    color_menu_bg: '#111827', color_menu_text: '#e5e7eb', color_menu_hover: '#a78bfa',
+    color_body_bg: '#0f172a', color_card_bg: '#1e293b',
+    color_text: '#f9fafb', color_text_muted: '#9ca3af',
+    color_footer_bg: '#030712', color_footer_text: '#6b7280'
+  },
+  dark_red: {
+    color_primary: '#f87171', color_primary_dark: '#ef4444', color_secondary: '#f8fafc',
+    color_topbar_bg: '#030712', color_topbar_text: '#e5e7eb',
+    color_header_bg: '#111827', color_header_text: '#f9fafb',
+    color_menu_bg: '#111827', color_menu_text: '#e5e7eb', color_menu_hover: '#f87171',
+    color_body_bg: '#0f172a', color_card_bg: '#1e293b',
+    color_text: '#f9fafb', color_text_muted: '#9ca3af',
+    color_footer_bg: '#030712', color_footer_text: '#6b7280'
+  },
+  // Padrão (para reset)
+  default: {
+    color_primary: '#3b82f6', color_primary_dark: '#2563eb', color_secondary: '#0f172a',
+    color_topbar_bg: '#0f172a', color_topbar_text: '#ffffff',
+    color_header_bg: '#ffffff', color_header_text: '#0f172a',
+    color_menu_bg: '#ffffff', color_menu_text: '#0f172a', color_menu_hover: '#3b82f6',
+    color_body_bg: '#f8fafc', color_card_bg: '#ffffff',
+    color_text: '#0f172a', color_text_muted: '#64748b',
+    color_footer_bg: '#0f172a', color_footer_text: '#94a3b8'
+  }
+};
+
+function applyPalette(name) {
+  const palette = palettes[name];
+  if (!palette) return;
+  
+  Object.keys(palette).forEach(key => {
+    const picker = document.querySelector('input[name="' + key + '"]');
+    const text = document.querySelector('.color-text[data-for="' + key + '"]');
+    if (picker) picker.value = palette[key];
+    if (text) text.value = palette[key].toUpperCase();
+  });
+}
+
+function resetColors() {
+  if (confirm('Deseja resetar todas as cores para o padrão?')) {
+    applyPalette('default');
+  }
+}
+</script>
 `}) %>

@@ -62,10 +62,26 @@ class SettingController {
           finalValue = value || '';
         }
 
-        await Setting.update(
-          { value: finalValue },
-          { where: { key } }
-        );
+        // Verificar se a configuração existe
+        const existing = await Setting.findOne({ where: { key } });
+        
+        if (existing) {
+          // Atualizar existente
+          await Setting.update(
+            { value: finalValue },
+            { where: { key } }
+          );
+        } else {
+          // Criar nova (para cores e outras configurações dinâmicas)
+          const group = key.startsWith('color_') ? 'colors' : 'general';
+          await Setting.create({
+            key,
+            value: finalValue,
+            type: key.startsWith('color_') ? 'color' : 'text',
+            group,
+            label: key
+          });
+        }
       }
 
       // Limpar cache de configurações

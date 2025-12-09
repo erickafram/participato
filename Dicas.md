@@ -14,3 +14,7 @@ pm2 restart portalconvictos
 
 Servidor de Produção Participa TO
 cd home/participato/htdocs/participato.com.br/participato
+git pull origin main
+npx sequelize-cli db:migrate
+npx sequelize-cli db:seed:all
+pm2 restart portalconvictos
