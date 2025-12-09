@@ -16,22 +16,26 @@ async function getBanners(positions) {
     // Converter para array se for string única
     const positionArray = Array.isArray(positions) ? positions : [positions];
     
+    // Buscar banners ativos nas posições solicitadas
     const banners = await Banner.findAll({
       where: {
         position: { [Op.in]: positionArray },
-        active: true,
-        [Op.or]: [
-          { start_date: null },
-          { start_date: { [Op.lte]: now } }
-        ]
+        active: true
       },
       order: [['position', 'ASC'], ['order', 'ASC']]
     });
 
-    // Filtrar por data de término (precisa ser feito em JS por causa do OR com null)
+    // Filtrar por datas de início e término
     const activeBanners = banners.filter(banner => {
-      if (!banner.end_date) return true;
-      return new Date(banner.end_date) >= now;
+      // Verificar data de início
+      if (banner.start_date && new Date(banner.start_date) > now) {
+        return false;
+      }
+      // Verificar data de término
+      if (banner.end_date && new Date(banner.end_date) < now) {
+        return false;
+      }
+      return true;
     });
 
     // Agrupar por posição
@@ -40,10 +44,12 @@ async function getBanners(positions) {
       grouped[pos] = activeBanners.filter(b => b.position === pos);
     }
 
-    // Incrementar views dos banners retornados
+    // Incrementar views dos banners retornados (em background, sem await)
     for (const banner of activeBanners) {
-      banner.views += 1;
-      await banner.save({ silent: true });
+      Banner.update(
+        { views: banner.views + 1 },
+        { where: { id: banner.id }, silent: true }
+      ).catch(() => {});
     }
 
     return grouped;

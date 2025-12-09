@@ -218,6 +218,24 @@ ${featuredPosts && featuredPosts.length > 0 ? `
   </div>
 </div>
 
+<!-- Banner Meio Home (após conteúdo principal) -->
+${banners && banners.home_middle && banners.home_middle.length > 0 ? `
+<div class="banner-area banner-middle">
+  <div class="container">
+    ${banners.home_middle.map(b => '<a href="' + (b.link || '#') + '" target="' + b.target + '" class="banner-link" data-banner-id="' + b.id + '"><img src="' + b.image + '" alt="' + (b.alt_text || b.title) + '" class="banner-img banner-' + b.size + '"></a>').join('')}
+  </div>
+</div>
+` : ''}
+
+<!-- Banner Rodapé Home -->
+${banners && banners.home_bottom && banners.home_bottom.length > 0 ? `
+<div class="banner-area banner-bottom">
+  <div class="container">
+    ${banners.home_bottom.map(b => '<a href="' + (b.link || '#') + '" target="' + b.target + '" class="banner-link" data-banner-id="' + b.id + '"><img src="' + b.image + '" alt="' + (b.alt_text || b.title) + '" class="banner-img banner-' + b.size + '"></a>').join('')}
+  </div>
+</div>
+` : ''}
+
 <style>
 /* ========================================
    HOME PAGE STYLES
