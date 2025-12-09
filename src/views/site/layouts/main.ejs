@@ -694,11 +694,12 @@
     }
     
     /* ========================================
-       BANNER STYLES - Responsivo
+       BANNER STYLES - Responsivo com limite
        ======================================== */
     .banner-area {
-      padding: 20px 0;
+      padding: 15px 0;
       text-align: center;
+      overflow: hidden;
     }
     
     .banner-area.banner-top {
@@ -707,7 +708,7 @@
     }
     
     .banner-area.banner-content {
-      margin: 24px 0;
+      margin: 20px 0;
       padding: 0;
     }
     
@@ -721,22 +722,34 @@
       opacity: 0.9;
     }
     
-    /* Banner Images - SEMPRE responsivos */
+    /* Banner Images - LIMITE MÁXIMO DE TAMANHO */
     .banner-img {
-      max-width: 100% !important;
+      max-width: 728px !important; /* Limite máximo padrão */
+      max-height: 250px !important; /* Altura máxima */
       width: auto;
-      height: auto !important;
+      height: auto;
       display: block;
       margin: 0 auto;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      object-fit: contain;
     }
     
-    /* Sidebar banners */
+    /* Garantir que não ultrapasse o container */
+    .banner-area .container {
+      max-width: 100%;
+    }
+    
+    .banner-area .banner-img {
+      max-width: min(728px, 100%) !important;
+    }
+    
+    /* Sidebar banners - menores */
     .banner-sidebar .banner-img,
     .banner-widget .banner-img {
-      width: 100% !important;
-      max-width: 300px;
+      max-width: 300px !important;
+      max-height: 600px !important;
+      width: 100%;
       margin: 0 auto 16px;
     }
     
@@ -745,33 +758,33 @@
       margin-bottom: 0;
     }
     
-    /* Tamanhos específicos com limite máximo */
-    .banner-728x90 { max-width: 728px; }
-    .banner-970x90 { max-width: 970px; }
-    .banner-970x250 { max-width: 970px; }
-    .banner-300x250 { max-width: 300px; }
-    .banner-336x280 { max-width: 336px; }
-    .banner-300x600 { max-width: 300px; }
-    .banner-160x600 { max-width: 160px; }
-    .banner-320x100 { max-width: 320px; }
-    .banner-300x50 { max-width: 300px; }
-    .banner-responsive { max-width: 100%; }
+    /* Tamanhos específicos - todos com limite */
+    .banner-728x90 { max-width: 728px !important; max-height: 90px !important; }
+    .banner-970x90 { max-width: 728px !important; max-height: 90px !important; }
+    .banner-970x250 { max-width: 728px !important; max-height: 250px !important; }
+    .banner-300x250 { max-width: 300px !important; max-height: 250px !important; }
+    .banner-336x280 { max-width: 336px !important; max-height: 280px !important; }
+    .banner-300x600 { max-width: 300px !important; max-height: 600px !important; }
+    .banner-160x600 { max-width: 160px !important; max-height: 600px !important; }
+    .banner-320x100 { max-width: 320px !important; max-height: 100px !important; }
+    .banner-300x50 { max-width: 300px !important; max-height: 50px !important; }
+    .banner-responsive { max-width: 728px !important; max-height: 300px !important; }
     
-    /* Mobile adjustments */
+    /* Mobile - ainda menor */
     @media (max-width: 768px) {
       .banner-area {
-        padding: 15px 0;
+        padding: 10px 0;
       }
       
       .banner-img {
+        max-width: 100% !important;
+        max-height: 150px !important;
         border-radius: 6px;
       }
       
-      /* Esconder banners muito largos em mobile e mostrar versão adaptada */
-      .banner-728x90,
-      .banner-970x90,
-      .banner-970x250 {
-        max-width: 100%;
+      .banner-sidebar .banner-img,
+      .banner-widget .banner-img {
+        max-height: 250px !important;
       }
     }
     
