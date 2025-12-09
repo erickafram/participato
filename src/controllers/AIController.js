@@ -420,32 +420,35 @@ Responda APENAS com o novo subtítulo, sem aspas, sem explicações.`;
         return res.status(400).json({ success: false, message: 'Conteúdo é obrigatório.' });
       }
 
-      const prompt = `Reescreva e EXPANDA este conteúdo no estilo jornalístico do portal Metrópoles.
+      const prompt = `Reescreva este conteúdo no estilo jornalístico do portal Metrópoles.
 
-INSTRUÇÕES IMPORTANTES:
-1. MANTENHA todas as informações originais
-2. EXPANDA o conteúdo adicionando:
-   - Mais contexto e explicações
-   - Transições entre parágrafos
-   - Detalhes que enriqueçam a narrativa
-3. O resultado deve ter NO MÍNIMO o dobro de parágrafos do original
-4. Cada parágrafo deve ter 3-4 linhas completas
+⚠️ REGRAS ABSOLUTAS - NÃO QUEBRE:
+1. USE APENAS as informações que estão no texto original
+2. NÃO INVENTE nomes, datas, números, citações ou fatos novos
+3. NÃO ADICIONE informações que não existem no original
+4. MANTENHA o mesmo tamanho aproximado do texto original
+5. Se faltar informação, NÃO preencha com invenções
+
+O QUE VOCÊ DEVE FAZER:
+- Corrigir erros de português (gramática, ortografia, concordância)
+- Melhorar a estrutura das frases para ficarem mais claras
+- Reorganizar parágrafos para melhor fluidez
+- Aplicar estilo jornalístico profissional
+- Usar linguagem direta e objetiva
+- Formatar citações corretamente entre aspas
 
 ESTILO METRÓPOLES:
-- Lide forte no primeiro parágrafo
-- Parágrafos bem desenvolvidos
-- Linguagem direta e factual
-- Citações entre aspas
-- Tom investigativo
-- Corrija erros gramaticais
-- Estrutura: Lide > Desenvolvimento > Contexto > Desdobramentos
+- Lide forte no primeiro parágrafo (quem, o quê, quando, onde)
+- Parágrafos curtos e diretos (3-4 linhas)
+- Linguagem factual, sem opinião
+- Tom profissional e investigativo
 
 ${title ? `Título da matéria: "${title}"` : ''}
 
-Conteúdo original para expandir:
+Conteúdo original para melhorar:
 ${content}
 
-Responda APENAS com o conteúdo reescrito e EXPANDIDO em HTML (usando <p> para parágrafos, <strong> para destaques), sem explicações. O conteúdo deve ser significativamente maior que o original.`;
+Responda APENAS com o conteúdo reescrito em HTML (usando <p> para parágrafos, <strong> para destaques importantes), sem explicações ou comentários.`;
 
       const response = await this.callTogetherAI(prompt, settings);
       return res.json({ success: true, data: response.trim() });

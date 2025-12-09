@@ -100,7 +100,8 @@ class PostController {
         featured,
         meta_title,
         meta_description,
-        scheduled_at
+        scheduled_at,
+        featured_image_url
       } = req.body;
 
       // Gerar slug se não fornecido
@@ -110,6 +111,14 @@ class PostController {
       const existingPost = await Post.findOne({ where: { slug: postSlug } });
       if (existingPost) {
         postSlug = `${postSlug}-${Date.now()}`;
+      }
+
+      // Determinar imagem destacada: upload tem prioridade, depois URL
+      let featuredImage = null;
+      if (req.processedFile) {
+        featuredImage = req.processedFile.url;
+      } else if (featured_image_url) {
+        featuredImage = featured_image_url;
       }
 
       const post = await Post.create({
@@ -126,7 +135,7 @@ class PostController {
         meta_title,
         meta_description,
         scheduled_at: scheduled_at || null,
-        featured_image: req.processedFile ? req.processedFile.url : null,
+        featured_image: featuredImage,
         author_id: req.session.user.id
       });
 
@@ -195,7 +204,8 @@ class PostController {
         featured,
         meta_title,
         meta_description,
-        scheduled_at
+        scheduled_at,
+        featured_image_url
       } = req.body;
 
       // Verificar slug único (se alterado)
@@ -224,9 +234,11 @@ class PostController {
       post.meta_description = meta_description;
       post.scheduled_at = scheduled_at || null;
 
-      // Atualizar imagem se enviada
+      // Atualizar imagem: upload tem prioridade, depois URL da galeria
       if (req.processedFile) {
         post.featured_image = req.processedFile.url;
+      } else if (featured_image_url) {
+        post.featured_image = featured_image_url;
       }
 
       await post.save();

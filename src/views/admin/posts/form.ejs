@@ -287,6 +287,234 @@
     .upload-zone:hover { border-color: var(--primary); background: rgba(99, 102, 241, 0.03); }
     .upload-zone.dragover { border-color: var(--primary); background: rgba(99, 102, 241, 0.08); }
     
+    /* Featured Image Card - Novo Layout */
+    .featured-image-card { overflow: hidden; }
+    .featured-image-card .card-body { background: #fafbfc; }
+    
+    /* Tabs estilizadas */
+    .featured-tabs {
+      display: flex;
+      background: #fff;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .featured-tab {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 12px 8px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .featured-tab i { font-size: 1.1rem; }
+    .featured-tab:hover { color: var(--primary); background: rgba(99, 102, 241, 0.03); }
+    .featured-tab.active { color: var(--primary); background: #fafbfc; }
+    .featured-tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--primary);
+    }
+    
+    /* Upload Area */
+    .featured-upload-area {
+      border: 2px dashed #d1d5db;
+      border-radius: 12px;
+      padding: 24px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: #fff;
+      min-height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .featured-upload-area:hover { border-color: var(--primary); background: rgba(99, 102, 241, 0.02); }
+    .featured-upload-area.dragover { border-color: var(--primary); background: rgba(99, 102, 241, 0.05); border-style: solid; }
+    .featured-upload-area.has-image { padding: 8px; border-style: solid; border-color: var(--border-color); }
+    
+    .upload-placeholder { text-align: center; }
+    .upload-icon-wrapper {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 12px;
+      background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .upload-icon-wrapper i { font-size: 1.5rem; color: var(--primary); }
+    .upload-placeholder .upload-text { font-size: 0.85rem; font-weight: 500; color: var(--text-primary); margin-bottom: 4px; }
+    .upload-placeholder .upload-formats { font-size: 0.75rem; color: var(--text-secondary); }
+    
+    /* Preview Container */
+    .featured-preview-container { position: relative; width: 100%; }
+    .featured-preview-container img { width: 100%; max-height: 180px; object-fit: cover; border-radius: 8px; }
+    .featured-preview-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .featured-preview-container:hover .featured-preview-overlay { opacity: 1; }
+    .featured-preview-overlay .btn-change,
+    .featured-preview-overlay .btn-remove {
+      padding: 8px 14px;
+      border-radius: 6px;
+      border: none;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-change { background: #fff; color: var(--text-primary); }
+    .btn-remove { background: #ef4444; color: #fff; }
+    
+    /* Gallery Grid */
+    .gallery-search {
+      position: relative;
+      margin-bottom: 12px;
+    }
+    .gallery-search i {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+    .gallery-search input {
+      width: 100%;
+      padding: 8px 12px 8px 32px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 0.85rem;
+    }
+    .gallery-search input:focus { outline: none; border-color: var(--primary); }
+    
+    .featured-gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      max-height: 180px;
+      overflow-y: auto;
+      padding: 2px;
+    }
+    .featured-gallery-grid .media-item {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .featured-gallery-grid .media-item:hover { border-color: var(--primary); transform: scale(1.03); }
+    .featured-gallery-grid .media-item.selected { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3); }
+    .featured-gallery-grid .media-item img { width: 100%; height: 100%; object-fit: cover; }
+    
+    .gallery-loading {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 30px;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    /* URL Input */
+    .url-input-group {
+      display: flex;
+      align-items: center;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .url-input-group i { padding: 0 12px; color: var(--text-secondary); }
+    .url-input-group input {
+      flex: 1;
+      border: none;
+      padding: 10px 0;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .url-input-group button {
+      padding: 10px 14px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .url-input-group button:hover { background: var(--primary-hover); }
+    
+    .url-preview { margin-top: 12px; }
+    .url-preview img { max-height: 120px; border-radius: 8px; }
+    
+    .url-hint {
+      margin-top: 10px;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    /* Selected Preview */
+    .featured-selected-preview {
+      padding: 12px;
+      background: #fff;
+      border-top: 1px solid var(--border-color);
+      text-align: center;
+    }
+    .selected-image-wrapper { position: relative; display: inline-block; }
+    .selected-image-wrapper img { max-height: 140px; border-radius: 8px; }
+    .selected-image-actions {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .btn-action-change, .btn-action-remove {
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      border: 1px solid var(--border-color);
+      background: #fff;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+    }
+    .btn-action-change:hover { border-color: var(--primary); color: var(--primary); }
+    .btn-action-remove:hover { border-color: #ef4444; color: #ef4444; background: #fef2f2; }
+    
     /* Quick actions */
     .quick-action { 
       display: flex; 
@@ -536,31 +764,106 @@
           </div>
  
          <!-- Imagem Destacada -->
-          <div class="card fade-in" style="animation-delay: 0.3s;">
+          <div class="card fade-in featured-image-card" style="animation-delay: 0.3s;">
             <div class="card-header">
               <i class="bi bi-image"></i> Imagem Destacada
               <span class="webp-badge ms-auto"><i class="bi bi-lightning-charge"></i> Auto WebP</span>
             </div>
-            <div class="card-body">
-              <div class="image-upload-area <%= post && post.featured_image ? 'has-image' : '' %>" 
-                   onclick="document.getElementById('imageInput').click()" id="uploadArea">
-                <% if (post && post.featured_image) { %>
-                  <div class="img-preview-container">
-                    <img src="<%= post.featured_image %>" alt="Preview" id="currentImage">
-                    <button type="button" class="remove-btn" onclick="event.stopPropagation(); removeImage();">
-                      <i class="bi bi-x"></i>
+            <div class="card-body p-0">
+              <!-- Tabs estilizadas -->
+              <div class="featured-tabs">
+                <button class="featured-tab active" type="button" onclick="switchFeaturedTab('upload')">
+                  <i class="bi bi-cloud-arrow-up"></i>
+                  <span>Upload</span>
+                </button>
+                <button class="featured-tab" type="button" onclick="switchFeaturedTab('gallery')">
+                  <i class="bi bi-images"></i>
+                  <span>Galeria</span>
+                </button>
+                <button class="featured-tab" type="button" onclick="switchFeaturedTab('url')">
+                  <i class="bi bi-link-45deg"></i>
+                  <span>URL</span>
+                </button>
+              </div>
+              
+              <div class="featured-tab-content p-3">
+                <!-- Tab Upload -->
+                <div class="featured-tab-pane active" id="featuredUploadTab">
+                  <div class="featured-upload-area <%= post && post.featured_image ? 'has-image' : '' %>" 
+                       onclick="document.getElementById('imageInput').click()" id="uploadArea">
+                    <% if (post && post.featured_image) { %>
+                      <div class="featured-preview-container">
+                        <img src="<%= post.featured_image %>" alt="Preview" id="currentImage">
+                        <div class="featured-preview-overlay">
+                          <button type="button" class="btn-change" onclick="event.stopPropagation();">
+                            <i class="bi bi-pencil"></i> Alterar
+                          </button>
+                          <button type="button" class="btn-remove" onclick="event.stopPropagation(); removeFeaturedImage();">
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        </div>
+                      </div>
+                    <% } else { %>
+                      <div id="uploadPlaceholder" class="upload-placeholder">
+                        <div class="upload-icon-wrapper">
+                          <i class="bi bi-cloud-arrow-up"></i>
+                        </div>
+                        <div class="upload-text">Arraste uma imagem ou clique para selecionar</div>
+                        <div class="upload-formats">JPG, PNG, GIF, WebP • Máx 10MB</div>
+                      </div>
+                    <% } %>
+                  </div>
+                  <input type="file" name="featured_image" class="d-none" accept="image/*" id="imageInput">
+                </div>
+                
+                <!-- Tab Galeria -->
+                <div class="featured-tab-pane" id="featuredGalleryTab" style="display: none;">
+                  <div class="gallery-search mb-2">
+                    <i class="bi bi-search"></i>
+                    <input type="text" placeholder="Buscar na galeria..." id="gallerySearchInput" onkeyup="filterGallery(this.value)">
+                  </div>
+                  <div id="featuredGallery" class="featured-gallery-grid">
+                    <div class="gallery-loading">
+                      <div class="spinner-border spinner-border-sm text-primary"></div>
+                      <span>Carregando imagens...</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Tab URL -->
+                <div class="featured-tab-pane" id="featuredUrlTab" style="display: none;">
+                  <div class="url-input-group">
+                    <i class="bi bi-link-45deg"></i>
+                    <input type="url" id="featuredImageUrl" placeholder="Cole a URL da imagem aqui...">
+                    <button type="button" onclick="setFeaturedFromUrl()" title="Carregar">
+                      <i class="bi bi-arrow-right"></i>
                     </button>
                   </div>
-                <% } else { %>
-                  <div id="uploadPlaceholder">
-                    <i class="bi bi-cloud-arrow-up upload-icon"></i>
-                    <div class="upload-text">Clique ou arraste uma imagem</div>
-                    <div class="upload-hint">JPG, PNG, GIF • Convertido para WebP automaticamente</div>
+                  <div id="featuredUrlPreview" class="url-preview"></div>
+                  <div class="url-hint">
+                    <i class="bi bi-info-circle"></i>
+                    Cole uma URL de imagem válida (JPG, PNG, GIF, WebP)
                   </div>
-                <% } %>
+                </div>
               </div>
-              <input type="file" name="featured_image" class="d-none" accept="image/*" id="imageInput">
-              <div id="imagePreview" class="mt-2 text-center"></div>
+              
+              <!-- Preview da imagem selecionada -->
+              <div id="featuredImagePreview" class="featured-selected-preview" style="display: none;">
+                <div class="selected-image-wrapper">
+                  <img src="" alt="Preview" id="selectedFeaturedImg">
+                  <div class="selected-image-actions">
+                    <button type="button" class="btn-action-change" onclick="removeFeaturedImage()">
+                      <i class="bi bi-arrow-repeat"></i> Trocar
+                    </button>
+                    <button type="button" class="btn-action-remove" onclick="removeFeaturedImage()">
+                      <i class="bi bi-trash"></i> Remover
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Campo hidden para URL da imagem da galeria -->
+              <input type="hidden" name="featured_image_url" id="featuredImageUrlInput" value="">
             </div>
           </div>
         </div>
@@ -823,6 +1126,7 @@
           this.classList.toggle('collapsed');
         });
       });
+      
     });
 
     // Upload de imagem destacada com drag and drop
@@ -851,31 +1155,193 @@
       const reader = new FileReader();
       reader.onload = function(e) {
         uploadArea.innerHTML = `
-          <div class="img-preview-container">
-            <img src="${e.target.result}" alt="Preview" style="max-height: 150px; border-radius: 8px;">
-            <button type="button" class="remove-btn" onclick="event.stopPropagation(); removeImage();">
-              <i class="bi bi-x"></i>
-            </button>
+          <div class="featured-preview-container">
+            <img src="${e.target.result}" alt="Preview">
+            <div class="featured-preview-overlay">
+              <button type="button" class="btn-change" onclick="event.stopPropagation();">
+                <i class="bi bi-pencil"></i> Alterar
+              </button>
+              <button type="button" class="btn-remove" onclick="event.stopPropagation(); removeFeaturedImage();">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
           </div>
         `;
         uploadArea.classList.add('has-image');
+        // Limpa URL se fez upload
+        document.getElementById('featuredImageUrlInput').value = '';
       };
       reader.readAsDataURL(file);
     }
     
     function removeImage() {
-      imageInput.value = '';
+      removeFeaturedImage();
+    }
+
+    // ========== FEATURED IMAGE FUNCTIONS ==========
+    let featuredGalleryLoaded = false;
+    let galleryItems = [];
+    
+    function switchFeaturedTab(tab) {
+      // Remove active de todas as tabs
+      document.querySelectorAll('.featured-tab').forEach(t => t.classList.remove('active'));
+      
+      // Esconde todos os painéis
+      document.querySelectorAll('.featured-tab-pane').forEach(p => {
+        p.style.display = 'none';
+        p.classList.remove('active');
+      });
+      
+      // Ativa a tab clicada
+      const tabs = document.querySelectorAll('.featured-tab');
+      if (tab === 'upload') {
+        tabs[0].classList.add('active');
+        document.getElementById('featuredUploadTab').style.display = 'block';
+      } else if (tab === 'gallery') {
+        tabs[1].classList.add('active');
+        document.getElementById('featuredGalleryTab').style.display = 'block';
+        loadFeaturedGallery();
+      } else if (tab === 'url') {
+        tabs[2].classList.add('active');
+        document.getElementById('featuredUrlTab').style.display = 'block';
+      }
+    }
+    
+    async function loadFeaturedGallery() {
+      if (featuredGalleryLoaded) return;
+      
+      const gallery = document.getElementById('featuredGallery');
+      try {
+        const response = await fetch('/admin/media/browse');
+        const data = await response.json();
+        if (data.medias && data.medias.length > 0) {
+          galleryItems = data.medias;
+          renderGalleryItems(galleryItems);
+          featuredGalleryLoaded = true;
+        } else {
+          gallery.innerHTML = '<div class="gallery-loading"><i class="bi bi-images"></i><span>Nenhuma imagem na galeria</span></div>';
+        }
+      } catch (error) {
+        gallery.innerHTML = '<div class="gallery-loading"><i class="bi bi-exclamation-circle"></i><span>Erro ao carregar</span></div>';
+      }
+    }
+    
+    function renderGalleryItems(items) {
+      const gallery = document.getElementById('featuredGallery');
+      if (items.length > 0) {
+        gallery.innerHTML = items.map(item => `
+          <div class="media-item" data-name="${(item.original_name || '').toLowerCase()}" onclick="selectFeaturedFromGallery('${item.url}', this)">
+            <img src="${item.url}" alt="${item.alt_text || ''}" loading="lazy">
+          </div>
+        `).join('');
+      } else {
+        gallery.innerHTML = '<div class="gallery-loading"><i class="bi bi-search"></i><span>Nenhuma imagem encontrada</span></div>';
+      }
+    }
+    
+    function filterGallery(query) {
+      const q = query.toLowerCase().trim();
+      if (!q) {
+        renderGalleryItems(galleryItems);
+        return;
+      }
+      const filtered = galleryItems.filter(item => 
+        (item.original_name || '').toLowerCase().includes(q) ||
+        (item.alt_text || '').toLowerCase().includes(q)
+      );
+      renderGalleryItems(filtered);
+    }
+    
+    function selectFeaturedFromGallery(url, element) {
+      // Remove seleção anterior
+      document.querySelectorAll('#featuredGallery .media-item').forEach(el => el.classList.remove('selected'));
+      element.classList.add('selected');
+      
+      // Define a URL no campo hidden
+      document.getElementById('featuredImageUrlInput').value = url;
+      
+      // Mostra preview
+      showFeaturedPreview(url);
+      
+      // Limpa o input de arquivo
+      document.getElementById('imageInput').value = '';
+    }
+    
+    function setFeaturedFromUrl() {
+      const url = document.getElementById('featuredImageUrl').value.trim();
+      if (!url) {
+        alert('Digite uma URL válida');
+        return;
+      }
+      
+      // Valida se é uma URL de imagem
+      if (!url.match(/\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i) && !url.includes('unsplash') && !url.includes('pexels')) {
+        if (!confirm('Esta URL pode não ser uma imagem válida. Deseja continuar?')) {
+          return;
+        }
+      }
+      
+      // Define a URL no campo hidden
+      document.getElementById('featuredImageUrlInput').value = url;
+      
+      // Mostra preview
+      showFeaturedPreview(url);
+      
+      // Limpa o input de arquivo
+      document.getElementById('imageInput').value = '';
+      
+      // Mostra preview na aba URL
+      document.getElementById('featuredUrlPreview').innerHTML = `
+        <img src="${url}" alt="Preview" style="max-height: 100px; border-radius: 8px; margin-top: 8px;" 
+             onerror="this.style.display='none'; alert('Não foi possível carregar a imagem');">
+      `;
+    }
+    
+    function showFeaturedPreview(url) {
+      const previewDiv = document.getElementById('featuredImagePreview');
+      const previewImg = document.getElementById('selectedFeaturedImg');
+      
+      previewImg.src = url;
+      previewDiv.style.display = 'block';
+      
+      // Esconde a área de upload
+      document.getElementById('uploadArea').style.display = 'none';
+    }
+    
+    function removeFeaturedImage() {
+      // Limpa tudo
+      document.getElementById('featuredImageUrlInput').value = '';
+      document.getElementById('imageInput').value = '';
+      const urlInput = document.getElementById('featuredImageUrl');
+      if (urlInput) urlInput.value = '';
+      const urlPreview = document.getElementById('featuredUrlPreview');
+      if (urlPreview) urlPreview.innerHTML = '';
+      
+      // Esconde preview
+      document.getElementById('featuredImagePreview').style.display = 'none';
+      
+      // Mostra área de upload novamente
+      const uploadArea = document.getElementById('uploadArea');
+      uploadArea.style.display = 'flex';
       uploadArea.innerHTML = `
-        <div id="uploadPlaceholder">
-          <i class="bi bi-cloud-arrow-up upload-icon"></i>
-          <div class="upload-text">Clique ou arraste uma imagem</div>
-          <div class="upload-hint">JPG, PNG, GIF • Convertido para WebP automaticamente</div>
+        <div id="uploadPlaceholder" class="upload-placeholder">
+          <div class="upload-icon-wrapper">
+            <i class="bi bi-cloud-arrow-up"></i>
+          </div>
+          <div class="upload-text">Arraste uma imagem ou clique para selecionar</div>
+          <div class="upload-formats">JPG, PNG, GIF, WebP • Máx 10MB</div>
         </div>
       `;
       uploadArea.classList.remove('has-image');
+      
+      // Remove seleção da galeria
+      document.querySelectorAll('#featuredGallery .media-item').forEach(el => el.classList.remove('selected'));
+      
+      // Volta para a aba de upload
+      switchFeaturedTab('upload');
     }
 
-    // Modal de mídia
+    // ========== MODAL DE MÍDIA ==========
     function openMediaModal() {
       selectedImageUrl = '';
       document.getElementById('insertImageBtn').disabled = true;
