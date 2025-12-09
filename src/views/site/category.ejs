@@ -9,27 +9,14 @@ ${banners && banners.category_top && banners.category_top.length > 0 ? `
 ` : ''}
 
 <!-- Header da Categoria -->
-<section class="py-5" style="background: linear-gradient(135deg, ${category.color} 0%, ${category.color}dd 100%); color: #fff;">
+<div class="category-header" style="border-left: 4px solid ${category.color};">
   <div class="container">
-    <nav aria-label="breadcrumb" class="mb-4">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/" class="text-white opacity-75 text-decoration-none">Início</a></li>
-        <li class="breadcrumb-item text-white opacity-75">Categorias</li>
-        <li class="breadcrumb-item active text-white" aria-current="page">${category.name}</li>
-      </ol>
+    <nav class="category-breadcrumb">
+      <a href="/">Início</a> <span>/</span> <span>${category.name}</span>
     </nav>
-    
-    <div class="d-flex align-items-center gap-4">
-      <div class="bg-white text-dark rounded-circle d-flex align-items-center justify-content-center shadow-lg" style="width: 80px; height: 80px;">
-        <i class="${category.icon || 'bi bi-folder'} fs-1" style="color: ${category.color};"></i>
-      </div>
-      <div>
-        <h1 class="display-5 fw-bold mb-2">${category.name}</h1>
-        <p class="lead mb-0 opacity-90">${category.description || 'Notícias e atualizações sobre ' + category.name}</p>
-      </div>
-    </div>
+    <h1 style="color: ${category.color};">${category.name}</h1>
   </div>
-</section>
+</div>
 
 <div class="container py-5">
   <div class="row g-5">
@@ -157,6 +144,34 @@ ${banners && banners.category_bottom && banners.category_bottom.length > 0 ? `
 ` : ''}
 
 <style>
+/* Header da Categoria - Clean */
+.category-header {
+  background: #fff;
+  padding: 20px 0;
+  margin-bottom: 30px;
+  border-bottom: 1px solid #e2e8f0;
+}
+.category-breadcrumb {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+.category-breadcrumb a {
+  color: #64748b;
+  text-decoration: none;
+}
+.category-breadcrumb a:hover {
+  color: #3b82f6;
+}
+.category-breadcrumb span {
+  margin: 0 6px;
+}
+.category-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+}
+
 .hover-shadow:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
