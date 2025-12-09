@@ -77,7 +77,7 @@ class SettingController {
           await Setting.create({
             key,
             value: finalValue,
-            type: key.startsWith('color_') ? 'color' : 'text',
+            type: 'text', // Usar 'text' pois 'color' não existe no ENUM
             group,
             label: key
           });
