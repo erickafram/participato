@@ -128,8 +128,9 @@
       font-size: 22px;
     }
     
-    .site-logo span {
-      color: var(--primary-color);
+    .site-logo .logo-img {
+      max-height: 40px;
+      width: auto;
     }
     
     /* Search Bar */
@@ -839,8 +840,12 @@
       <div class="container">
         <div class="d-flex align-items-center justify-content-between gap-3">
           <a href="/" class="site-logo">
-            <i class="bi bi-lightning-charge-fill"></i>
-            <span>Portal</span>Convictos
+            <% if (settings.site_logo) { %>
+              <img src="<%= settings.site_logo %>" alt="<%= settings.site_name || 'Portal' %>" class="logo-img">
+            <% } else { %>
+              <i class="bi bi-lightning-charge-fill"></i>
+              <%= settings.site_name || 'Portal Convictos' %>
+            <% } %>
           </a>
           
           <form action="/busca" method="GET" class="header-search d-none d-lg-block">
@@ -923,8 +928,12 @@
         <div class="col-lg-4">
           <div class="footer-widget">
             <a href="/" class="site-logo text-white mb-4 d-inline-block">
-              <i class="bi bi-lightning-charge-fill"></i>
-              <div><span>Portal</span>Convictos</div>
+              <% if (settings.site_logo) { %>
+                <img src="<%= settings.site_logo %>" alt="<%= settings.site_name || 'Portal' %>" class="logo-img">
+              <% } else { %>
+                <i class="bi bi-lightning-charge-fill"></i>
+                <div><%= settings.site_name || 'Portal Convictos' %></div>
+              <% } %>
             </a>
             <p class="mb-4 opacity-75" style="line-height: 1.8;">
               <%= settings.site_description || 'Seu portal de notícias e entretenimento com conteúdo de qualidade e atualizações diárias.' %>
@@ -993,7 +1002,7 @@
       <div class="container">
         <div class="row align-items-center">
           <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-            <p class="mb-0"><%= settings.footer_text || '© ' + currentYear + ' Portal Convictos. Todos os direitos reservados.' %></p>
+            <p class="mb-0"><%= settings.footer_text || '© ' + currentYear + ' ' + (settings.site_name || 'Portal') + '. Todos os direitos reservados.' %></p>
           </div>
           <div class="col-md-6 text-center text-md-end">
             <a href="/pagina/politica-de-privacidade" class="text-white-50 me-3 small">Privacidade</a>
@@ -1009,8 +1018,12 @@
   <div class="mobile-sidebar">
     <div class="mobile-sidebar-header">
       <a href="/" class="site-logo">
-        <i class="bi bi-lightning-charge-fill"></i>
-        <span>Portal</span>Convictos
+        <% if (settings.site_logo) { %>
+          <img src="<%= settings.site_logo %>" alt="<%= settings.site_name || 'Portal' %>" class="logo-img" style="max-height: 32px;">
+        <% } else { %>
+          <i class="bi bi-lightning-charge-fill"></i>
+          <%= settings.site_name || 'Portal Convictos' %>
+        <% } %>
       </a>
       <button class="mobile-sidebar-close" onclick="closeMobileMenu()">
         <i class="bi bi-x-lg"></i>
