@@ -87,6 +87,12 @@ class PostController {
   // Salvar novo post
   async store(req, res) {
     try {
+      // Verificar se usuário está logado
+      if (!req.session || !req.session.user || !req.session.user.id) {
+        req.flash('error', 'Sessão expirada. Faça login novamente.');
+        return res.redirect('/admin/login');
+      }
+
       const {
         title,
         subtitle,
@@ -121,20 +127,25 @@ class PostController {
         featuredImage = featured_image_url;
       }
 
+      // Definir published_at se status for published
+      const postStatus = status || 'draft';
+      const publishedAt = postStatus === 'published' ? new Date() : null;
+
       const post = await Post.create({
         title,
         subtitle,
         slug: postSlug,
         content,
         embed_code: embed_code || null,
-        excerpt,
+        excerpt: excerpt || null,
         category_id: category_id || null,
         tags: tags || '',
-        status: status || 'draft',
+        status: postStatus,
         featured: featured === 'on' || featured === true,
-        meta_title,
-        meta_description,
+        meta_title: meta_title || null,
+        meta_description: meta_description || null,
         scheduled_at: scheduled_at || null,
+        published_at: publishedAt,
         featured_image: featuredImage,
         author_id: req.session.user.id
       });
