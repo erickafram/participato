@@ -1,0 +1,121 @@
+<%- include('../layouts/main', { body: `
+<div class="page-header">
+  <div>
+    <a href="/admin/petitions" class="back-link"><i class="bi bi-arrow-left"></i> Voltar</a>
+    <h1>Assinaturas</h1>
+    <p>${petition.title}</p>
+  </div>
+  <div class="header-actions">
+    <a href="/admin/petitions/${petition.id}/export" class="btn-secondary">
+      <i class="bi bi-download"></i>
+      Exportar CSV
+    </a>
+    <a href="/admin/petitions/${petition.id}/edit" class="btn-action">
+      <i class="bi bi-pencil"></i>
+      Editar Petição
+    </a>
+  </div>
+</div>
+
+<div class="stats-row">
+  <div class="stat-card">
+    <i class="bi bi-pen"></i>
+    <div class="stat-content">
+      <span class="stat-value">${total}</span>
+      <span class="stat-label">Total de Assinaturas</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <i class="bi bi-bullseye"></i>
+    <div class="stat-content">
+      <span class="stat-value">${petition.goal}</span>
+      <span class="stat-label">Meta</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <i class="bi bi-graph-up"></i>
+    <div class="stat-content">
+      <span class="stat-value">${Math.min(100, Math.round((total / petition.goal) * 100))}%</span>
+      <span class="stat-label">Progresso</span>
+    </div>
+  </div>
+</div>
+
+<div class="data-card">
+  ${signatures && signatures.length > 0
+    ? '<table class="data-table"><thead><tr><th>Nome</th><th>Email</th><th>Cidade/Estado</th><th>Data</th><th>Status</th></tr></thead><tbody>' +
+      signatures.map(s => 
+        '<tr>' +
+          '<td><strong>' + s.name + '</strong>' + (s.comment ? '<br><small class="text-muted">"' + s.comment.substring(0, 50) + (s.comment.length > 50 ? '...' : '') + '"</small>' : '') + '</td>' +
+          '<td>' + s.email + '</td>' +
+          '<td>' + (s.city || '-') + (s.state ? ', ' + s.state : '') + '</td>' +
+          '<td>' + new Date(s.created_at).toLocaleDateString('pt-BR') + '</td>' +
+          '<td>' +
+            (s.verified ? '<span class="badge success">Verificado</span>' : '<span class="badge muted">Pendente</span>') +
+            (!s.is_public ? ' <span class="badge warning">Privado</span>' : '') +
+          '</td>' +
+        '</tr>'
+      ).join('') +
+      '</tbody></table>'
+    : '<div class="empty-state"><i class="bi bi-pen"></i><h3>Nenhuma assinatura</h3><p>Esta petição ainda não recebeu assinaturas</p></div>'
+  }
+</div>
+
+${totalPages > 1 ? '<div class="pagination">' +
+  (currentPage > 1 ? '<a href="?page=' + (currentPage - 1) + '" class="page-btn"><i class="bi bi-chevron-left"></i></a>' : '') +
+  '<span class="page-info">Página ' + currentPage + ' de ' + totalPages + '</span>' +
+  (currentPage < totalPages ? '<a href="?page=' + (currentPage + 1) + '" class="page-btn"><i class="bi bi-chevron-right"></i></a>' : '') +
+'</div>' : ''}
+
+<style>
+  .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; }
+  .back-link { display: inline-flex; align-items: center; gap: 6px; color: #64748b; text-decoration: none; font-size: 13px; margin-bottom: 8px; }
+  .back-link:hover { color: #3b82f6; }
+  .page-header h1 { font-size: 22px; font-weight: 700; color: #0f172a; margin: 0 0 4px; }
+  .page-header p { font-size: 13px; color: #64748b; margin: 0; max-width: 400px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  
+  .header-actions { display: flex; gap: 12px; }
+  .btn-action, .btn-secondary { display: flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none; }
+  .btn-action { background: #3b82f6; color: #fff; }
+  .btn-action:hover { background: #2563eb; color: #fff; }
+  .btn-secondary { background: #fff; color: #475569; border: 1px solid #e2e8f0; }
+  .btn-secondary:hover { background: #f8fafc; }
+  
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+  .stat-card { background: #fff; padding: 20px; border-radius: 12px; display: flex; align-items: center; gap: 16px; }
+  .stat-card i { font-size: 24px; color: #3b82f6; background: #eff6ff; padding: 12px; border-radius: 10px; }
+  .stat-content { display: flex; flex-direction: column; }
+  .stat-value { font-size: 24px; font-weight: 700; color: #0f172a; }
+  .stat-label { font-size: 12px; color: #64748b; }
+  
+  .data-card { background: #fff; border-radius: 12px; overflow: hidden; }
+  .data-table { width: 100%; border-collapse: collapse; }
+  .data-table th, .data-table td { padding: 14px 20px; text-align: left; border-bottom: 1px solid #f1f5f9; }
+  .data-table th { background: #f8fafc; font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; }
+  .data-table td { font-size: 13px; color: #374151; }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover { background: #f8fafc; }
+  .text-muted { color: #94a3b8; }
+  
+  .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .badge.success { background: #dcfce7; color: #16a34a; }
+  .badge.warning { background: #fef3c7; color: #d97706; }
+  .badge.muted { background: #f1f5f9; color: #64748b; }
+  
+  .empty-state { text-align: center; padding: 60px 20px; color: #64748b; }
+  .empty-state i { font-size: 48px; color: #cbd5e1; margin-bottom: 16px; }
+  .empty-state h3 { font-size: 16px; font-weight: 600; color: #475569; margin: 0 0 8px; }
+  .empty-state p { font-size: 13px; margin: 0; }
+  
+  .pagination { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 24px; }
+  .page-btn { padding: 8px 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; color: #64748b; text-decoration: none; }
+  .page-btn:hover { background: #f8fafc; }
+  .page-info { font-size: 13px; color: #64748b; }
+  
+  @media (max-width: 768px) {
+    .stats-row { grid-template-columns: 1fr; }
+    .header-actions { flex-direction: column; }
+    .data-table { display: block; overflow-x: auto; }
+  }
+</style>
+`}) %>

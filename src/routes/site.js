@@ -5,8 +5,28 @@ const express = require('express');
 const router = express.Router();
 const SiteController = require('../controllers/SiteController');
 const BannerController = require('../controllers/BannerController');
+const PetitionSiteController = require('../controllers/PetitionSiteController');
+const PetitionerController = require('../controllers/PetitionerController');
+const AuthUnifiedController = require('../controllers/AuthUnifiedController');
+const { uploadSingle } = require('../middlewares/upload');
 const { SitemapStream, streamToPromise } = require('sitemap');
 const { Post, Category, Page } = require('../models');
+
+// Middleware para verificar se peticionário está logado
+const isPetitionerAuthenticated = (req, res, next) => {
+  if (req.session && req.session.petitioner) {
+    return next();
+  }
+  req.flash('error', 'Faça login para acessar esta página.');
+  return res.redirect('/login');
+};
+
+// ==========================================
+// LOGIN UNIFICADO
+// ==========================================
+router.get('/login', AuthUnifiedController.showLogin);
+router.post('/login', AuthUnifiedController.login);
+router.get('/logout', AuthUnifiedController.logout);
 
 // Página inicial
 router.get('/', SiteController.home);
@@ -31,6 +51,32 @@ router.get('/tag/:tag', SiteController.tag);
 
 // Busca
 router.get('/busca', SiteController.search);
+
+// ==========================================
+// PETIÇÕES PÚBLICAS
+// ==========================================
+router.get('/peticoes', PetitionSiteController.index);
+router.get('/peticao/:slug', PetitionSiteController.show);
+router.post('/peticao/:slug/assinar', PetitionSiteController.sign);
+router.get('/peticao/:slug/assinaturas', PetitionSiteController.loadSignatures);
+
+// ==========================================
+// ÁREA DO CIDADÃO (PETICIONÁRIO)
+// ==========================================
+// Autenticação
+router.get('/cidadao/login', PetitionerController.showLogin);
+router.post('/cidadao/login', PetitionerController.login);
+router.get('/cidadao/logout', PetitionerController.logout);
+
+// Criar petição (com cadastro)
+router.get('/criar-peticao', PetitionerController.showCreatePetition);
+router.post('/criar-peticao', ...uploadSingle('image'), PetitionerController.createPetition);
+
+// Painel do cidadão (requer login)
+router.get('/minha-conta', isPetitionerAuthenticated, PetitionerController.dashboard);
+router.get('/minha-conta/peticao/:id', isPetitionerAuthenticated, PetitionerController.viewPetition);
+router.get('/minha-conta/perfil', isPetitionerAuthenticated, PetitionerController.showProfile);
+router.post('/minha-conta/perfil', isPetitionerAuthenticated, PetitionerController.updateProfile);
 
 // Registrar clique em banner (API)
 router.post('/api/banner/:id/click', BannerController.registerClick);

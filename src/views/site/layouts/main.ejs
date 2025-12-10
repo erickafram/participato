@@ -314,6 +314,49 @@
       background: var(--primary-light);
     }
     
+    .header-user {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 12px 4px 4px;
+      background: var(--primary-light);
+      border-radius: 20px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    
+    .header-user:hover {
+      background: var(--primary-color);
+    }
+    
+    .header-user:hover .user-avatar {
+      background: #fff;
+      color: var(--primary-color);
+    }
+    
+    .header-user:hover .user-name {
+      color: #fff;
+    }
+    
+    .header-user .user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--primary-color);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .header-user .user-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+    
     /* Cards */
     .card {
       border: none;
@@ -879,9 +922,21 @@
           </form>
           
           <div class="d-flex align-items-center gap-2">
-            <a href="/admin/login" class="header-login" title="Entrar">
-              <i class="bi bi-person-circle"></i>
-            </a>
+            <% if (user) { %>
+              <a href="/admin" class="header-user" title="Painel Admin">
+                <span class="user-avatar"><%= user.name.charAt(0).toUpperCase() %></span>
+                <span class="user-name d-none d-md-inline"><%= user.name.split(' ')[0] %></span>
+              </a>
+            <% } else if (typeof petitioner !== 'undefined' && petitioner) { %>
+              <a href="/minha-conta" class="header-user" title="Minha Conta">
+                <span class="user-avatar"><%= petitioner.name.charAt(0).toUpperCase() %></span>
+                <span class="user-name d-none d-md-inline"><%= petitioner.name.split(' ')[0] %></span>
+              </a>
+            <% } else { %>
+              <a href="/login" class="header-login" title="Entrar">
+                <i class="bi bi-person-circle"></i>
+              </a>
+            <% } %>
             <button class="navbar-toggler d-lg-none" type="button" onclick="openMobileMenu()">
               <i class="bi bi-list"></i>
             </button>
@@ -935,6 +990,13 @@
                 <a href="/pagina/<%= page.slug %>" class="nav-link<%= currentPath === '/pagina/' + page.slug ? ' active' : '' %>"><%= page.title %></a>
               </li>
             <% }) %>
+            <% if (typeof modulePetitions !== 'undefined' && modulePetitions) { %>
+              <li class="nav-item">
+                <a href="/peticoes" class="nav-link<%= currentPath && currentPath.startsWith('/petic') ? ' active' : '' %>">
+                  <i class="bi bi-megaphone me-1"></i>Petições
+                </a>
+              </li>
+            <% } %>
           </ul>
         </div>
       </nav>
@@ -1105,6 +1167,13 @@
           </a>
         </div>
       <% }) %>
+      <% if (typeof modulePetitions !== 'undefined' && modulePetitions) { %>
+        <div class="mobile-nav-item">
+          <a href="/peticoes" class="mobile-nav-link<%= currentPath && currentPath.startsWith('/petic') ? ' active' : '' %>">
+            <span><i class="bi bi-megaphone me-1"></i>Petições</span>
+          </a>
+        </div>
+      <% } %>
     </nav>
     
     <div class="mobile-sidebar-footer">

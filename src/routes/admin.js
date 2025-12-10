@@ -17,6 +17,7 @@ const SettingController = require('../controllers/SettingController');
 const BannerController = require('../controllers/BannerController');
 const HomeEditorController = require('../controllers/HomeEditorController');
 const AIController = require('../controllers/AIController');
+const PetitionController = require('../controllers/PetitionController');
 
 // Middlewares
 const { isAuthenticated, isNotAuthenticated, isAdmin } = require('../middlewares/auth');
@@ -160,5 +161,21 @@ router.post('/ai/generate', AIController.generateArticle.bind(AIController));
 router.post('/ai/improve-title', AIController.improveTitle.bind(AIController));
 router.post('/ai/improve-subtitle', AIController.improveSubtitle.bind(AIController));
 router.post('/ai/improve-content', AIController.improveContent.bind(AIController));
+
+// ==========================================
+// PETIÇÕES
+// ==========================================
+router.get('/petitions', PetitionController.index);
+router.get('/petitions/create', PetitionController.create);
+router.post('/petitions', ...uploadSingle('image'), PetitionController.store);
+router.get('/petitions/:id/edit', PetitionController.edit);
+router.post('/petitions/:id', ...uploadSingle('image'), PetitionController.update);
+router.post('/petitions/:id/delete', PetitionController.destroy);
+router.get('/petitions/:id/signatures', PetitionController.signatures);
+router.get('/petitions/:id/export', PetitionController.exportSignatures);
+router.post('/petitions/:id/toggle-status', PetitionController.toggleStatus);
+router.get('/petitions/:id/review', PetitionController.review);
+router.post('/petitions/:id/approve', PetitionController.approve);
+router.post('/petitions/:id/reject', PetitionController.reject);
 
 module.exports = router;

@@ -1,0 +1,160 @@
+<%- include('../layouts/main', { body: `
+<div class="page-header">
+  <div>
+    <a href="/admin/petitions" class="back-link"><i class="bi bi-arrow-left"></i> Voltar</a>
+    <h1>${petition ? 'Editar Petição' : 'Nova Petição'}</h1>
+  </div>
+</div>
+
+<form method="POST" action="${petition ? '/admin/petitions/' + petition.id : '/admin/petitions'}" enctype="multipart/form-data" class="form-card">
+  <div class="form-grid">
+    <div class="form-main">
+      <div class="form-group">
+        <label>Título da Petição *</label>
+        <input type="text" name="title" value="${petition ? petition.title : ''}" required class="form-control" placeholder="Ex: Mais áreas verdes para nossa cidade">
+      </div>
+      
+      <div class="form-group">
+        <label>Descrição Curta *</label>
+        <textarea name="description" rows="3" required class="form-control" placeholder="Resumo da petição que aparece na listagem">${petition ? petition.description : ''}</textarea>
+      </div>
+      
+      <div class="form-group">
+        <label>Conteúdo Completo</label>
+        <textarea name="content" rows="10" class="form-control" placeholder="Texto completo da petição com todos os detalhes e argumentos">${petition ? petition.content : ''}</textarea>
+      </div>
+    </div>
+    
+    <div class="form-sidebar">
+      <div class="sidebar-card">
+        <h3>Publicação</h3>
+        <div class="form-group">
+          <label>Status</label>
+          <select name="status" class="form-control">
+            <option value="draft" ${petition && petition.status === 'draft' ? 'selected' : ''}>Rascunho</option>
+            <option value="active" ${petition && petition.status === 'active' ? 'selected' : ''}>Ativa</option>
+            <option value="closed" ${petition && petition.status === 'closed' ? 'selected' : ''}>Encerrada</option>
+            <option value="victory" ${petition && petition.status === 'victory' ? 'selected' : ''}>Vitória!</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Categoria</label>
+          <select name="category" class="form-control">
+            <option value="">Selecione...</option>
+            ${categories.map(c => '<option value="' + c + '" ' + (petition && petition.category === c ? 'selected' : '') + '>' + c + '</option>').join('')}
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Meta de Assinaturas</label>
+          <input type="number" name="goal" value="${petition ? petition.goal : 1000}" min="10" class="form-control">
+        </div>
+        
+        <div class="form-group">
+          <label>Data de Encerramento</label>
+          <input type="date" name="end_date" value="${petition && petition.end_date ? petition.end_date.toISOString().split('T')[0] : ''}" class="form-control">
+        </div>
+        
+        <div class="form-check">
+          <input type="checkbox" name="featured" id="featured" ${petition && petition.featured ? 'checked' : ''}>
+          <label for="featured">Petição em Destaque</label>
+        </div>
+      </div>
+      
+      <div class="sidebar-card">
+        <h3>Configurações</h3>
+        <div class="form-check">
+          <input type="checkbox" name="allow_anonymous" id="allow_anonymous" ${!petition || petition.allow_anonymous ? 'checked' : ''}>
+          <label for="allow_anonymous">Permitir assinatura anônima (só email)</label>
+        </div>
+        
+        <div class="form-check">
+          <input type="checkbox" name="show_signatures" id="show_signatures" ${!petition || petition.show_signatures ? 'checked' : ''}>
+          <label for="show_signatures">Mostrar lista de assinaturas</label>
+        </div>
+      </div>
+      
+      <div class="sidebar-card">
+        <h3>Imagem</h3>
+        <div class="image-upload">
+          ${petition && petition.image ? '<img src="' + petition.image + '" alt="" class="preview-image">' : '<div class="upload-placeholder"><i class="bi bi-image"></i><span>Clique para enviar</span></div>'}
+          <input type="file" name="image" accept="image/*" class="file-input" onchange="previewImage(this)">
+        </div>
+      </div>
+      
+      ${petition ? '<div class="sidebar-card stats-card"><h3>Estatísticas</h3><div class="stat-item"><span class="stat-value">' + (signatureCount || 0) + '</span><span class="stat-label">Assinaturas</span></div><div class="stat-item"><span class="stat-value">' + (petition.views || 0) + '</span><span class="stat-label">Visualizações</span></div></div>' : ''}
+      
+      <button type="submit" class="btn-submit">
+        <i class="bi bi-check-lg"></i>
+        ${petition ? 'Salvar Alterações' : 'Criar Petição'}
+      </button>
+    </div>
+  </div>
+</form>
+
+<style>
+  .page-header { margin-bottom: 24px; }
+  .back-link { display: inline-flex; align-items: center; gap: 6px; color: #64748b; text-decoration: none; font-size: 13px; margin-bottom: 8px; }
+  .back-link:hover { color: #3b82f6; }
+  .page-header h1 { font-size: 22px; font-weight: 700; color: #0f172a; margin: 0; }
+  
+  .form-card { background: transparent; }
+  .form-grid { display: grid; grid-template-columns: 1fr 320px; gap: 24px; }
+  
+  .form-main { display: flex; flex-direction: column; gap: 20px; }
+  .form-main .form-group { background: #fff; padding: 20px; border-radius: 12px; }
+  
+  .form-sidebar { display: flex; flex-direction: column; gap: 16px; }
+  .sidebar-card { background: #fff; padding: 20px; border-radius: 12px; }
+  .sidebar-card h3 { font-size: 14px; font-weight: 600; color: #0f172a; margin: 0 0 16px; padding-bottom: 12px; border-bottom: 1px solid #f1f5f9; }
+  
+  .form-group { margin-bottom: 0; }
+  .form-group label { display: block; font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 6px; }
+  .form-control { width: 100%; padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; transition: border-color 0.2s; }
+  .form-control:focus { outline: none; border-color: #3b82f6; }
+  textarea.form-control { resize: vertical; min-height: 100px; }
+  
+  .sidebar-card .form-group { margin-bottom: 16px; }
+  .sidebar-card .form-group:last-child { margin-bottom: 0; }
+  
+  .form-check { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .form-check:last-child { margin-bottom: 0; }
+  .form-check input[type="checkbox"] { width: 18px; height: 18px; accent-color: #3b82f6; }
+  .form-check label { font-size: 13px; color: #475569; cursor: pointer; margin: 0; }
+  
+  .image-upload { position: relative; border: 2px dashed #e2e8f0; border-radius: 8px; overflow: hidden; cursor: pointer; transition: border-color 0.2s; }
+  .image-upload:hover { border-color: #3b82f6; }
+  .upload-placeholder { padding: 40px 20px; text-align: center; color: #94a3b8; }
+  .upload-placeholder i { font-size: 32px; display: block; margin-bottom: 8px; }
+  .upload-placeholder span { font-size: 13px; }
+  .preview-image { width: 100%; height: 150px; object-fit: cover; }
+  .file-input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  
+  .stats-card { display: flex; flex-wrap: wrap; gap: 16px; }
+  .stats-card h3 { width: 100%; }
+  .stat-item { flex: 1; text-align: center; padding: 12px; background: #f8fafc; border-radius: 8px; }
+  .stat-value { display: block; font-size: 24px; font-weight: 700; color: #3b82f6; }
+  .stat-label { font-size: 11px; color: #64748b; text-transform: uppercase; }
+  
+  .btn-submit { width: 100%; padding: 12px; background: #3b82f6; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-submit:hover { background: #2563eb; }
+  
+  @media (max-width: 900px) {
+    .form-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+  function previewImage(input) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const container = input.parentElement;
+        container.innerHTML = '<img src="' + e.target.result + '" alt="" class="preview-image"><input type="file" name="image" accept="image/*" class="file-input" onchange="previewImage(this)">';
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+</script>
+`}) %>

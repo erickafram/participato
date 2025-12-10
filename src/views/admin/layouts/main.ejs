@@ -425,6 +425,13 @@
         <span>Editor da Home</span>
       </a>
 
+      <% if (typeof modulePetitions !== 'undefined' && modulePetitions) { %>
+      <a href="/admin/petitions" class="nav-item <%= currentPath.startsWith('/admin/petitions') ? 'active' : '' %>">
+        <i class="bi bi-megaphone"></i>
+        <span>Petições</span>
+      </a>
+      <% } %>
+
       <% if (user && user.role==='admin' ) { %>
         <div class="menu-label">Sistema</div>
 

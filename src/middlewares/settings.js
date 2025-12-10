@@ -92,6 +92,12 @@ const addSettingsToLocals = async (req, res, next) => {
     res.locals.currentUrl = req.originalUrl;
     res.locals.currentPath = req.path;
 
+    // Módulos habilitados
+    res.locals.modulePetitions = settings.module_petitions === 'true' || settings.module_petitions === '1';
+
+    // Peticionário logado (cidadão)
+    res.locals.petitioner = req.session.petitioner || null;
+
     next();
   } catch (error) {
     console.error('Erro no middleware de configurações:', error);

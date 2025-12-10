@@ -1,0 +1,171 @@
+<%- include('../layouts/minimal', { body: `
+
+<div class="auth-page">
+  <div class="container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <i class="bi bi-person-circle"></i>
+        <h1>Entrar</h1>
+        <p>Acesse sua conta</p>
+      </div>
+
+      <form method="POST" action="/login" class="auth-form">
+        <div class="form-group">
+          <label><i class="bi bi-envelope"></i> Email</label>
+          <input type="email" name="email" required placeholder="seu@email.com" autofocus>
+        </div>
+
+        <div class="form-group">
+          <label><i class="bi bi-lock"></i> Senha</label>
+          <input type="password" name="password" required placeholder="Sua senha">
+        </div>
+
+        <button type="submit" class="btn-submit">
+          <i class="bi bi-box-arrow-in-right"></i> Entrar
+        </button>
+      </form>
+
+      <div class="auth-divider">
+        <span>ou</span>
+      </div>
+
+      <div class="auth-footer">
+        <p>Quer criar uma petição?</p>
+        <a href="/criar-peticao" class="btn-secondary">
+          <i class="bi bi-megaphone"></i> Criar Petição e Cadastrar
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .auth-page {
+    min-height: calc(100vh - 200px);
+    display: flex;
+    align-items: center;
+    padding: 40px 0;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  }
+  .auth-card {
+    max-width: 420px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+  }
+  .auth-header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .auth-header i {
+    font-size: 48px;
+    color: var(--primary-color, #3b82f6);
+    margin-bottom: 16px;
+    display: block;
+  }
+  .auth-header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 8px;
+  }
+  .auth-header p {
+    color: #64748b;
+    font-size: 14px;
+    margin: 0;
+  }
+  .auth-form .form-group {
+    margin-bottom: 20px;
+  }
+  .auth-form label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+  }
+  .auth-form input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 15px;
+    transition: all 0.2s;
+  }
+  .auth-form input:focus {
+    outline: none;
+    border-color: var(--primary-color, #3b82f6);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+  .btn-submit {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--primary-color, #3b82f6), #1d4ed8);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+  }
+  .btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  }
+  .auth-divider {
+    text-align: center;
+    margin: 24px 0;
+    position: relative;
+  }
+  .auth-divider::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;
+    background: #e2e8f0;
+  }
+  .auth-divider span {
+    background: #fff;
+    padding: 0 16px;
+    color: #94a3b8;
+    font-size: 13px;
+    position: relative;
+  }
+  .auth-footer {
+    text-align: center;
+  }
+  .auth-footer p {
+    color: #64748b;
+    font-size: 14px;
+    margin: 0 0 16px;
+  }
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: #f1f5f9;
+    color: #475569;
+    border-radius: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-secondary:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+  }
+</style>
+
+`}) %>

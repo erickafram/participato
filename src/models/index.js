@@ -32,6 +32,9 @@ const Media = require('./Media')(sequelize);
 const Setting = require('./Setting')(sequelize);
 const Banner = require('./Banner')(sequelize);
 const HomeBlock = require('./HomeBlock')(sequelize);
+const Petition = require('./Petition')(sequelize);
+const PetitionSignature = require('./PetitionSignature')(sequelize);
+const Petitioner = require('./Petitioner')(sequelize);
 
 // Definir associações
 // User -> Posts (um usuário pode ter muitos posts)
@@ -65,6 +68,26 @@ Category.hasMany(HomeBlock, { foreignKey: 'category_id', as: 'homeBlocks' });
 // HomeBlock -> Banner
 HomeBlock.belongsTo(Banner, { foreignKey: 'banner_id', as: 'banner' });
 
+// Petition -> User (autor)
+User.hasMany(Petition, { foreignKey: 'author_id', as: 'petitions' });
+Petition.belongsTo(User, { foreignKey: 'author_id', as: 'author' });
+
+// Petition -> PetitionSignature
+Petition.hasMany(PetitionSignature, { foreignKey: 'petition_id', as: 'signatures' });
+PetitionSignature.belongsTo(Petition, { foreignKey: 'petition_id', as: 'petition' });
+
+// PetitionSignature -> User (opcional)
+User.hasMany(PetitionSignature, { foreignKey: 'user_id', as: 'petitionSignatures' });
+PetitionSignature.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+
+// Petitioner -> Petition (cidadão criador)
+Petitioner.hasMany(Petition, { foreignKey: 'petitioner_id', as: 'petitions' });
+Petition.belongsTo(Petitioner, { foreignKey: 'petitioner_id', as: 'petitioner' });
+
+// Petitioner -> PetitionSignature
+Petitioner.hasMany(PetitionSignature, { foreignKey: 'petitioner_id', as: 'signatures' });
+PetitionSignature.belongsTo(Petitioner, { foreignKey: 'petitioner_id', as: 'petitionerUser' });
+
 module.exports = {
   sequelize,
   Sequelize,
@@ -76,5 +99,8 @@ module.exports = {
   Media,
   Setting,
   Banner,
-  HomeBlock
+  HomeBlock,
+  Petition,
+  PetitionSignature,
+  Petitioner
 };

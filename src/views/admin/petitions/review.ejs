@@ -1,0 +1,142 @@
+<%- include('../layouts/main', { body: `
+<div class="page-header">
+  <div>
+    <a href="/admin/petitions?status=pending" class="back-link"><i class="bi bi-arrow-left"></i> Voltar</a>
+    <h1>Revisar Petição</h1>
+    <p>Analise e aprove ou rejeite esta petição</p>
+  </div>
+</div>
+
+<div class="review-layout">
+  <div class="review-main">
+    <div class="review-card">
+      <div class="status-badge pending">Aguardando Aprovação</div>
+      
+      ${petition.image ? '<div class="petition-image"><img src="' + petition.image + '" alt=""></div>' : ''}
+      
+      <h2>${petition.title}</h2>
+      
+      <div class="petition-meta">
+        <span><i class="bi bi-calendar"></i> Enviada em ${new Date(petition.created_at).toLocaleDateString('pt-BR')}</span>
+        ${petition.category ? '<span><i class="bi bi-tag"></i> ' + petition.category + '</span>' : ''}
+        <span><i class="bi bi-bullseye"></i> Meta: ${petition.goal} assinaturas</span>
+      </div>
+
+      <div class="content-section">
+        <h3>Descrição</h3>
+        <p>${petition.description}</p>
+      </div>
+
+      ${petition.content ? '<div class="content-section"><h3>Conteúdo Completo</h3><div class="full-content">' + petition.content.replace(/\\n/g, '<br>') + '</div></div>' : ''}
+    </div>
+  </div>
+
+  <div class="review-sidebar">
+    <!-- Dados do Autor -->
+    <div class="sidebar-card">
+      <h3><i class="bi bi-person"></i> Autor da Petição</h3>
+      ${petition.petitioner ? 
+        '<div class="author-info">' +
+          '<div class="author-avatar">' + petition.petitioner.name.charAt(0).toUpperCase() + '</div>' +
+          '<div class="author-details">' +
+            '<strong>' + petition.petitioner.name + '</strong>' +
+            '<span><i class="bi bi-envelope"></i> ' + petition.petitioner.email + '</span>' +
+            '<span><i class="bi bi-telephone"></i> ' + petition.petitioner.phone + '</span>' +
+          '</div>' +
+        '</div>'
+      : petition.author ?
+        '<div class="author-info">' +
+          '<div class="author-avatar admin">' + petition.author.name.charAt(0).toUpperCase() + '</div>' +
+          '<div class="author-details">' +
+            '<strong>' + petition.author.name + '</strong>' +
+            '<span class="admin-badge">Administrador</span>' +
+          '</div>' +
+        '</div>'
+      : '<p class="text-muted">Autor não identificado</p>'
+      }
+    </div>
+
+    <!-- Ações -->
+    <div class="sidebar-card actions-card">
+      <h3><i class="bi bi-check-circle"></i> Aprovar Petição</h3>
+      <form method="POST" action="/admin/petitions/${petition.id}/approve">
+        <div class="form-group">
+          <label>Observações (opcional)</label>
+          <textarea name="admin_notes" rows="2" placeholder="Notas internas sobre a aprovação..."></textarea>
+        </div>
+        <button type="submit" class="btn-approve">
+          <i class="bi bi-check-lg"></i> Aprovar e Publicar
+        </button>
+      </form>
+    </div>
+
+    <div class="sidebar-card reject-card">
+      <h3><i class="bi bi-x-circle"></i> Rejeitar Petição</h3>
+      <form method="POST" action="/admin/petitions/${petition.id}/reject">
+        <div class="form-group">
+          <label>Motivo da Rejeição *</label>
+          <textarea name="rejection_reason" rows="3" placeholder="Explique o motivo da rejeição..." required></textarea>
+        </div>
+        <button type="submit" class="btn-reject">
+          <i class="bi bi-x-lg"></i> Rejeitar
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+  .page-header { margin-bottom: 24px; }
+  .back-link { display: inline-flex; align-items: center; gap: 6px; color: #64748b; text-decoration: none; font-size: 13px; margin-bottom: 8px; }
+  .back-link:hover { color: #3b82f6; }
+  .page-header h1 { font-size: 22px; font-weight: 700; color: #0f172a; margin: 0 0 4px; }
+  .page-header p { font-size: 13px; color: #64748b; margin: 0; }
+
+  .review-layout { display: grid; grid-template-columns: 1fr 360px; gap: 24px; align-items: start; }
+  
+  .review-card { background: #fff; border-radius: 12px; padding: 24px; }
+  .status-badge { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 16px; }
+  .status-badge.pending { background: #fef3c7; color: #d97706; }
+  
+  .petition-image { border-radius: 10px; overflow: hidden; margin-bottom: 20px; max-height: 300px; }
+  .petition-image img { width: 100%; height: 100%; object-fit: cover; }
+  
+  .review-card h2 { font-size: 24px; font-weight: 700; color: #0f172a; margin: 0 0 16px; line-height: 1.3; }
+  
+  .petition-meta { display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; color: #64748b; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #f1f5f9; }
+  .petition-meta span { display: flex; align-items: center; gap: 6px; }
+  
+  .content-section { margin-bottom: 24px; }
+  .content-section:last-child { margin-bottom: 0; }
+  .content-section h3 { font-size: 14px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 12px; }
+  .content-section p, .full-content { color: #374151; line-height: 1.7; font-size: 15px; }
+  
+  .sidebar-card { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+  .sidebar-card h3 { font-size: 14px; font-weight: 600; color: #0f172a; margin: 0 0 16px; display: flex; align-items: center; gap: 8px; }
+  .sidebar-card h3 i { color: #3b82f6; }
+  
+  .author-info { display: flex; gap: 12px; }
+  .author-avatar { width: 48px; height: 48px; border-radius: 10px; background: linear-gradient(135deg, #3b82f6, #10b981); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 600; flex-shrink: 0; }
+  .author-avatar.admin { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+  .author-details { display: flex; flex-direction: column; gap: 4px; }
+  .author-details strong { font-size: 15px; color: #0f172a; }
+  .author-details span { font-size: 13px; color: #64748b; display: flex; align-items: center; gap: 6px; }
+  .admin-badge { background: #fef3c7; color: #d97706; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 6px; }
+  .form-group textarea { width: 100%; padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; resize: vertical; }
+  .form-group textarea:focus { outline: none; border-color: #3b82f6; }
+  
+  .btn-approve { width: 100%; padding: 12px; background: #16a34a; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.2s; }
+  .btn-approve:hover { background: #15803d; }
+  
+  .reject-card h3 i { color: #dc2626; }
+  .btn-reject { width: 100%; padding: 12px; background: #fee2e2; color: #dc2626; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; }
+  .btn-reject:hover { background: #dc2626; color: #fff; }
+  
+  @media (max-width: 900px) {
+    .review-layout { grid-template-columns: 1fr; }
+  }
+</style>
+`}) %>

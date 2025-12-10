@@ -31,6 +31,7 @@ class SettingController {
           social: 'Redes Sociais',
           posts: 'Posts',
           footer: 'Rodapé',
+          modules: 'Módulos',
           ai: 'Assistente de IA'
         },
         nodeVersion: process.version,

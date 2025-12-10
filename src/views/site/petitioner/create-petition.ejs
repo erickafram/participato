@@ -1,0 +1,787 @@
+<%- include('../layouts/minimal', { body: `
+
+<div class="create-petition-page">
+  <div class="container">
+    <!-- Progress Steps -->
+    <div class="wizard-progress">
+      <div class="step active" data-step="1">
+        <div class="step-number">1</div>
+        <span>Sua Causa</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" data-step="2">
+        <div class="step-number">2</div>
+        <span>Detalhes</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" data-step="3">
+        <div class="step-number">3</div>
+        <span>${petitioner ? 'Revisar' : 'Seus Dados'}</span>
+      </div>
+    </div>
+
+    <form method="POST" action="/criar-peticao" enctype="multipart/form-data" id="petitionForm">
+      <!-- Step 1: Causa -->
+      <div class="wizard-step active" data-step="1">
+        <div class="step-card">
+          <div class="step-header">
+            <i class="bi bi-megaphone-fill"></i>
+            <h1>Qual é a sua causa?</h1>
+            <p>Comece com um título claro e uma descrição que explique o problema</p>
+          </div>
+
+          <div class="form-group">
+            <label>Título da Petição *</label>
+            <input type="text" name="title" id="title" required placeholder="Ex: Mais áreas verdes para nossa cidade" maxlength="255">
+            <small>Um título claro e objetivo que resuma sua causa (máx. 255 caracteres)</small>
+          </div>
+
+          <div class="form-group">
+            <label>Descrição do Problema *</label>
+            <textarea name="description" id="description" required rows="4" placeholder="Descreva o problema que você quer resolver e por que isso é importante..." maxlength="500"></textarea>
+            <small class="char-count"><span id="descCount">0</span>/500 caracteres</small>
+          </div>
+
+          <div class="form-group">
+            <label>Categoria</label>
+            <div class="category-grid">
+              <label class="category-option">
+                <input type="radio" name="category" value="Meio Ambiente">
+                <span><i class="bi bi-tree"></i> Meio Ambiente</span>
+              </label>
+              <label class="category-option">
+                <input type="radio" name="category" value="Direitos Humanos">
+                <span><i class="bi bi-people"></i> Direitos Humanos</span>
+              </label>
+              <label class="category-option">
+                <input type="radio" name="category" value="Educação">
+                <span><i class="bi bi-book"></i> Educação</span>
+              </label>
+              <label class="category-option">
+                <input type="radio" name="category" value="Saúde">
+                <span><i class="bi bi-heart-pulse"></i> Saúde</span>
+              </label>
+              <label class="category-option">
+                <input type="radio" name="category" value="Segurança">
+                <span><i class="bi bi-shield-check"></i> Segurança</span>
+              </label>
+              <label class="category-option">
+                <input type="radio" name="category" value="Transporte">
+                <span><i class="bi bi-bus-front"></i> Transporte</span>
+              </label>
+              <label class="category-option">
+                <input type="radio" name="category" value="Política">
+                <span><i class="bi bi-bank"></i> Política</span>
+              </label>
+              <label class="category-option">
+                <input type="radio" name="category" value="Outros">
+                <span><i class="bi bi-three-dots"></i> Outros</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="step-actions">
+            <div></div>
+            <button type="button" class="btn-next" onclick="nextStep(2)">
+              Continuar <i class="bi bi-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Detalhes -->
+      <div class="wizard-step" data-step="2">
+        <div class="step-card">
+          <div class="step-header">
+            <i class="bi bi-file-text"></i>
+            <h1>Conte mais detalhes</h1>
+            <p>Adicione informações que fortaleçam sua petição</p>
+          </div>
+
+          <div class="form-group">
+            <label>Conteúdo Completo (opcional)</label>
+            <textarea name="content" id="content" rows="8" placeholder="Explique detalhadamente sua causa, apresente dados, argumentos e o que você espera alcançar..."></textarea>
+            <small>Quanto mais detalhes, mais pessoas vão entender e apoiar sua causa</small>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Meta de Assinaturas</label>
+              <select name="goal" id="goal">
+                <option value="100">100 assinaturas</option>
+                <option value="500">500 assinaturas</option>
+                <option value="1000" selected>1.000 assinaturas</option>
+                <option value="5000">5.000 assinaturas</option>
+                <option value="10000">10.000 assinaturas</option>
+                <option value="50000">50.000 assinaturas</option>
+              </select>
+              <small>Você pode alterar depois</small>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Imagem (opcional)</label>
+            <div class="image-upload" id="imageUpload">
+              <i class="bi bi-image"></i>
+              <span>Clique ou arraste uma imagem</span>
+              <small>JPG, PNG ou GIF (máx. 5MB)</small>
+              <input type="file" name="image" id="imageInput" accept="image/*">
+            </div>
+            <div class="image-preview" id="imagePreview" style="display:none;">
+              <img id="previewImg" src="" alt="">
+              <button type="button" class="btn-remove-image" onclick="removeImage()"><i class="bi bi-x"></i></button>
+            </div>
+          </div>
+
+          <div class="step-actions">
+            <button type="button" class="btn-back" onclick="prevStep(1)">
+              <i class="bi bi-arrow-left"></i> Voltar
+            </button>
+            <button type="button" class="btn-next" onclick="nextStep(3)">
+              Continuar <i class="bi bi-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Dados do Usuário ou Revisão -->
+      <div class="wizard-step" data-step="3">
+        <div class="step-card">
+          ${petitioner ? 
+            '<div class="step-header">' +
+              '<i class="bi bi-check-circle"></i>' +
+              '<h1>Revise sua petição</h1>' +
+              '<p>Confira os dados antes de enviar</p>' +
+            '</div>' +
+            '<div class="review-section">' +
+              '<div class="review-user">' +
+                '<div class="user-avatar">' + petitioner.name.charAt(0).toUpperCase() + '</div>' +
+                '<div>' +
+                  '<strong>' + petitioner.name + '</strong>' +
+                  '<span>' + petitioner.email + '</span>' +
+                '</div>' +
+              '</div>' +
+              '<div class="review-item">' +
+                '<label>Título</label>' +
+                '<p id="reviewTitle">-</p>' +
+              '</div>' +
+              '<div class="review-item">' +
+                '<label>Descrição</label>' +
+                '<p id="reviewDesc">-</p>' +
+              '</div>' +
+              '<div class="review-item">' +
+                '<label>Categoria</label>' +
+                '<p id="reviewCategory">-</p>' +
+              '</div>' +
+              '<div class="review-item">' +
+                '<label>Meta</label>' +
+                '<p id="reviewGoal">-</p>' +
+              '</div>' +
+            '</div>'
+          :
+            '<div class="step-header">' +
+              '<i class="bi bi-person-plus"></i>' +
+              '<h1>Crie sua conta</h1>' +
+              '<p>Para acompanhar o andamento da sua petição</p>' +
+            '</div>' +
+            '<div class="form-group">' +
+              '<label>Nome Completo *</label>' +
+              '<input type="text" name="name" id="name" required placeholder="Seu nome completo">' +
+            '</div>' +
+            '<div class="form-group">' +
+              '<label>Email *</label>' +
+              '<input type="email" name="email" id="email" required placeholder="seu@email.com">' +
+              '<small>Você receberá atualizações sobre sua petição</small>' +
+            '</div>' +
+            '<div class="form-group">' +
+              '<label>Telefone *</label>' +
+              '<input type="tel" name="phone" id="phone" required placeholder="(00) 00000-0000">' +
+            '</div>' +
+            '<div class="form-group">' +
+              '<label>Senha *</label>' +
+              '<input type="password" name="password" id="password" required minlength="6" placeholder="Mínimo 6 caracteres">' +
+              '<small>Crie uma senha para acessar sua conta</small>' +
+            '</div>' +
+            '<div class="login-hint">' +
+              '<p>Já tem uma conta? <a href="/login">Faça login</a></p>' +
+            '</div>'
+          }
+
+          <div class="terms-check">
+            <label class="checkbox-label">
+              <input type="checkbox" id="termsCheck" required>
+              <span>Li e concordo com os <a href="/pagina/termos-de-uso" target="_blank">Termos de Uso</a> e <a href="/pagina/politica-de-privacidade" target="_blank">Política de Privacidade</a></span>
+            </label>
+          </div>
+
+          <div class="step-actions">
+            <button type="button" class="btn-back" onclick="prevStep(2)">
+              <i class="bi bi-arrow-left"></i> Voltar
+            </button>
+            <button type="submit" class="btn-submit" id="submitBtn">
+              <i class="bi bi-send"></i> Enviar Petição
+            </button>
+          </div>
+
+          <div class="submit-note">
+            <i class="bi bi-info-circle"></i>
+            Sua petição será analisada pela equipe antes de ser publicada.
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  .create-petition-page {
+    padding: 40px 0 80px;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    min-height: 100vh;
+  }
+
+  /* Progress Steps */
+  .wizard-progress {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 500px;
+    margin: 0 auto 40px;
+  }
+  .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    transition: all 0.3s;
+  }
+  .step span {
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 500;
+  }
+  .step.active .step-number,
+  .step.completed .step-number {
+    background: var(--primary-color, #3b82f6);
+    color: #fff;
+  }
+  .step.active span,
+  .step.completed span {
+    color: var(--primary-color, #3b82f6);
+  }
+  .step.completed .step-number {
+    background: #10b981;
+  }
+  .step.completed .step-number::after {
+    content: '✓';
+  }
+  .step-line {
+    flex: 1;
+    height: 3px;
+    background: #e2e8f0;
+    margin: 0 12px;
+    margin-bottom: 28px;
+    transition: background 0.3s;
+  }
+  .step-line.active {
+    background: var(--primary-color, #3b82f6);
+  }
+
+  /* Wizard Steps */
+  .wizard-step {
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+  .wizard-step.active {
+    display: block;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .step-card {
+    max-width: 700px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 20px;
+    padding: 48px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+  }
+
+  .step-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .step-header i {
+    font-size: 48px;
+    color: var(--primary-color, #3b82f6);
+    margin-bottom: 16px;
+    display: block;
+  }
+  .step-header h1 {
+    font-size: 28px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 8px;
+  }
+  .step-header p {
+    color: #64748b;
+    font-size: 16px;
+    margin: 0;
+  }
+
+  /* Form */
+  .form-group {
+    margin-bottom: 24px;
+  }
+  .form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 15px;
+    transition: all 0.2s;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-color, #3b82f6);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  }
+  .form-group small {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #94a3b8;
+  }
+  .char-count {
+    text-align: right;
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  /* Category Grid */
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .category-option {
+    cursor: pointer;
+  }
+  .category-option input {
+    display: none;
+  }
+  .category-option span {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #64748b;
+    transition: all 0.2s;
+  }
+  .category-option span i {
+    font-size: 24px;
+  }
+  .category-option:hover span {
+    border-color: var(--primary-color, #3b82f6);
+    color: var(--primary-color, #3b82f6);
+  }
+  .category-option input:checked + span {
+    border-color: var(--primary-color, #3b82f6);
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--primary-color, #3b82f6);
+  }
+
+  /* Image Upload */
+  .image-upload {
+    border: 2px dashed #e2e8f0;
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .image-upload:hover {
+    border-color: var(--primary-color, #3b82f6);
+    background: rgba(59, 130, 246, 0.02);
+  }
+  .image-upload i {
+    font-size: 40px;
+    color: #94a3b8;
+    display: block;
+    margin-bottom: 12px;
+  }
+  .image-upload span {
+    display: block;
+    color: #64748b;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .image-upload small {
+    color: #94a3b8;
+  }
+  .image-upload input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .image-preview {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .image-preview img {
+    width: 100%;
+    max-height: 250px;
+    object-fit: cover;
+    border-radius: 12px;
+  }
+  .btn-remove-image {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Review Section */
+  .review-section {
+    margin-bottom: 24px;
+  }
+  .review-user {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 12px;
+    margin-bottom: 24px;
+  }
+  .review-user .user-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color, #3b82f6), #10b981);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .review-user strong {
+    display: block;
+    font-size: 16px;
+    color: #0f172a;
+  }
+  .review-user span {
+    font-size: 14px;
+    color: #64748b;
+  }
+  .review-item {
+    padding: 16px 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .review-item:last-child {
+    border-bottom: none;
+  }
+  .review-item label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .review-item p {
+    margin: 4px 0 0;
+    color: #0f172a;
+    font-size: 15px;
+  }
+
+  /* Login Hint */
+  .login-hint {
+    text-align: center;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 10px;
+    margin-bottom: 24px;
+  }
+  .login-hint p {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+  }
+  .login-hint a {
+    color: var(--primary-color, #3b82f6);
+    font-weight: 600;
+  }
+
+  /* Terms */
+  .terms-check {
+    margin-bottom: 24px;
+  }
+  .checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+  }
+  .checkbox-label input {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    accent-color: var(--primary-color, #3b82f6);
+  }
+  .checkbox-label span {
+    font-size: 14px;
+    color: #64748b;
+    line-height: 1.5;
+  }
+  .checkbox-label a {
+    color: var(--primary-color, #3b82f6);
+  }
+
+  /* Actions */
+  .step-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 32px;
+  }
+  .btn-back {
+    padding: 14px 28px;
+    background: #f1f5f9;
+    color: #475569;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+  }
+  .btn-back:hover {
+    background: #e2e8f0;
+  }
+  .btn-next {
+    padding: 14px 28px;
+    background: var(--primary-color, #3b82f6);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+  }
+  .btn-next:hover {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+  }
+  .btn-submit {
+    padding: 16px 32px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.2s;
+  }
+  .btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+  }
+  .btn-submit:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .submit-note {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 13px;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  @media (max-width: 768px) {
+    .step-card { padding: 32px 24px; }
+    .category-grid { grid-template-columns: repeat(2, 1fr); }
+    .form-row { grid-template-columns: 1fr; }
+    .step span { display: none; }
+    .wizard-progress { max-width: 300px; }
+  }
+</style>
+
+<script>
+  let currentStep = 1;
+
+  function nextStep(step) {
+    // Validar step atual
+    if (!validateStep(currentStep)) return;
+
+    // Atualizar UI
+    document.querySelector('.wizard-step[data-step="' + currentStep + '"]').classList.remove('active');
+    document.querySelector('.wizard-step[data-step="' + step + '"]').classList.add('active');
+    
+    // Atualizar progress
+    document.querySelector('.wizard-progress .step[data-step="' + currentStep + '"]').classList.remove('active');
+    document.querySelector('.wizard-progress .step[data-step="' + currentStep + '"]').classList.add('completed');
+    document.querySelector('.wizard-progress .step[data-step="' + step + '"]').classList.add('active');
+    
+    if (step > 1) {
+      document.querySelectorAll('.step-line')[step - 2].classList.add('active');
+    }
+
+    currentStep = step;
+
+    // Se for step 3 e usuário logado, atualizar review
+    if (step === 3) {
+      updateReview();
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function prevStep(step) {
+    document.querySelector('.wizard-step[data-step="' + currentStep + '"]').classList.remove('active');
+    document.querySelector('.wizard-step[data-step="' + step + '"]').classList.add('active');
+    
+    document.querySelector('.wizard-progress .step[data-step="' + currentStep + '"]').classList.remove('active');
+    document.querySelector('.wizard-progress .step[data-step="' + step + '"]').classList.add('active');
+    document.querySelector('.wizard-progress .step[data-step="' + step + '"]').classList.remove('completed');
+    
+    if (currentStep > 1) {
+      document.querySelectorAll('.step-line')[currentStep - 2].classList.remove('active');
+    }
+
+    currentStep = step;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function validateStep(step) {
+    if (step === 1) {
+      const title = document.getElementById('title').value.trim();
+      const desc = document.getElementById('description').value.trim();
+      
+      if (!title) {
+        alert('Por favor, informe o título da petição.');
+        document.getElementById('title').focus();
+        return false;
+      }
+      if (!desc) {
+        alert('Por favor, descreva o problema.');
+        document.getElementById('description').focus();
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function updateReview() {
+    const reviewTitle = document.getElementById('reviewTitle');
+    const reviewDesc = document.getElementById('reviewDesc');
+    const reviewCategory = document.getElementById('reviewCategory');
+    const reviewGoal = document.getElementById('reviewGoal');
+
+    if (reviewTitle) {
+      reviewTitle.textContent = document.getElementById('title').value || '-';
+      reviewDesc.textContent = document.getElementById('description').value || '-';
+      
+      const selectedCat = document.querySelector('input[name="category"]:checked');
+      reviewCategory.textContent = selectedCat ? selectedCat.value : 'Não definida';
+      
+      const goalSelect = document.getElementById('goal');
+      reviewGoal.textContent = goalSelect.options[goalSelect.selectedIndex].text;
+    }
+  }
+
+  // Character counter
+  document.getElementById('description').addEventListener('input', function() {
+    document.getElementById('descCount').textContent = this.value.length;
+  });
+
+  // Image preview
+  document.getElementById('imageInput').addEventListener('change', function(e) {
+    if (this.files && this.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('previewImg').src = e.target.result;
+        document.getElementById('imageUpload').style.display = 'none';
+        document.getElementById('imagePreview').style.display = 'block';
+      };
+      reader.readAsDataURL(this.files[0]);
+    }
+  });
+
+  function removeImage() {
+    document.getElementById('imageInput').value = '';
+    document.getElementById('imageUpload').style.display = 'block';
+    document.getElementById('imagePreview').style.display = 'none';
+  }
+
+  // Form submit
+  document.getElementById('petitionForm').addEventListener('submit', function(e) {
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Enviando...';
+  });
+</script>
+
+`}) %>

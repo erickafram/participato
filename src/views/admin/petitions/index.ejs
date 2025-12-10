@@ -1,0 +1,160 @@
+<%- include('../layouts/main', { body: `
+<div class="page-header">
+  <div>
+    <h1>Petições</h1>
+    <p>Gerencie as petições da plataforma</p>
+  </div>
+  <div class="header-actions">
+    ${pendingCount > 0 ? '<a href="/admin/petitions?status=pending" class="btn-pending"><i class="bi bi-hourglass-split"></i> ' + pendingCount + ' Pendente' + (pendingCount > 1 ? 's' : '') + '</a>' : ''}
+    <a href="/admin/petitions/create" class="btn-action">
+      <i class="bi bi-plus"></i>
+      Nova Petição
+    </a>
+  </div>
+</div>
+
+<div class="filters-bar">
+  <form method="GET" class="filters-form">
+    <div class="filter-group">
+      <select name="status" class="filter-select" onchange="this.form.submit()">
+        <option value="">Todos os status</option>
+        <option value="pending" ${status === 'pending' ? 'selected' : ''}>Pendentes</option>
+        <option value="draft" ${status === 'draft' ? 'selected' : ''}>Rascunho</option>
+        <option value="active" ${status === 'active' ? 'selected' : ''}>Ativa</option>
+        <option value="closed" ${status === 'closed' ? 'selected' : ''}>Encerrada</option>
+        <option value="victory" ${status === 'victory' ? 'selected' : ''}>Vitória</option>
+        <option value="rejected" ${status === 'rejected' ? 'selected' : ''}>Rejeitadas</option>
+      </select>
+    </div>
+    <div class="filter-group search-group">
+      <input type="text" name="search" placeholder="Buscar petições..." value="${search || ''}" class="filter-input">
+      <button type="submit" class="btn-search"><i class="bi bi-search"></i></button>
+    </div>
+  </form>
+</div>
+
+<div class="data-card">
+  ${petitions && petitions.length > 0
+    ? '<div class="data-list">' +
+      petitions.map(p => {
+        const progress = Math.min(100, Math.round((p.signatureCount / p.goal) * 100));
+        const statusClass = p.status === 'active' ? 'success' : p.status === 'victory' ? 'info' : p.status === 'draft' ? 'warning' : p.status === 'pending' ? 'pending' : p.status === 'rejected' ? 'danger' : 'muted';
+        const statusLabel = p.status === 'active' ? 'Ativa' : p.status === 'victory' ? 'Vitória' : p.status === 'draft' ? 'Rascunho' : p.status === 'pending' ? 'Pendente' : p.status === 'rejected' ? 'Rejeitada' : 'Encerrada';
+        const isPending = p.status === 'pending';
+        return '<div class="data-item">' +
+          '<div class="item-image">' +
+            (p.image ? '<img src="' + p.image + '" alt="">' : '<i class="bi bi-megaphone"></i>') +
+          '</div>' +
+          '<div class="item-info">' +
+            '<h3>' + p.title + '</h3>' +
+            '<span class="item-meta">' +
+              '<span class="signatures-count"><i class="bi bi-pen"></i> ' + p.signatureCount + ' / ' + p.goal + ' assinaturas</span>' +
+              ' | <span class="category-badge">' + (p.category || 'Sem categoria') + '</span>' +
+              ' | Por ' + (p.author ? p.author.name : 'Desconhecido') +
+            '</span>' +
+            '<div class="progress-bar-mini"><div class="progress-fill" style="width: ' + progress + '%"></div></div>' +
+          '</div>' +
+          '<div class="item-status">' +
+            (p.featured ? '<span class="badge featured"><i class="bi bi-star-fill"></i></span>' : '') +
+            '<span class="badge ' + statusClass + '">' + statusLabel + '</span>' +
+          '</div>' +
+          '<div class="item-actions">' +
+            (isPending ? '<a href="/admin/petitions/' + p.id + '/review" class="btn-icon review" title="Revisar"><i class="bi bi-clipboard-check"></i></a>' : '') +
+            '<a href="/admin/petitions/' + p.id + '/signatures" class="btn-icon" title="Ver Assinaturas"><i class="bi bi-people"></i></a>' +
+            '<a href="/admin/petitions/' + p.id + '/edit" class="btn-icon" title="Editar"><i class="bi bi-pencil"></i></a>' +
+            (p.status === 'active' ? '<a href="/peticao/' + p.slug + '" target="_blank" class="btn-icon" title="Ver no Site"><i class="bi bi-eye"></i></a>' : '') +
+            '<button type="button" class="btn-icon danger" onclick="deleteItem(' + p.id + ')" title="Excluir"><i class="bi bi-trash"></i></button>' +
+          '</div>' +
+        '</div>';
+      }).join('') +
+      '</div>'
+    : '<div class="empty-state">' +
+        '<i class="bi bi-megaphone"></i>' +
+        '<h3>Nenhuma petição</h3>' +
+        '<p>Crie a primeira petição da plataforma</p>' +
+        '<a href="/admin/petitions/create" class="btn-action"><i class="bi bi-plus"></i> Nova Petição</a>' +
+      '</div>'
+  }
+</div>
+
+${totalPages > 1 ? '<div class="pagination">' +
+  (currentPage > 1 ? '<a href="?page=' + (currentPage - 1) + '&status=' + (status || '') + '&search=' + (search || '') + '" class="page-btn"><i class="bi bi-chevron-left"></i></a>' : '') +
+  '<span class="page-info">Página ' + currentPage + ' de ' + totalPages + '</span>' +
+  (currentPage < totalPages ? '<a href="?page=' + (currentPage + 1) + '&status=' + (status || '') + '&search=' + (search || '') + '" class="page-btn"><i class="bi bi-chevron-right"></i></a>' : '') +
+'</div>' : ''}
+
+<form id="deleteForm" method="POST" style="display: none;"></form>
+
+<style>
+  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .page-header h1 { font-size: 22px; font-weight: 700; color: #0f172a; margin: 0 0 4px; }
+  .page-header p { font-size: 13px; color: #64748b; margin: 0; }
+  .header-actions { display: flex; gap: 12px; }
+  .btn-action { display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: #3b82f6; color: #fff; border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none; }
+  .btn-action:hover { background: #2563eb; color: #fff; }
+  .btn-pending { display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: #fef3c7; color: #d97706; border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none; }
+  .btn-pending:hover { background: #fde68a; color: #b45309; }
+  
+  .filters-bar { background: #fff; padding: 16px; border-radius: 12px; margin-bottom: 16px; }
+  .filters-form { display: flex; gap: 12px; flex-wrap: wrap; }
+  .filter-select, .filter-input { padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; }
+  .search-group { display: flex; flex: 1; min-width: 200px; }
+  .search-group .filter-input { flex: 1; border-radius: 8px 0 0 8px; }
+  .btn-search { padding: 8px 14px; background: #3b82f6; color: #fff; border: none; border-radius: 0 8px 8px 0; cursor: pointer; }
+  
+  .data-card { background: #fff; border-radius: 12px; }
+  .data-list { display: flex; flex-direction: column; }
+  .data-item { display: flex; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid #f1f5f9; }
+  .data-item:last-child { border-bottom: none; }
+  .data-item:hover { background: #f8fafc; }
+  
+  .item-image { width: 60px; height: 60px; border-radius: 10px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+  .item-image img { width: 100%; height: 100%; object-fit: cover; }
+  .item-image i { font-size: 24px; color: #94a3b8; }
+  
+  .item-info { flex: 1; min-width: 0; }
+  .item-info h3 { font-size: 14px; font-weight: 600; color: #0f172a; margin: 0 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .item-meta { font-size: 12px; color: #64748b; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+  .signatures-count { color: #3b82f6; font-weight: 500; }
+  .category-badge { background: #f1f5f9; padding: 2px 8px; border-radius: 4px; }
+  
+  .progress-bar-mini { height: 4px; background: #e2e8f0; border-radius: 2px; margin-top: 8px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #10b981); border-radius: 2px; transition: width 0.3s; }
+  
+  .item-status { display: flex; gap: 6px; flex-shrink: 0; }
+  .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .badge.success { background: #dcfce7; color: #16a34a; }
+  .badge.warning { background: #fef3c7; color: #d97706; }
+  .badge.info { background: #dbeafe; color: #2563eb; }
+  .badge.muted { background: #f1f5f9; color: #64748b; }
+  .badge.pending { background: #fef3c7; color: #d97706; }
+  .badge.danger { background: #fee2e2; color: #dc2626; }
+  .badge.featured { background: #fef3c7; color: #f59e0b; padding: 4px 6px; }
+  
+  .item-actions { display: flex; gap: 4px; }
+  .btn-icon { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 1px solid #e2e8f0; background: #fff; color: #64748b; cursor: pointer; text-decoration: none; }
+  .btn-icon:hover { background: #f8fafc; color: #0f172a; }
+  .btn-icon.danger:hover { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+  .btn-icon.review { background: #fef3c7; color: #d97706; border-color: #fde68a; }
+  .btn-icon.review:hover { background: #fde68a; color: #b45309; }
+  
+  .empty-state { text-align: center; padding: 60px 20px; color: #64748b; }
+  .empty-state i { font-size: 48px; color: #cbd5e1; margin-bottom: 16px; }
+  .empty-state h3 { font-size: 16px; font-weight: 600; color: #475569; margin: 0 0 8px; }
+  .empty-state p { font-size: 13px; margin: 0 0 20px; }
+  
+  .pagination { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 24px; }
+  .page-btn { padding: 8px 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; color: #64748b; text-decoration: none; }
+  .page-btn:hover { background: #f8fafc; }
+  .page-info { font-size: 13px; color: #64748b; }
+</style>
+
+<script>
+  function deleteItem(id) {
+    if (confirm('Excluir esta petição e todas as assinaturas?')) {
+      document.getElementById('deleteForm').action = '/admin/petitions/' + id + '/delete';
+      document.getElementById('deleteForm').submit();
+    }
+  }
+</script>
+`}) %>

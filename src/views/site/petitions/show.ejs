@@ -1,0 +1,242 @@
+<%- include('../layouts/main', { body: `
+
+<div class="petition-page">
+  <div class="container">
+    <div class="petition-layout">
+      <!-- Conteúdo Principal -->
+      <main class="petition-main">
+        <nav class="breadcrumb-nav">
+          <a href="/">Início</a>
+          <i class="bi bi-chevron-right"></i>
+          <a href="/peticoes">Petições</a>
+          <i class="bi bi-chevron-right"></i>
+          <span>${petition.title.substring(0, 30)}...</span>
+        </nav>
+
+        ${petition.image ? '<div class="petition-hero-image"><img src="' + petition.image + '" alt="' + petition.title + '"></div>' : ''}
+
+        <article class="petition-article">
+          ${petition.category ? '<span class="petition-category">' + petition.category + '</span>' : ''}
+          
+          <h1>${petition.title}</h1>
+          
+          <div class="petition-meta">
+            <span><i class="bi bi-person"></i> Criada por ${petition.author ? petition.author.name : 'Anônimo'}</span>
+            <span><i class="bi bi-calendar"></i> ${new Date(petition.created_at).toLocaleDateString('pt-BR')}</span>
+            <span><i class="bi bi-eye"></i> ${petition.views} visualizações</span>
+          </div>
+
+          <div class="petition-description">
+            <p>${petition.description}</p>
+          </div>
+
+          ${petition.content ? '<div class="petition-content">' + petition.content.replace(/\\n/g, '<br>') + '</div>' : ''}
+
+          <!-- Compartilhar -->
+          <div class="share-section">
+            <h3>Compartilhe esta petição</h3>
+            <div class="share-buttons">
+              <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(siteUrl + '/peticao/' + petition.slug)}" target="_blank" class="share-btn facebook">
+                <i class="bi bi-facebook"></i>
+              </a>
+              <a href="https://twitter.com/intent/tweet?url=${encodeURIComponent(siteUrl + '/peticao/' + petition.slug)}&text=${encodeURIComponent(petition.title)}" target="_blank" class="share-btn twitter">
+                <i class="bi bi-twitter-x"></i>
+              </a>
+              <a href="https://wa.me/?text=${encodeURIComponent(petition.title + ' - ' + siteUrl + '/peticao/' + petition.slug)}" target="_blank" class="share-btn whatsapp">
+                <i class="bi bi-whatsapp"></i>
+              </a>
+              <button onclick="copyLink()" class="share-btn copy">
+                <i class="bi bi-link-45deg"></i>
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Assinaturas Recentes -->
+        ${petition.show_signatures && recentSignatures.length > 0 ? 
+          '<section class="signatures-section">' +
+            '<h3><i class="bi bi-people-fill"></i> Assinaturas Recentes</h3>' +
+            '<div class="signatures-list" id="signaturesList">' +
+              recentSignatures.map(sig => 
+                '<div class="signature-item">' +
+                  '<div class="signature-avatar">' + sig.name.charAt(0).toUpperCase() + '</div>' +
+                  '<div class="signature-info">' +
+                    '<strong>' + sig.name + '</strong>' +
+                    (sig.city || sig.state ? '<span class="location">' + (sig.city || '') + (sig.state ? ', ' + sig.state : '') + '</span>' : '') +
+                    (sig.comment ? '<p class="comment">"' + sig.comment + '"</p>' : '') +
+                  '</div>' +
+                  '<span class="signature-time">' + timeAgo(sig.created_at) + '</span>' +
+                '</div>'
+              ).join('') +
+            '</div>' +
+          '</section>'
+        : ''}
+      </main>
+
+      <!-- Sidebar com Formulário -->
+      <aside class="petition-sidebar">
+        <div class="sign-card" id="signCard">
+          ${petition.status === 'closed' ? 
+            '<div class="petition-closed"><i class="bi bi-lock-fill"></i><h3>Petição Encerrada</h3><p>Esta petição não está mais aceitando assinaturas.</p></div>'
+          : petition.status === 'victory' ?
+            '<div class="petition-victory"><i class="bi bi-trophy-fill"></i><h3>Vitória!</h3><p>Esta petição alcançou seu objetivo!</p></div>'
+          :
+            '<div class="progress-section">' +
+              '<div class="progress-circle">' +
+                '<svg viewBox="0 0 100 100">' +
+                  '<circle class="bg" cx="50" cy="50" r="45"></circle>' +
+                  '<circle class="fill" cx="50" cy="50" r="45" style="stroke-dashoffset: ' + (283 - (283 * progress / 100)) + '"></circle>' +
+                '</svg>' +
+                '<div class="progress-text"><span class="percent">' + progress + '%</span></div>' +
+              '</div>' +
+              '<div class="progress-stats">' +
+                '<div class="stat"><span class="value" id="signatureCount">' + signatureCount.toLocaleString('pt-BR') + '</span><span class="label">assinaturas</span></div>' +
+                '<div class="stat"><span class="value">' + petition.goal.toLocaleString('pt-BR') + '</span><span class="label">meta</span></div>' +
+              '</div>' +
+            '</div>' +
+            (alreadySigned ? 
+              '<div class="already-signed"><i class="bi bi-check-circle-fill"></i><p>Você já assinou esta petição!</p></div>'
+            :
+              '<form id="signForm" class="sign-form">' +
+                '<h3>Assine esta petição</h3>' +
+                '<div class="form-group"><input type="text" name="name" placeholder="Seu nome completo *" required></div>' +
+                '<div class="form-group"><input type="email" name="email" placeholder="Seu email *" required></div>' +
+                '<div class="form-row">' +
+                  '<div class="form-group"><input type="text" name="city" placeholder="Cidade"></div>' +
+                  '<div class="form-group"><select name="state"><option value="">UF</option><option value="AC">AC</option><option value="AL">AL</option><option value="AP">AP</option><option value="AM">AM</option><option value="BA">BA</option><option value="CE">CE</option><option value="DF">DF</option><option value="ES">ES</option><option value="GO">GO</option><option value="MA">MA</option><option value="MT">MT</option><option value="MS">MS</option><option value="MG">MG</option><option value="PA">PA</option><option value="PB">PB</option><option value="PR">PR</option><option value="PE">PE</option><option value="PI">PI</option><option value="RJ">RJ</option><option value="RN">RN</option><option value="RS">RS</option><option value="RO">RO</option><option value="RR">RR</option><option value="SC">SC</option><option value="SP">SP</option><option value="SE">SE</option><option value="TO">TO</option></select></div>' +
+                '</div>' +
+                '<div class="form-group"><textarea name="comment" placeholder="Deixe um comentário (opcional)" rows="2"></textarea></div>' +
+                '<div class="form-check"><input type="checkbox" name="is_public" id="isPublic" checked><label for="isPublic">Mostrar meu nome publicamente</label></div>' +
+                '<button type="submit" class="btn-submit" id="submitBtn"><i class="bi bi-pen-fill"></i> Assinar Petição</button>' +
+                '<p class="privacy-note"><i class="bi bi-shield-check"></i> Seu email não será compartilhado publicamente.</p>' +
+              '</form>'
+            )
+          }
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<style>
+  .petition-page { padding: 30px 0 60px; background: #f8fafc; min-height: 100vh; }
+  .petition-layout { display: grid; grid-template-columns: 1fr 380px; gap: 30px; align-items: start; }
+  .breadcrumb-nav { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #64748b; margin-bottom: 20px; }
+  .breadcrumb-nav a { color: #64748b; text-decoration: none; }
+  .breadcrumb-nav a:hover { color: var(--primary-color, #3b82f6); }
+  .breadcrumb-nav i { font-size: 10px; }
+  .petition-hero-image { border-radius: 12px; overflow: hidden; margin-bottom: 24px; }
+  .petition-hero-image img { width: 100%; max-height: 400px; object-fit: cover; }
+  .petition-article { background: #fff; padding: 30px; border-radius: 12px; margin-bottom: 24px; }
+  .petition-category { display: inline-block; background: #eff6ff; color: var(--primary-color, #3b82f6); padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 16px; }
+  .petition-article h1 { font-size: 1.75rem; font-weight: 800; color: #0f172a; margin: 0 0 16px; line-height: 1.3; }
+  .petition-meta { display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; color: #64748b; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #f1f5f9; }
+  .petition-meta span { display: flex; align-items: center; gap: 6px; }
+  .petition-description { font-size: 1.1rem; color: #374151; line-height: 1.7; margin-bottom: 24px; }
+  .petition-content { font-size: 15px; color: #475569; line-height: 1.8; }
+  .share-section { margin-top: 30px; padding-top: 24px; border-top: 1px solid #f1f5f9; }
+  .share-section h3 { font-size: 14px; font-weight: 600; color: #475569; margin: 0 0 12px; }
+  .share-buttons { display: flex; gap: 10px; }
+  .share-btn { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; text-decoration: none; transition: transform 0.2s; border: none; cursor: pointer; }
+  .share-btn:hover { transform: scale(1.1); }
+  .share-btn.facebook { background: #1877f2; }
+  .share-btn.twitter { background: #000; }
+  .share-btn.whatsapp { background: #25d366; }
+  .share-btn.copy { background: #64748b; }
+  .signatures-section { background: #fff; padding: 24px; border-radius: 12px; }
+  .signatures-section h3 { font-size: 16px; font-weight: 700; color: #0f172a; margin: 0 0 20px; display: flex; align-items: center; gap: 8px; }
+  .signatures-list { display: flex; flex-direction: column; gap: 16px; }
+  .signature-item { display: flex; align-items: flex-start; gap: 12px; padding-bottom: 16px; border-bottom: 1px solid #f1f5f9; }
+  .signature-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .signature-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-color, #3b82f6), #10b981); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; flex-shrink: 0; }
+  .signature-info { flex: 1; }
+  .signature-info strong { display: block; font-size: 14px; color: #0f172a; }
+  .signature-info .location { font-size: 12px; color: #64748b; }
+  .signature-info .comment { font-size: 13px; color: #475569; font-style: italic; margin: 6px 0 0; }
+  .signature-time { font-size: 11px; color: #94a3b8; white-space: nowrap; }
+  .petition-sidebar { position: sticky; top: 100px; }
+  .sign-card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+  .progress-section { text-align: center; margin-bottom: 24px; }
+  .progress-circle { width: 120px; height: 120px; margin: 0 auto 16px; position: relative; }
+  .progress-circle svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+  .progress-circle circle { fill: none; stroke-width: 8; }
+  .progress-circle .bg { stroke: #e2e8f0; }
+  .progress-circle .fill { stroke: var(--primary-color, #3b82f6); stroke-linecap: round; stroke-dasharray: 283; }
+  .progress-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+  .progress-text .percent { font-size: 24px; font-weight: 800; color: var(--primary-color, #3b82f6); }
+  .progress-stats { display: flex; justify-content: center; gap: 30px; }
+  .progress-stats .stat { text-align: center; }
+  .progress-stats .value { display: block; font-size: 20px; font-weight: 700; color: #0f172a; }
+  .progress-stats .label { font-size: 12px; color: #64748b; }
+  .sign-form h3 { font-size: 16px; font-weight: 700; color: #0f172a; margin: 0 0 20px; text-align: center; }
+  .form-group { margin-bottom: 12px; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary-color, #3b82f6); }
+  .form-row { display: grid; grid-template-columns: 1fr 80px; gap: 12px; }
+  .form-check { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+  .form-check input { width: 18px; height: 18px; }
+  .form-check label { font-size: 13px; color: #475569; cursor: pointer; }
+  .btn-submit { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--primary-color, #3b82f6), #1d4ed8); color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); }
+  .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; }
+  .privacy-note { font-size: 11px; color: #94a3b8; text-align: center; margin: 12px 0 0; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .already-signed { text-align: center; padding: 20px; background: #dcfce7; border-radius: 8px; }
+  .already-signed i { font-size: 32px; color: #16a34a; margin-bottom: 8px; display: block; }
+  .already-signed p { margin: 0; color: #166534; font-weight: 500; }
+  .petition-closed, .petition-victory { text-align: center; padding: 30px 20px; }
+  .petition-closed i, .petition-victory i { font-size: 48px; margin-bottom: 12px; display: block; }
+  .petition-closed i { color: #94a3b8; }
+  .petition-victory i { color: #f59e0b; }
+  .petition-closed h3, .petition-victory h3 { font-size: 18px; margin: 0 0 8px; }
+  .petition-closed p, .petition-victory p { color: #64748b; margin: 0; }
+  @media (max-width: 900px) {
+    .petition-layout { grid-template-columns: 1fr; }
+    .petition-sidebar { position: static; order: -1; }
+  }
+</style>
+
+<script>
+  function copyLink() {
+    navigator.clipboard.writeText(window.location.href);
+    alert('Link copiado!');
+  }
+
+  ${!alreadySigned && petition.status === 'active' ? `
+  document.getElementById('signForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Enviando...';
+
+    try {
+      const formData = new FormData(this);
+      const data = Object.fromEntries(formData);
+      data.is_public = document.getElementById('isPublic').checked ? 'true' : 'false';
+
+      const response = await fetch('/peticao/${petition.slug}/assinar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        document.getElementById('signatureCount').textContent = result.signatureCount.toLocaleString('pt-BR');
+        document.getElementById('signCard').innerHTML = '<div class="already-signed"><i class="bi bi-check-circle-fill"></i><p>' + result.message + '</p></div>';
+      } else {
+        alert(result.message);
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    } catch (error) {
+      alert('Erro ao processar. Tente novamente.');
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+    }
+  });
+  ` : ''}
+</script>
+
+`}) %>

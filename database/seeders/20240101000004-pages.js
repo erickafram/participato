@@ -3,6 +3,12 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
+    // Buscar o primeiro admin
+    const [users] = await queryInterface.sequelize.query(
+      "SELECT id FROM users WHERE role = 'admin' LIMIT 1"
+    );
+    const authorId = users.length > 0 ? users[0].id : 1;
+
     await queryInterface.bulkInsert('pages', [
       {
         title: 'Sobre Nós',
@@ -31,7 +37,7 @@ module.exports = {
         show_in_menu: true,
         meta_title: 'Sobre Nós - Portal Convictos',
         meta_description: 'Conheça o Portal Convictos, sua fonte de notícias e entretenimento de qualidade.',
-        author_id: 1,
+        author_id: authorId,
         created_at: new Date(),
         updated_at: new Date()
       },
@@ -61,7 +67,7 @@ module.exports = {
         show_in_menu: true,
         meta_title: 'Contato - Portal Convictos',
         meta_description: 'Entre em contato com o Portal Convictos. Estamos prontos para atendê-lo.',
-        author_id: 1,
+        author_id: authorId,
         created_at: new Date(),
         updated_at: new Date()
       },
@@ -98,7 +104,7 @@ module.exports = {
         show_in_menu: false,
         meta_title: 'Política de Privacidade - Portal Convictos',
         meta_description: 'Conheça nossa política de privacidade e como protegemos seus dados.',
-        author_id: 1,
+        author_id: authorId,
         created_at: new Date(),
         updated_at: new Date()
       },
@@ -130,7 +136,7 @@ module.exports = {
         show_in_menu: false,
         meta_title: 'Termos de Uso - Portal Convictos',
         meta_description: 'Leia os termos de uso do Portal Convictos.',
-        author_id: 1,
+        author_id: authorId,
         created_at: new Date(),
         updated_at: new Date()
       }

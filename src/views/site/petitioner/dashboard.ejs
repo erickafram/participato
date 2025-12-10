@@ -1,0 +1,412 @@
+<%- include('../layouts/main', { body: `
+
+<div class="dashboard-page">
+  <div class="container">
+    <div class="dashboard-header">
+      <div class="welcome">
+        <h1>Olá, ${petitioner.name.split(' ')[0]}!</h1>
+        <p>Gerencie suas petições e acompanhe o progresso</p>
+      </div>
+      <div class="header-actions">
+        <a href="/criar-peticao" class="btn-primary">
+          <i class="bi bi-plus-lg"></i> Nova Petição
+        </a>
+        <a href="/cidadao/logout" class="btn-logout" title="Sair">
+          <i class="bi bi-box-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Estatísticas -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="bi bi-file-text"></i></div>
+        <div class="stat-info">
+          <span class="stat-value">${stats.total}</span>
+          <span class="stat-label">Total de Petições</span>
+        </div>
+      </div>
+      <div class="stat-card pending">
+        <div class="stat-icon"><i class="bi bi-hourglass-split"></i></div>
+        <div class="stat-info">
+          <span class="stat-value">${stats.pending}</span>
+          <span class="stat-label">Aguardando Aprovação</span>
+        </div>
+      </div>
+      <div class="stat-card active">
+        <div class="stat-icon"><i class="bi bi-check-circle"></i></div>
+        <div class="stat-info">
+          <span class="stat-value">${stats.active}</span>
+          <span class="stat-label">Ativas</span>
+        </div>
+      </div>
+      <div class="stat-card signatures">
+        <div class="stat-icon"><i class="bi bi-pen"></i></div>
+        <div class="stat-info">
+          <span class="stat-value">${stats.totalSignatures}</span>
+          <span class="stat-label">Total de Assinaturas</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de Petições -->
+    <div class="section-header">
+      <h2><i class="bi bi-megaphone"></i> Minhas Petições</h2>
+      <a href="/minha-conta/perfil" class="btn-secondary">
+        <i class="bi bi-person"></i> Meu Perfil
+      </a>
+    </div>
+
+    ${petitions.length > 0 ?
+      '<div class="petitions-list">' +
+        petitions.map(p => {
+          const statusClass = p.status === 'active' ? 'success' : p.status === 'pending' ? 'warning' : p.status === 'rejected' ? 'danger' : 'muted';
+          const statusLabel = p.status === 'active' ? 'Ativa' : p.status === 'pending' ? 'Aguardando' : p.status === 'rejected' ? 'Rejeitada' : p.status === 'victory' ? 'Vitória!' : 'Encerrada';
+          const progress = Math.min(100, Math.round((p.signatureCount / p.goal) * 100));
+          return '<div class="petition-item">' +
+            '<div class="petition-image">' +
+              (p.image ? '<img src="' + p.image + '" alt="">' : '<i class="bi bi-megaphone"></i>') +
+            '</div>' +
+            '<div class="petition-info">' +
+              '<div class="petition-header">' +
+                '<h3>' + p.title + '</h3>' +
+                '<span class="status-badge ' + statusClass + '">' + statusLabel + '</span>' +
+              '</div>' +
+              '<p>' + p.description.substring(0, 100) + (p.description.length > 100 ? '...' : '') + '</p>' +
+              '<div class="petition-meta">' +
+                '<span><i class="bi bi-pen"></i> ' + p.signatureCount + ' assinaturas</span>' +
+                '<span><i class="bi bi-bullseye"></i> Meta: ' + p.goal + '</span>' +
+                '<span><i class="bi bi-calendar"></i> ' + new Date(p.created_at).toLocaleDateString('pt-BR') + '</span>' +
+              '</div>' +
+              (p.status === 'active' ? 
+                '<div class="progress-bar"><div class="progress-fill" style="width:' + progress + '%"></div></div>'
+              : '') +
+              (p.status === 'rejected' && p.rejection_reason ? 
+                '<div class="rejection-reason"><i class="bi bi-exclamation-circle"></i> ' + p.rejection_reason + '</div>'
+              : '') +
+            '</div>' +
+            '<div class="petition-actions">' +
+              '<a href="/minha-conta/peticao/' + p.id + '" class="btn-view"><i class="bi bi-eye"></i> Ver Detalhes</a>' +
+              (p.status === 'active' ? '<a href="/peticao/' + p.slug + '" target="_blank" class="btn-external"><i class="bi bi-box-arrow-up-right"></i></a>' : '') +
+            '</div>' +
+          '</div>';
+        }).join('')
+      + '</div>'
+    :
+      '<div class="empty-state">' +
+        '<i class="bi bi-megaphone"></i>' +
+        '<h3>Nenhuma petição ainda</h3>' +
+        '<p>Crie sua primeira petição e comece a mobilizar pessoas!</p>' +
+        '<a href="/criar-peticao" class="btn-primary"><i class="bi bi-plus-lg"></i> Criar Petição</a>' +
+      '</div>'
+    }
+  </div>
+</div>
+
+<style>
+  .dashboard-page {
+    padding: 40px 0 80px;
+    background: #f8fafc;
+    min-height: 100vh;
+  }
+  .dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+  }
+  .welcome h1 {
+    font-size: 28px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 4px;
+  }
+  .welcome p {
+    color: #64748b;
+    margin: 0;
+  }
+  .header-actions {
+    display: flex;
+    gap: 12px;
+  }
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: var(--primary-color, #3b82f6);
+    color: #fff;
+    border-radius: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-primary:hover {
+    background: #1d4ed8;
+    color: #fff;
+  }
+  .btn-logout {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    color: #64748b;
+    border-radius: 10px;
+    font-size: 18px;
+    transition: all 0.2s;
+  }
+  .btn-logout:hover {
+    background: #fee2e2;
+    color: #dc2626;
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 40px;
+  }
+  .stat-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background: #eff6ff;
+    color: var(--primary-color, #3b82f6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+  }
+  .stat-card.pending .stat-icon { background: #fef3c7; color: #d97706; }
+  .stat-card.active .stat-icon { background: #dcfce7; color: #16a34a; }
+  .stat-card.signatures .stat-icon { background: #f3e8ff; color: #9333ea; }
+  .stat-value {
+    display: block;
+    font-size: 28px;
+    font-weight: 800;
+    color: #0f172a;
+  }
+  .stat-label {
+    font-size: 13px;
+    color: #64748b;
+  }
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  .section-header h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: #fff;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-secondary:hover {
+    background: #f8fafc;
+    color: #1e293b;
+  }
+  .petitions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .petition-item {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    gap: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: all 0.2s;
+  }
+  .petition-item:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .petition-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 12px;
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .petition-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .petition-image i {
+    font-size: 32px;
+    color: #94a3b8;
+  }
+  .petition-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .petition-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .petition-header h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+  }
+  .status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .status-badge.success { background: #dcfce7; color: #16a34a; }
+  .status-badge.warning { background: #fef3c7; color: #d97706; }
+  .status-badge.danger { background: #fee2e2; color: #dc2626; }
+  .status-badge.muted { background: #f1f5f9; color: #64748b; }
+  .petition-info p {
+    color: #64748b;
+    font-size: 14px;
+    margin: 0 0 12px;
+    line-height: 1.5;
+  }
+  .petition-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: 13px;
+    color: #94a3b8;
+  }
+  .petition-meta span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .progress-bar {
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 3px;
+    margin-top: 12px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color, #3b82f6), #10b981);
+    border-radius: 3px;
+  }
+  .rejection-reason {
+    margin-top: 12px;
+    padding: 12px;
+    background: #fef2f2;
+    border-radius: 8px;
+    color: #dc2626;
+    font-size: 13px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .petition-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .btn-view {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    background: var(--primary-color, #3b82f6);
+    color: #fff;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-view:hover {
+    background: #1d4ed8;
+    color: #fff;
+  }
+  .btn-external {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+    color: #64748b;
+    border-radius: 8px;
+    transition: all 0.2s;
+  }
+  .btn-external:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+  }
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    background: #fff;
+    border-radius: 16px;
+  }
+  .empty-state i {
+    font-size: 64px;
+    color: #cbd5e1;
+    margin-bottom: 20px;
+    display: block;
+  }
+  .empty-state h3 {
+    font-size: 20px;
+    color: #475569;
+    margin: 0 0 8px;
+  }
+  .empty-state p {
+    color: #64748b;
+    margin: 0 0 24px;
+  }
+  @media (max-width: 992px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 768px) {
+    .dashboard-header { flex-direction: column; gap: 16px; text-align: center; }
+    .stats-grid { grid-template-columns: 1fr; }
+    .petition-item { flex-direction: column; }
+    .petition-image { width: 100%; height: 150px; }
+    .petition-actions { flex-direction: row; }
+  }
+</style>
+
+`}) %>
