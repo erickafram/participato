@@ -18,6 +18,7 @@ const BannerController = require('../controllers/BannerController');
 const HomeEditorController = require('../controllers/HomeEditorController');
 const AIController = require('../controllers/AIController');
 const PetitionController = require('../controllers/PetitionController');
+const STFController = require('../controllers/STFController');
 
 // Middlewares
 const { isAuthenticated, isNotAuthenticated, isAdmin } = require('../middlewares/auth');
@@ -141,6 +142,8 @@ router.post('/users/:id/toggle-active', UserController.toggleActive);
 // ==========================================
 router.get('/settings', SettingController.index);
 router.post('/settings', SettingController.update);
+router.post('/settings/upload-logo', ...uploadSingle('logo'), SettingController.uploadLogo);
+router.post('/settings/remove-logo', SettingController.removeLogo);
 
 // ==========================================
 // EDITOR DA HOME
@@ -161,6 +164,12 @@ router.post('/ai/generate', AIController.generateArticle.bind(AIController));
 router.post('/ai/improve-title', AIController.improveTitle.bind(AIController));
 router.post('/ai/improve-subtitle', AIController.improveSubtitle.bind(AIController));
 router.post('/ai/improve-content', AIController.improveContent.bind(AIController));
+
+// ==========================================
+// INTEGRAÇÃO STF
+// ==========================================
+router.get('/stf/process', STFController.fetchProcess.bind(STFController));
+router.post('/stf/generate', STFController.generateArticle.bind(STFController));
 
 // ==========================================
 // PETIÇÕES

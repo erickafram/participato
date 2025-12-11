@@ -275,6 +275,23 @@
     .ai-loading-content { background: white; padding: 30px 40px; border-radius: 12px; text-align: center; }
     .ai-loading-content i { font-size: 2.5rem; color: #6366f1; animation: pulse 1s infinite; }
     .ai-loading-content p { margin: 15px 0 0; font-weight: 500; color: #374151; }
+    
+    /* Estilos do STF */
+    .stf-card { border: 1px solid #fcd34d; background: linear-gradient(135deg, #fffef5 0%, #fefce8 100%); }
+    .stf-header { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white !important; }
+    .stf-header i { color: white !important; }
+    .stf-badge-small { background: rgba(255,255,255,0.25); padding: 2px 6px; border-radius: 8px; font-size: 0.65rem; font-weight: 600; margin-left: auto; }
+    .btn-stf { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border: none; font-weight: 500; }
+    .btn-stf:hover { background: linear-gradient(135deg, #d97706 0%, #b45309 100%); color: white; transform: translateY(-1px); }
+    .stf-process-card { background: white; border-radius: 10px; border: 1px solid #e5e7eb; overflow: hidden; }
+    .stf-process-header { padding: 12px 14px; background: #f9fafb; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+    .stf-numero { font-weight: 700; color: #1f2937; font-size: 0.95rem; }
+    .stf-situacao { font-size: 0.7rem; padding: 3px 8px; border-radius: 12px; background: #dbeafe; color: #1d4ed8; font-weight: 500; }
+    .stf-process-body { padding: 12px 14px; }
+    .stf-info-row { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; font-size: 0.8rem; color: #4b5563; }
+    .stf-info-row i { color: #9ca3af; margin-top: 2px; }
+    .stf-info-row:last-child { margin-bottom: 0; }
+    .stf-process-actions { padding: 12px 14px; background: #f9fafb; border-top: 1px solid #e5e7eb; display: flex; gap: 8px; justify-content: flex-end; }
 </style>
 <style>
     /* Modal de mídia */
@@ -705,6 +722,59 @@
                   <button type="button" class="btn btn-outline-ai btn-sm" onclick="improveField('content')">
                     <i class="bi bi-text-paragraph"></i> Conteúdo
                   </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Integração STF -->
+          <div class="card mb-3 fade-in stf-card" id="stfCard" style="display: none;">
+            <div class="card-header stf-header">
+              <i class="bi bi-bank"></i> Processos STF
+              <span class="stf-badge-small">Novo</span>
+            </div>
+            <div class="card-body">
+              <p class="text-muted small mb-3">Busque dados de processos do Supremo Tribunal Federal para criar matérias.</p>
+              
+              <div class="mb-3">
+                <label class="form-label">Número do Incidente</label>
+                <div class="input-group">
+                  <input type="text" id="stfIncidente" class="form-control" placeholder="Ex: 7360529">
+                  <button type="button" class="btn btn-stf" onclick="fetchSTFProcess()">
+                    <i class="bi bi-search"></i>
+                  </button>
+                </div>
+                <small class="text-muted">Encontre o número na URL do processo no portal do STF</small>
+              </div>
+              
+              <div id="stfProcessInfo" style="display: none;">
+                <div class="stf-process-card">
+                  <div class="stf-process-header">
+                    <span id="stfNumero" class="stf-numero"></span>
+                    <span id="stfSituacao" class="stf-situacao"></span>
+                  </div>
+                  <div class="stf-process-body">
+                    <div class="stf-info-row">
+                      <i class="bi bi-person"></i>
+                      <span><strong>Relator:</strong> <span id="stfRelator"></span></span>
+                    </div>
+                    <div class="stf-info-row" id="stfPartesRow">
+                      <i class="bi bi-people"></i>
+                      <span><strong>Partes:</strong> <span id="stfPartes"></span></span>
+                    </div>
+                    <div class="stf-info-row" id="stfAndamentosRow">
+                      <i class="bi bi-clock-history"></i>
+                      <span><strong>Última movimentação:</strong> <span id="stfUltimoAndamento"></span></span>
+                    </div>
+                  </div>
+                  <div class="stf-process-actions">
+                    <a id="stfLink" href="#" target="_blank" class="btn btn-outline-secondary btn-sm">
+                      <i class="bi bi-box-arrow-up-right"></i> Ver no STF
+                    </a>
+                    <button type="button" class="btn btn-stf btn-sm" onclick="generateSTFArticle()">
+                      <i class="bi bi-magic"></i> Gerar Matéria
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1499,6 +1569,7 @@
         const data = await response.json();
         if (data.enabled && data.configured) {
           document.getElementById('aiCard').style.display = 'block';
+          document.getElementById('stfCard').style.display = 'block';
           document.querySelectorAll('.ai-field-btn').forEach(btn => btn.style.display = 'flex');
         }
       } catch (e) {
@@ -1603,6 +1674,102 @@ showAILoading('Gerando matéria, aguarde...');
           }
         } else {
           alert('Erro: ' + (data.message || 'Não foi possível melhorar.'));
+        }
+      } catch (error) {
+        alert('Erro: ' + error.message);
+      } finally {
+        hideAILoading();
+      }
+    }
+
+    // ========================================
+    // INTEGRAÇÃO STF
+    // ========================================
+    let stfProcessData = null;
+
+    // Buscar dados do processo STF
+    async function fetchSTFProcess() {
+      const incidente = document.getElementById('stfIncidente').value.trim();
+      if (!incidente) {
+        alert('Digite o número do incidente.');
+        return;
+      }
+
+      showAILoading('Buscando processo no STF...');
+
+      try {
+        const response = await fetch('/admin/stf/process?incidente=' + encodeURIComponent(incidente));
+        const data = await response.json();
+
+        if (data.success && data.data) {
+          stfProcessData = data.data;
+          displaySTFProcess(data.data);
+        } else {
+          alert('Erro: ' + (data.message || 'Processo não encontrado.'));
+          document.getElementById('stfProcessInfo').style.display = 'none';
+        }
+      } catch (error) {
+        alert('Erro ao buscar processo: ' + error.message);
+      } finally {
+        hideAILoading();
+      }
+    }
+
+    // Exibir dados do processo
+    function displaySTFProcess(data) {
+      document.getElementById('stfNumero').textContent = data.numero || 'Processo ' + data.incidente;
+      document.getElementById('stfSituacao').textContent = data.situacao || 'Em andamento';
+      document.getElementById('stfRelator').textContent = data.relator || 'Não informado';
+      
+      if (data.partes && data.partes.length > 0) {
+        document.getElementById('stfPartes').textContent = data.partes.slice(0, 2).join(' x ');
+        document.getElementById('stfPartesRow').style.display = 'flex';
+      } else {
+        document.getElementById('stfPartesRow').style.display = 'none';
+      }
+      
+      if (data.andamentos && data.andamentos.length > 0) {
+        const ultimo = data.andamentos[0];
+        document.getElementById('stfUltimoAndamento').textContent = '[' + ultimo.data + '] ' + ultimo.descricao.substring(0, 100) + '...';
+        document.getElementById('stfAndamentosRow').style.display = 'flex';
+      } else {
+        document.getElementById('stfAndamentosRow').style.display = 'none';
+      }
+      
+      document.getElementById('stfLink').href = data.url;
+      document.getElementById('stfProcessInfo').style.display = 'block';
+    }
+
+    // Gerar matéria sobre processo STF
+    async function generateSTFArticle() {
+      if (!stfProcessData) {
+        alert('Busque um processo primeiro.');
+        return;
+      }
+
+      const style = document.getElementById('aiStyle')?.value || 'metropoles_politica';
+      showAILoading('Gerando matéria sobre o processo...');
+
+      try {
+        const response = await fetch('/admin/stf/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            incidente: stfProcessData.incidente,
+            style: style
+          })
+        });
+        const data = await response.json();
+
+        if (data.success && data.data) {
+          document.getElementById('titleInput').value = data.data.title || '';
+          document.getElementById('subtitleInput').value = data.data.subtitle || '';
+          if (editorInstance && data.data.content) {
+            editorInstance.setData(data.data.content);
+          }
+          alert('Matéria gerada! Revise o conteúdo antes de publicar.');
+        } else {
+          alert('Erro: ' + (data.message || 'Não foi possível gerar a matéria.'));
         }
       } catch (error) {
         alert('Erro: ' + error.message);

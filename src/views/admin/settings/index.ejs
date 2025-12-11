@@ -6,6 +6,57 @@
   </div>
 </div>
 
+<!-- Logo do Site (fora do form principal) -->
+<div class="settings-card logo-card" style="margin-bottom: 20px;">
+  <div class="card-header">
+    <i class="bi bi-image"></i>
+    <span>Logo do Site</span>
+  </div>
+  <div class="card-body">
+    <p class="logo-description">Faça upload da logo principal do seu site. Ela será exibida no cabeçalho.</p>
+    
+    <div class="logo-preview-area">
+      ${groupedSettings.general?.find(s => s.key === 'site_logo')?.value 
+        ? '<div class="logo-current">' +
+            '<img src="' + groupedSettings.general.find(s => s.key === 'site_logo').value + '" alt="Logo atual">' +
+            '<div class="logo-actions">' +
+              '<form action="/admin/settings/remove-logo" method="POST" class="logo-remove-form">' +
+                '<button type="submit" class="btn-remove-logo" onclick="return confirmRemoveLogo();">' +
+                  '<i class="bi bi-trash"></i> Remover' +
+                '</button>' +
+              '</form>' +
+            '</div>' +
+          '</div>'
+        : '<div class="logo-placeholder">' +
+            '<i class="bi bi-image"></i>' +
+            '<span>Nenhuma logo definida</span>' +
+          '</div>'
+      }
+    </div>
+    
+    <form action="/admin/settings/upload-logo" method="POST" enctype="multipart/form-data" class="logo-upload-form">
+      <div class="upload-area" id="logoDropArea">
+        <input type="file" name="logo" id="logoInput" accept="image/*" hidden>
+        <div class="upload-content">
+          <i class="bi bi-cloud-arrow-up"></i>
+          <span>Arraste uma imagem ou <label for="logoInput" class="upload-link">clique para selecionar</label></span>
+          <small>PNG, JPG, SVG ou WebP (máx. 10MB)</small>
+        </div>
+      </div>
+      <div class="upload-preview" id="logoPreview" style="display: none;">
+        <img id="logoPreviewImg" src="" alt="Preview">
+        <span id="logoFileName"></span>
+        <button type="button" class="btn-clear-preview" onclick="clearLogoPreview()">
+          <i class="bi bi-x"></i>
+        </button>
+      </div>
+      <button type="submit" class="btn-upload-logo" id="btnUploadLogo" disabled>
+        <i class="bi bi-upload"></i> Enviar Logo
+      </button>
+    </form>
+  </div>
+</div>
+
 <form action="/admin/settings" method="POST">
   <div class="settings-layout">
     <div class="settings-main">
@@ -918,6 +969,193 @@
   color: #64748b;
   font-family: monospace;
 }
+
+/* Estilos da Logo */
+.logo-card {
+  border: 1px solid #d1fae5;
+  background: linear-gradient(135deg, #fafffe 0%, #f0fdf4 100%);
+}
+.logo-card .card-header {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #fff;
+  border-bottom: none;
+}
+.logo-card .card-header i {
+  color: #fff;
+}
+.logo-description {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 20px;
+  padding: 12px;
+  background: #fff;
+  border-radius: 8px;
+  border-left: 3px solid #10b981;
+}
+.logo-preview-area {
+  margin-bottom: 20px;
+}
+.logo-current {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: #fff;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+}
+.logo-current img {
+  max-width: 200px;
+  max-height: 80px;
+  object-fit: contain;
+}
+.logo-actions {
+  margin-left: auto;
+}
+.btn-remove-logo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: #fee2e2;
+  color: #dc2626;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-remove-logo:hover {
+  background: #fecaca;
+}
+.logo-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 30px;
+  background: #f8fafc;
+  border: 2px dashed #e2e8f0;
+  border-radius: 12px;
+  color: #94a3b8;
+}
+.logo-placeholder i {
+  font-size: 32px;
+}
+.logo-placeholder span {
+  font-size: 13px;
+}
+.upload-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  background: #fff;
+  border: 2px dashed #d1d5db;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 12px;
+}
+.upload-area:hover,
+.upload-area.drag-over {
+  border-color: #10b981;
+  background: #f0fdf4;
+}
+.upload-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+.upload-content i {
+  font-size: 36px;
+  color: #10b981;
+}
+.upload-content span {
+  font-size: 13px;
+  color: #64748b;
+}
+.upload-link {
+  color: #10b981;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.upload-content small {
+  font-size: 11px;
+  color: #94a3b8;
+}
+.upload-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #fff;
+  border: 2px solid #10b981;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+.upload-preview img {
+  max-width: 100px;
+  max-height: 50px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+.upload-preview span {
+  flex: 1;
+  font-size: 13px;
+  color: #374151;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.btn-clear-preview {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 6px;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-clear-preview:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+.btn-upload-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px;
+  background: #10b981;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-upload-logo:hover:not(:disabled) {
+  background: #059669;
+}
+.btn-upload-logo:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+}
+.logo-remove-form {
+  display: inline;
+}
 </style>
 
 <script>
@@ -1078,6 +1316,76 @@ function resetColors() {
   if (confirm('Deseja resetar todas as cores para o padrão?')) {
     applyPalette('default');
   }
+}
+
+// Upload de Logo
+const logoDropArea = document.getElementById('logoDropArea');
+const logoInput = document.getElementById('logoInput');
+const logoPreview = document.getElementById('logoPreview');
+const logoPreviewImg = document.getElementById('logoPreviewImg');
+const logoFileName = document.getElementById('logoFileName');
+const btnUploadLogo = document.getElementById('btnUploadLogo');
+
+if (logoDropArea && logoInput) {
+  // Drag and drop
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    logoDropArea.addEventListener(eventName, preventDefaults, false);
+  });
+
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  ['dragenter', 'dragover'].forEach(eventName => {
+    logoDropArea.addEventListener(eventName, () => logoDropArea.classList.add('drag-over'), false);
+  });
+
+  ['dragleave', 'drop'].forEach(eventName => {
+    logoDropArea.addEventListener(eventName, () => logoDropArea.classList.remove('drag-over'), false);
+  });
+
+  logoDropArea.addEventListener('drop', (e) => {
+    const files = e.dataTransfer.files;
+    if (files.length) {
+      logoInput.files = files;
+      handleLogoFile(files[0]);
+    }
+  });
+
+  logoInput.addEventListener('change', () => {
+    if (logoInput.files.length) {
+      handleLogoFile(logoInput.files[0]);
+    }
+  });
+}
+
+function handleLogoFile(file) {
+  if (!file.type.startsWith('image/')) {
+    alert('Por favor, selecione uma imagem.');
+    return;
+  }
+  
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    logoPreviewImg.src = e.target.result;
+    logoFileName.textContent = file.name;
+    logoPreview.style.display = 'flex';
+    logoDropArea.style.display = 'none';
+    btnUploadLogo.disabled = false;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearLogoPreview() {
+  logoInput.value = '';
+  logoPreview.style.display = 'none';
+  logoDropArea.style.display = 'flex';
+  btnUploadLogo.disabled = true;
+}
+
+function confirmRemoveLogo() {
+  return confirm('Deseja remover a logo?');
 }
 </script>
 `}) %>

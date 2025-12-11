@@ -4,6 +4,8 @@
  */
 const { Setting } = require('../models');
 const { clearSettingsCache } = require('../middlewares/settings');
+const { deleteImage } = require('../middlewares/upload');
+const path = require('path');
 
 class SettingController {
   // Exibir página de configurações
@@ -164,6 +166,78 @@ class SettingController {
         success: false,
         message: 'Erro ao excluir configuração.'
       });
+    }
+  }
+
+  // Upload de logo
+  async uploadLogo(req, res) {
+    try {
+      if (!req.processedFile) {
+        req.flash('error', 'Nenhum arquivo enviado.');
+        return res.redirect('/admin/settings');
+      }
+
+      // Buscar logo atual para deletar
+      const currentLogo = await Setting.findOne({ where: { key: 'site_logo' } });
+      if (currentLogo && currentLogo.value) {
+        // Extrair nome do arquivo da URL
+        const oldFilename = path.basename(currentLogo.value);
+        deleteImage(oldFilename);
+      }
+
+      // Salvar nova logo
+      const logoUrl = req.processedFile.url;
+      
+      const [setting, created] = await Setting.findOrCreate({
+        where: { key: 'site_logo' },
+        defaults: {
+          value: logoUrl,
+          type: 'text',
+          group: 'general',
+          label: 'Logo do Site',
+          description: 'Logo principal exibida no cabeçalho'
+        }
+      });
+
+      if (!created) {
+        await setting.update({ value: logoUrl });
+      }
+
+      // Limpar cache
+      clearSettingsCache();
+
+      req.flash('success', 'Logo atualizada com sucesso!');
+      res.redirect('/admin/settings');
+    } catch (error) {
+      console.error('Erro ao fazer upload da logo:', error);
+      req.flash('error', 'Erro ao fazer upload da logo: ' + error.message);
+      res.redirect('/admin/settings');
+    }
+  }
+
+  // Remover logo
+  async removeLogo(req, res) {
+    try {
+      const setting = await Setting.findOne({ where: { key: 'site_logo' } });
+      
+      if (setting && setting.value) {
+        // Deletar arquivo
+        const filename = path.basename(setting.value);
+        deleteImage(filename);
+        
+        // Limpar valor
+        await setting.update({ value: '' });
+        
+        // Limpar cache
+        clearSettingsCache();
+      }
+
+      req.flash('success', 'Logo removida com sucesso!');
+      res.redirect('/admin/settings');
+    } catch (error) {
+      console.error('Erro ao remover logo:', error);
+      req.flash('error', 'Erro ao remover logo.');
+      res.redirect('/admin/settings');
     }
   }
 }
