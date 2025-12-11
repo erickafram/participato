@@ -1,6 +1,6 @@
 {
   "name": "portal-convictos",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Portal de entretenimento com painel administrativo estilo WordPress",
   "main": "src/app.js",
   "scripts": {
